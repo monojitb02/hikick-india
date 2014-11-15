@@ -1,0 +1,32 @@
+.site-header {
+    font-size: 48px;
+    line-height: 48px;
+    margin-right: -50px;
+    color: #208794!important;
+}
+.header-right {
+    text-align: left;
+}
+.gradient-back {
+    background: -webkit-linear-gradient(#fff, #1d2939);
+    /* For Safari 5.1 to 6.0 */
+    
+    background: -o-linear-gradient(#fff, #1d2939);
+    /* For Opera 11.1 to 12.0 */
+    
+    background: -moz-linear-gradient(#fff, #1d2939);
+    /* For Firefox 3.6 to 15 */
+    
+    background: linear-gradient(#fff, #1d2939);
+    /* Standard syntax */
+}
+.transparent-back {
+    background-color: transparent!important;
+}
+.logopanel h1 {
+    color: #EF862E!important;
+}
+/* 
+body {
+    transition: all 2s;
+} */
