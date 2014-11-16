@@ -1,7 +1,8 @@
 .site-header {
     font-size: 48px;
     line-height: 48px;
-    margin-right: -50px;
+    /*margin-right: -50px;*/
+    
     color: #208794!important;
 }
 .header-right {
@@ -25,6 +26,12 @@
 }
 .logopanel h1 {
     color: #EF862E!important;
+}
+.template-loading {
+    font-size: 2em!important;
+    margin-right: 0!important;
+    width: 24px!important;
+    line-height: 21px;
 }
 /* 
 body {
