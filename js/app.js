@@ -1,55 +1,33 @@
+'use strict';
 var mainModule = angular.module('hikick', ['ngRoute']);
 mainModule
     .config(['$routeProvider', '$locationProvider',
         function($routeProvider, $locationProvider) {
             $routeProvider
-                .when('/dashboard.html', {
-                    templateUrl: 'dashboard.html'
+                .when('/dashboard', {
+                    templateUrl: 'templates/dashboard.html'
                 })
-                .when('/general-forms.html', {
-                    templateUrl: 'general-forms.html'
+                .when('/register-candidate', {
+                    templateUrl: 'templates/register-candidate.html'
                 })
-                .when('/form-layouts.html', {
-                    templateUrl: 'form-layouts.html'
+                .when('/candidate-list', {
+                    templateUrl: 'templates/candidate-list.html'
                 })
-                .when('/form-validation.html', {
-                    templateUrl: 'form-validation.html'
+                .when('/prepare-chart', {
+                    templateUrl: 'templates/prepare-chart.html',
+                    controller: 'chartPreperationController'
                 })
-                .when('/form-wizards.html', {
-                    templateUrl: 'form-wizards.html'
+                .when('/view-chart', {
+                    templateUrl: 'templates/view-chart.html'
                 })
-                .when('/wysiwyg.html', {
-                    templateUrl: 'wysiwyg.html'
+                .when('/dojo-mat/:matId', {
+                    templateUrl: 'templates/dojo-mat.html'
                 })
-                .when('/buttons.html', {
-                    templateUrl: 'buttons.html'
-                })
-                .when('/icons.html', {
-                    templateUrl: 'icons.html'
-                })
-                .when('/typography.html', {
-                    templateUrl: 'typography.html'
-                })
-                .when('/alerts.html', {
-                    templateUrl: 'alerts.html'
-                })
-                .when('/tabs-accordions.html', {
-                    templateUrl: 'tabs-accordions.html'
-                })
-                .when('/sliders.html', {
-                    templateUrl: 'sliders.html'
-                })
-                .when('/graphs.html', {
-                    templateUrl: 'graphs.html'
-                })
-                .when('/widgets.html', {
-                    templateUrl: 'widgets.html'
-                })
-                .when('/extras.html', {
-                    templateUrl: 'extras.html'
+                .when('/game-history', {
+                    templateUrl: 'templates/game-history.html'
                 })
                 .otherwise({
-                    redirectTo: '/dashboard.html'
+                    redirectTo: '/dashboard'
                 });
             //$locationProvider.html5Mode(true)
             /*.when('/Book/:bookId/ch/:chapterId', {
@@ -62,8 +40,26 @@ mainModule
         }
     ])
     .controller('mainController', ['$scope', '$route', function($scope, $route) {
+
+        // Minimize Button in Panels
+        jQuery('.minimize').click(function() {
+            var t = jQuery(this);
+            var p = t.closest('.panel');
+            if (!jQuery(this).hasClass('maximize')) {
+                p.find('.panel-body, .panel-footer').slideUp(200);
+                t.addClass('maximize');
+                t.html('&plus;');
+            } else {
+                p.find('.panel-body, .panel-footer').slideDown(200);
+                t.removeClass('maximize');
+                t.html('&minus;');
+            }
+            return false;
+        });
+
         $scope.$on('$viewContentLoaded', function(event) {
-            var activeListElement = jQuery('a[href="#/' + $route.current.loadedTemplateUrl + '"]').closest("li");
+            var originalHash = window.location.hash.replace(/\?.*$/, '');
+            var activeListElement = jQuery('a[href="' + originalHash + '"]').closest("li");
             /*
                         var closeVisibleSubMenu = function() {
                             jQuery('.nav-parent').each(function() {
@@ -91,4 +87,152 @@ mainModule
             }
 
         });
+    }])
+    .controller('chartPreperationController', ['$scope', '$route', function($scope, $route) {
+
+        // Minimize Button in Panels
+        $scope.slidePanel = function(event) {
+            var target = event.target,
+                docHeight;
+            var t = jQuery(target);
+            var p = t.closest('.panel');
+            if (!jQuery(target).hasClass('maximize')) {
+                p.find('.panel-body, .panel-footer').slideUp(200);
+                t.addClass('maximize');
+            } else {
+                p.find('.panel-body, .panel-footer').slideDown(200);
+                t.removeClass('maximize');
+            }
+
+            // Adjust mainpanel heightss
+            docHeight = jQuery(document).height();
+            if (docHeight > jQuery('.mainpanel').height())
+                jQuery('.mainpanel').height(docHeight);
+        };
+        jQuery('#tags').tagsInput({
+            width: 'auto',
+            height: 'auto',
+            interactive: false
+        });
+        var data = [{
+            eventName: 'kata',
+            eventId: 1,
+            ageLimit: {
+                upper: 5,
+                lower: 2
+            },
+            weightLimit: {
+                upper: 5,
+                lower: 2
+            },
+            pending: true
+        }, {
+            eventName: 'kata',
+            eventId: 3,
+            ageLimit: {
+                upper: 10,
+                lower: 2
+            },
+            weightLimit: {
+                upper: 7,
+                lower: 2
+            },
+            pending: false
+        }, {
+            eventName: 'kumite',
+            eventId: 2,
+            ageLimit: {
+                upper: 5,
+                lower: 2
+            },
+            weightLimit: {
+                upper: 5,
+                lower: 2
+            },
+            pending: true
+        }, {
+            eventName: 'kata',
+            eventId: 4,
+            ageLimit: {
+                upper: 10,
+                lower: 2
+            },
+            weightLimit: {
+                upper: 7,
+                lower: 2
+            },
+            pending: false
+        }, {
+            eventName: 'weapons',
+            eventId: 6,
+            ageLimit: {
+                upper: 5,
+                lower: 2
+            },
+            weightLimit: {
+                upper: 5,
+                lower: 2
+            },
+            pending: true
+        }];
+
+        var games = [],
+            ressult,
+            gameEvents = [],
+            events,
+            hasOdds,
+            groupsCount;
+        for (var i = 0; i < data.length; i++) {
+            if (games.indexOf(data[i].eventName) === -1) {
+                games.push(data[i].eventName);
+            }
+        }
+        for (var gameIndex = 0; gameIndex < games.length; gameIndex++) {
+            events = data.filter(function(event) {
+                return (event.eventName === games[gameIndex]);
+            });
+            hasOdds = events.length % 2;
+            groupsCount = Math.floor(events.length / 2);
+            ressult = {
+                eventName: games[gameIndex],
+                events: []
+            };
+            for (var i = 0; i < groupsCount; i++) {
+                ressult.events.push([events[(i * 2)], events[(i * 2 + 1)]]);
+            }
+            if (hasOdds) {
+                ressult.events.push([events[(groupsCount * 2)]]);
+            }
+            gameEvents.push(ressult);
+        }
+        $scope.$watch(function() {
+            if (!$scope.renderingComplete) {
+                $scope.renderingComplete = true;
+                setTimeout(function() {
+                    jQuery('.tags-input').tagsInput({
+                        width: 'auto',
+                        height: 'auto',
+                        interactive: false
+                    });
+                }, 10);
+            }
+        })
+        $scope.getGames = function() {
+            return gameEvents;
+        };
+        $scope.addToByList = function(event, eventId) {
+            var target = event.target,
+                tagContainer = jQuery(target).closest(jQuery('.panel-body')).find('.tags-input'),
+                eventData = data.filter(function(element) {
+                    return element.eventId === eventId;
+                })[0];
+            console.log(tagContainer.tagExist(target.value), eventData);
+
+            if (!tagContainer.tagExist(target.value)) {
+                tagContainer.addTag(target.value);
+                target.value = '';
+            }
+            tagContainer.addTag(target.value);
+            // jQuery(target).closest('.panel-body')('.tags-input').addTag(target.value);
+        };
     }]);

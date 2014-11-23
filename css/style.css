@@ -37,3 +37,43 @@
 body {
     transition: all 2s;
 } */
+/*************************** chart preperation *************************/
+
+.clear-mb {
+    margin-bottom: 0px !important;
+}
+.background-aqua {
+    background-color: #87FAD7!important;
+    border-radius: 5px;
+}
+.tagsinput {
+    min-height: 30px;
+    height: auto!important;
+    width: 100% !important;
+}
+.events-panel {
+    position: relative;
+}
+.status-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    position: absolute;
+    top: 20px;
+    right: 15px;
+    box-sizing: border-box;
+}
+.background-green {
+    background-color: #008129;
+    -webkit-box-shadow: 0 0 50px 3px #E3FF38;
+    box-shadow: 0 0 50px 3px #E3FF38;
+}
+.background-red {
+    background-color: #F73351;
+    -webkit-box-shadow: 0 0 30px 0px #D2921D;
+    box-shadow: 0 0 30px 0px #D2921D;
+}
+.background-ash {
+    background-color: rgba(28, 175, 154, 0.17);
+}

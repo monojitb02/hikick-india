@@ -13,7 +13,6 @@ jQuery(document).ready(function() {
 
     // Toggle Left Menu
     jQuery('.nav-parent > a').click(function() {
-        console.log('(.nav-parent > a).click()')
         var parent = jQuery(this).parent();
         var sub = parent.find('> ul');
 
@@ -115,6 +114,7 @@ jQuery(document).ready(function() {
     // Minimize Button in Panels
     jQuery('.minimize').click(function() {
         var t = jQuery(this);
+        console.log('test');
         var p = t.closest('.panel');
         if (!jQuery(this).hasClass('maximize')) {
             p.find('.panel-body, .panel-footer').slideUp(200);
