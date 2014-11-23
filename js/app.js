@@ -125,7 +125,8 @@ mainModule
                 upper: 5,
                 lower: 2
             },
-            pending: true
+            pending: false,
+            candidatesGotBy: [23]
         }, {
             eventName: 'kata',
             eventId: 3,
@@ -212,7 +213,21 @@ mainModule
                     jQuery('.tags-input').tagsInput({
                         width: 'auto',
                         height: 'auto',
-                        interactive: false
+                        interactive: false,
+                        onChange: function(element, tag) {
+                            // console.log(element, tag);
+                            var element = (element.length ? element[0] : element);
+                            console.log(element.value);
+                            var eventId = element.getAttribute('event-id');
+                            // if (element[0].value.split(',').indexOf(tag))
+
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].eventId === eventId) {
+                                    data[i].candidatesGotBy = element.value.split(',');
+                                }
+                            }
+                            console.log(data);
+                        }
                     });
                 }, 10);
             }
@@ -220,19 +235,24 @@ mainModule
         $scope.getGames = function() {
             return gameEvents;
         };
-        $scope.addToByList = function(event, eventId) {
+        $scope.getCandidatesGotBy = function(eventId) {
+            var eventData = data.filter(function(element) {
+                return element.eventId === eventId;
+            })[0];
+            return eventData.candidatesGotBy || [];
+        }
+        $scope.addToByList = function(event, eventId, maxBycount) {
             var target = event.target,
+                candidateId = target.value,
                 tagContainer = jQuery(target).closest(jQuery('.panel-body')).find('.tags-input'),
-                eventData = data.filter(function(element) {
-                    return element.eventId === eventId;
-                })[0];
-            console.log(tagContainer.tagExist(target.value), eventData);
-
-            if (!tagContainer.tagExist(target.value)) {
-                tagContainer.addTag(target.value);
-                target.value = '';
+                candidatesGotBy = $scope.getCandidatesGotBy(eventId);
+            if ((!candidateId) ||
+                (candidatesGotBy.indexOf(candidateId) >= 0) ||
+                (candidatesGotBy.length >= maxBycount)) {
+                return;
             }
-            tagContainer.addTag(target.value);
-            // jQuery(target).closest('.panel-body')('.tags-input').addTag(target.value);
+            tagContainer.addTag(candidateId);
+            target.value = '';
+            // tagContainer.addTag(target.value);
         };
     }]);
