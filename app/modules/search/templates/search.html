@@ -1,0 +1,36 @@
+<div>
+    <form role="search" class="m-b-10">
+        <div class="input-group">
+            <input type="text" class="form-control" ng-model="searchKey" enter-event="findVideoes()">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="findVideoes()">Search</button>
+            </span>
+        </div>
+    </form>
+
+    <div>
+        <alert type="danger" ng-show="noResult" close="closeAlert()">
+            No Results Found
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        </alert>
+        <div class="row video-container m-b-10" ng-repeat="video in videoList">
+            <img ng-src="{{video.snippet.thumbnails.high.url}}" alt="" class="thumbnail-img img-responsive col-xs-4 cursor-pointer" ng-click="playVideo(video)">
+            <div class="col-lg-7">
+                <span class="video-title col-lg-7 col-sm-7 col-xs-7 cursor-pointer" ng-click="playVideo(video)">{{video.snippet.title}}</span>
+                <span class="video-channel-title col-lg-7 col-sm-7 col-xs-7">{{video.snippet.channelTitle}}</span>
+                <button class="btn btn-default" ng-click="addToPlaylist(video)">
+                    Add to Playlist
+                    <span class="glyphicon glyphicon-ok add-to-playlist-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <alert type="success" ng-show="added" close="closeAlert()" class="notification">
+        Successfully added to playlist.
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+    </alert>
+    <alert type="danger" ng-show="alreadyExists" close="closeAlert()" class="notification">
+        Already exists in playlist.
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    </alert>
+</div>

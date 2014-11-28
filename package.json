@@ -1,0 +1,86 @@
+{
+    "name": "Hikick-India",
+    "version": "0.0.1",
+    "description": "Hikick-India",
+    "main": "index.js",
+    "scripts": {
+        "start": "watchify -t brfs index.js -o build/bundle.js -v",
+        "bundle": "browserify -t brfs index.js -o build/bundle.js"
+    },
+    "dependencies": {
+        "brfs": "",
+        "browserify-shim": "",
+        "angular": "",
+        "angular-bootstrap": "",
+        "angular-ui-router": "",
+        "underscore": ""
+    },
+    "devDependencies": {
+        "browserify": "^5.11.2",
+        "watchify": "^1.0.2"
+    },
+    "browser": {
+        "jquery": "./build/resources/lib/bracket/jquery-1.10.2.min.js",
+        "jqueryUi": "./build/resources/lib/bracket/jquery-ui-1.10.3.min.js",
+        "jqueryMigrate": "./build/resources/lib/bracket/jquery-migrate-1.2.1.min.js",
+        "bootstrap": "./build/resources/lib/bracket/bootstrap.min.js",
+        "modernizr": "./build/resources/lib/bracket/modernizr.min.js",
+        "jquerySparkline": "./build/resources/lib/bracket/jquery.sparkline.min.js",
+        "toggles": "./build/resources/lib/bracket/toggles.min.js",
+        "retina": "./build/resources/lib/bracket/retina.min.js",
+        "jqueryCookies": "./build/resources/lib/bracket/jquery.cookies.js",
+        "tagsInput": "./build/resources/lib/bracket/jquery.tagsinput.min.js",
+        "custom": "./build/resources/lib/bracket/custom.js"
+    },
+    "browserify-shim": {
+        "jquery": {
+            "exports": "jquery"
+        },
+        "jqueryUi": {
+            "exports": "jqueryUi",
+            "depends": ["jquery"]
+        },
+        "jqueryMigrate": {
+            "exports": "jqueryMigrate",
+            "depends": ["jquery"]
+        },
+        "bootstrap": {
+            "exports": "bootstrap",
+            "depends": ["jquery"]
+        },
+        "modernizr": {
+            "exports": "modernizr",
+            "depends": ["jquery"]
+        },
+        "jquerySparkline": {
+            "exports": "jquerySparkline",
+            "depends": ["jquery"]
+        },
+        "toggles": {
+            "exports": "toggles",
+            "depends": ["jquery"]
+        },
+        "retina": {
+            "exports": "retina",
+            "depends": ["jquery"]
+        },
+        "jqueryCookies": {
+            "exports": "jqueryCookies",
+            "depends": ["jquery"]
+        },
+        "tagsInput": {
+            "exports": "tagsInput",
+            "depends": ["jquery"]
+        },
+        "custom": {
+            "exports": "custom",
+            "depends": ["jquery", "jqueryUi", "jqueryMigrate", "bootstrap", "modernizr", "jquerySparkline", "toggles", "retina", "jqueryCookies", "tagsInput"]
+        }
+    },
+    "browserify": {
+        "transform": [
+            "browserify-shim"
+        ]
+    },
+    "author": "Monojit"
+}
