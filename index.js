@@ -2,7 +2,7 @@ window.name = "NG_DEFER_BOOTSTRAP!";
 
 window._ = require('underscore');
 // window.$ = require('jquery');
-window.lang = require('./app/lang/lang');
+window.lang = require('./app/lang');
 
 
 require('angular');
@@ -22,7 +22,7 @@ require("tagsInput");
 require("custom");
 
 
-var App = require('./app/modules/application/app.module');
+var App = require('./app/application/app.module');
 
 angular.element().ready(function() {
     angular.resumeBootstrap([App['name']]);
