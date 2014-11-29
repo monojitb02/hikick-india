@@ -121,29 +121,6 @@ module.exports = function($scope, $http, $state) {
         }
         gameEvents.push(ressult);
     }
-    $scope.$watch(function() {
-        if (!$scope.renderingComplete) {
-            $scope.renderingComplete = true;
-            setTimeout(function() {
-                jQuery('.tags-input').tagsInput({
-                    width: 'auto',
-                    height: 'auto',
-                    interactive: false,
-                    onChange: function(element, tag) {
-                        var element = (element.length ? element[0] : element);
-                        var eventId = element.getAttribute('event-id');
-                        // if (element[0].value.split(',').indexOf(tag))
-
-                        for (var i = 0; i < data.length; i++) {
-                            if (data[i].eventId === eventId) {
-                                data[i].candidatesGotBy = element.value.split(',');
-                            }
-                        }
-                    }
-                });
-            }, 10);
-        }
-    })
     $scope.getGames = function() {
         return gameEvents;
     };
@@ -152,18 +129,19 @@ module.exports = function($scope, $http, $state) {
             return element.eventId === eventId;
         })[0];
         return eventData.candidatesGotBy || [];
-    }
-    $scope.addToByList = function(event, eventId, maxBycount) {
-        var target = event.target,
-            candidateId = target.value,
-            tagContainer = jQuery(target).closest(jQuery('.panel-body')).find('.tags-input'),
-            candidatesGotBy = $scope.getCandidatesGotBy(eventId);
-        if ((!candidateId) ||
-            (candidatesGotBy.indexOf(candidateId) >= 0) ||
-            (candidatesGotBy.length >= maxBycount)) {
-            return;
-        }
-        tagContainer.addTag(candidateId);
-        target.value = '';
+    };
+    $scope.tags = [{
+        text: 'just'
+    }, {
+        text: 'some'
+    }, {
+        text: 'cool'
+    }, {
+        text: 'tags'
+    }];
+
+    // $scope.tags = ['just', 'some', 'cool', 'tags'];
+    $scope.loadCandidates = function(query) {
+        return ['a', 'b'];
     };
 }

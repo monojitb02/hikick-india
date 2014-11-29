@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -1051,7 +1051,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js","ieee754":"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js","is-array":"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js"}],"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js":[function(require,module,exports){
+},{"base64-js":"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js","ieee754":"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js","is-array":"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js"}],"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js":[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1173,7 +1173,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js":[function(require,module,exports){
+},{}],"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js":[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -1259,7 +1259,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js":[function(require,module,exports){
+},{}],"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js":[function(require,module,exports){
 
 /**
  * isArray
@@ -1294,12 +1294,12 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\config\\index.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\app\\config\\index.js":[function(require,module,exports){
 module.exports = {
 
 };
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\lang\\lang.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\app\\lang\\lang.js":[function(require,module,exports){
 'use strict';
 var lang = {
   validationMessages: {
@@ -1365,9 +1365,9 @@ var lang = {
 };
 module.exports = lang;
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\app.module.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\app.module.js":[function(require,module,exports){
 'use strict';
-var App = angular.module('app', ['ui.router', 'ui.bootstrap']) //, 'app.home', 'app.search', 'app.player'
+var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput']) //, 'app.home', 'app.search', 'app.player'
     .controller('mainFrameCtrl', require('./controllers/mainFrameCtrl'))
     .controller('loginCtrl', require('./controllers/loginCtrl'))
     .controller('homeCtrl', require('./controllers/homeCtrl'))
@@ -1381,7 +1381,7 @@ var App = angular.module('app', ['ui.router', 'ui.bootstrap']) //, 'app.home', '
 
 module.exports = App;
 
-},{"./controllers/candidateListCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\candidateListCtrl.js","./controllers/dojoMatCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js","./controllers/gameHistoryCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\gameHistoryCtrl.js","./controllers/homeCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\homeCtrl.js","./controllers/loginCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\loginCtrl.js","./controllers/mainFrameCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\mainFrameCtrl.js","./controllers/prepareChartCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\prepareChartCtrl.js","./controllers/registerCandidateCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\registerCandidateCtrl.js","./controllers/viewChartCtrl":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\viewChartCtrl.js","./router/router":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\router\\router.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\candidateListCtrl.js":[function(require,module,exports){
+},{"./controllers/candidateListCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\candidateListCtrl.js","./controllers/dojoMatCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\dojoMatCtrl.js","./controllers/gameHistoryCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\gameHistoryCtrl.js","./controllers/homeCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\homeCtrl.js","./controllers/loginCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\loginCtrl.js","./controllers/mainFrameCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\mainFrameCtrl.js","./controllers/prepareChartCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\prepareChartCtrl.js","./controllers/registerCandidateCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\registerCandidateCtrl.js","./controllers/viewChartCtrl":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\viewChartCtrl.js","./router/router":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\router\\router.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\candidateListCtrl.js":[function(require,module,exports){
 'use strict';
 var config = require('../../../config'),
     api = require('../../../util/api'),
@@ -1399,11 +1399,11 @@ module.exports = function($scope, $http, $state) {
     };
 }
 
-},{"../../../config":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\config\\index.js","../../../util/api":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js":[function(require,module,exports){
-module.exports=require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\candidateListCtrl.js")
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\candidateListCtrl.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\candidateListCtrl.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\gameHistoryCtrl.js":[function(require,module,exports){
-module.exports=require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js")
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\homeCtrl.js":[function(require,module,exports){
+},{"../../../config":"c:\\xampp\\htdocs\\hikick-india\\app\\config\\index.js","../../../util/api":"c:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\dojoMatCtrl.js":[function(require,module,exports){
+module.exports=require("c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\candidateListCtrl.js")
+},{"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\candidateListCtrl.js":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\candidateListCtrl.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\gameHistoryCtrl.js":[function(require,module,exports){
+module.exports=require("c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\dojoMatCtrl.js")
+},{"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\dojoMatCtrl.js":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\dojoMatCtrl.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\homeCtrl.js":[function(require,module,exports){
 'use strict';
 var config = require('../../../config'),
     api = require('../../../util/api'),
@@ -1421,14 +1421,14 @@ module.exports = function($scope, $http, $state) {
     };
 }
 
-},{"../../../config":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\config\\index.js","../../../util/api":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\loginCtrl.js":[function(require,module,exports){
+},{"../../../config":"c:\\xampp\\htdocs\\hikick-india\\app\\config\\index.js","../../../util/api":"c:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\loginCtrl.js":[function(require,module,exports){
 'use strict';
 
 module.exports = function($scope, $state, generateVideoId) {
 
 }
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\mainFrameCtrl.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\mainFrameCtrl.js":[function(require,module,exports){
 'use strict';
 
 module.exports = function($scope, $state) {
@@ -1556,7 +1556,7 @@ module.exports = function($scope, $state) {
 
 };
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\prepareChartCtrl.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\prepareChartCtrl.js":[function(require,module,exports){
 'use strict';
 var config = require('../../../config'),
     api = require('../../../util/api'),
@@ -1680,29 +1680,6 @@ module.exports = function($scope, $http, $state) {
         }
         gameEvents.push(ressult);
     }
-    $scope.$watch(function() {
-        if (!$scope.renderingComplete) {
-            $scope.renderingComplete = true;
-            setTimeout(function() {
-                jQuery('.tags-input').tagsInput({
-                    width: 'auto',
-                    height: 'auto',
-                    interactive: false,
-                    onChange: function(element, tag) {
-                        var element = (element.length ? element[0] : element);
-                        var eventId = element.getAttribute('event-id');
-                        // if (element[0].value.split(',').indexOf(tag))
-
-                        for (var i = 0; i < data.length; i++) {
-                            if (data[i].eventId === eventId) {
-                                data[i].candidatesGotBy = element.value.split(',');
-                            }
-                        }
-                    }
-                });
-            }, 10);
-        }
-    })
     $scope.getGames = function() {
         return gameEvents;
     };
@@ -1711,27 +1688,28 @@ module.exports = function($scope, $http, $state) {
             return element.eventId === eventId;
         })[0];
         return eventData.candidatesGotBy || [];
-    }
-    $scope.addToByList = function(event, eventId, maxBycount) {
-        var target = event.target,
-            candidateId = target.value,
-            tagContainer = jQuery(target).closest(jQuery('.panel-body')).find('.tags-input'),
-            candidatesGotBy = $scope.getCandidatesGotBy(eventId);
-        if ((!candidateId) ||
-            (candidatesGotBy.indexOf(candidateId) >= 0) ||
-            (candidatesGotBy.length >= maxBycount)) {
-            return;
-        }
-        tagContainer.addTag(candidateId);
-        target.value = '';
+    };
+    $scope.tags = [{
+        text: 'just'
+    }, {
+        text: 'some'
+    }, {
+        text: 'cool'
+    }, {
+        text: 'tags'
+    }];
+
+    // $scope.tags = ['just', 'some', 'cool', 'tags'];
+    $scope.loadCandidates = function(query) {
+        return ['a', 'b'];
     };
 }
 
-},{"../../../config":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\config\\index.js","../../../util/api":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\registerCandidateCtrl.js":[function(require,module,exports){
-module.exports=require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js")
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\viewChartCtrl.js":[function(require,module,exports){
-module.exports=require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js")
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\controllers\\dojoMatCtrl.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\router\\router.js":[function(require,module,exports){
+},{"../../../config":"c:\\xampp\\htdocs\\hikick-india\\app\\config\\index.js","../../../util/api":"c:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\registerCandidateCtrl.js":[function(require,module,exports){
+module.exports=require("c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\gameHistoryCtrl.js")
+},{"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\gameHistoryCtrl.js":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\gameHistoryCtrl.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\viewChartCtrl.js":[function(require,module,exports){
+module.exports=require("c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\registerCandidateCtrl.js")
+},{"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\registerCandidateCtrl.js":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\controllers\\registerCandidateCtrl.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\router\\router.js":[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -1779,7 +1757,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
             url: '/prepareChart',
             views: {
                 'pages': {
-                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+CiAgICA8aDI+PGkgY2xhc3M9ImZhIGZhLWhhbmQtby11cCI+PC9pPiBCdXR0b25zIDxzcGFuPlN1YnRpdGxlIGdvZXMgaGVyZS4uLjwvc3Bhbj4KICA8L2gyPgogICAgPGRpdiBjbGFzcz0iYnJlYWRjcnVtYi13cmFwcGVyIj4KICAgICAgICA8c3BhbiBjbGFzcz0ibGFiZWwiPllvdSBhcmUgaGVyZTo8L3NwYW4+CiAgICAgICAgPG9sIGNsYXNzPSJicmVhZGNydW1iIj4KICAgICAgICAgICAgPGxpPjxhIGhyZWY9ImluZGV4Lmh0bWwiPkJyYWNrZXQ8L2E+CiAgICAgICAgICAgIDwvbGk+CiAgICAgICAgICAgIDxsaT48YSBocmVmPSJidXR0b25zLmh0bWwiPlVJIEVsZW1lbnRzPC9hPgogICAgICAgICAgICA8L2xpPgogICAgICAgICAgICA8bGkgY2xhc3M9ImFjdGl2ZSI+QnV0dG9uczwvbGk+CiAgICAgICAgPC9vbD4KICAgIDwvZGl2Pgo8L2Rpdj4KCjxkaXYgY2xhc3M9ImNvbnRlbnRwYW5lbCI+CgogICAgPGRpdiBjbGFzcz0icGFuZWwgcGFuZWwtZGVmYXVsdCIgbmctcmVwZWF0PSJnYW1lIGluIGdldEdhbWVzKCkiPgogICAgICAgIDxkaXYgY2xhc3M9InBhbmVsLWhlYWRpbmcgYmFja2dyb3VuZC1hcXVhIHNsaWRpbmctcGFuZWwiIG5nLWNsaWNrPSJzbGlkZVBhbmVsKCRldmVudCkiPgogICAgICAgICAgICA8aDQgY2xhc3M9InBhbmVsLXRpdGxlIj57e2dhbWUuZXZlbnROYW1lfX08L2g0PgogICAgICAgIDwvZGl2PgogICAgICAgIDxkaXYgY2xhc3M9InBhbmVsLWJvZHkiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJyb3ciIG5nLXJlcGVhdD0iZXZlbnRHcm91cCBpbiBnYW1lLmV2ZW50cyI+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNiIgbmctcmVwZWF0PSJldmVudCBpbiBldmVudEdyb3VwIj4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJwYW5lbCBwYW5lbC1kZWZhdWx0Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icGFuZWwtaGVhZGluZyBiYWNrZ3JvdW5kLWFxdWEgc2xpZGluZy1wYW5lbCBldmVudHMtcGFuZWwiIG5nLWNsaWNrPSJzbGlkZVBhbmVsKCRldmVudCkiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGg0IGNsYXNzPSJwYW5lbC10aXRsZSI+RXZlbnQgSWQ6IHt7ZXZlbnQuZXZlbnRJZH19IFdlaWdodDoge3tldmVudC53ZWlnaHRMaW1pdC51cHBlcn19a2cgQWdlOiB7e2V2ZW50LmFnZUxpbWl0LnVwcGVyfX0gWWVhcnM8L2g0PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0ic3RhdHVzLWluZGljYXRvciIgbmctY2xhc3M9InsnYmFja2dyb3VuZC1ncmVlbic6IWV2ZW50LnBlbmRpbmcsJ2JhY2tncm91bmQtcmVkJzpldmVudC5wZW5kaW5nfSIgbmctYXR0ci10aXRsZT0ie3tldmVudC5wZW5kaW5nPydwZW5kaW5nJzonU2hlZHVsZWQnfX0iPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icGFuZWwtYm9keSBiYWNrZ3JvdW5kLWFzaCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aW5wdXQgbmFtZT0idGFncyIgY2xhc3M9InRhZ3MtaW5wdXQiIGNsYXNzPSJmb3JtLWNvbnRyb2wiIHZhbHVlPSJ7e2dldENhbmRpZGF0ZXNHb3RCeShldmVudC5ldmVudElkKS5qb2luKCcsJyl9fSIgZXZlbnQtaWQ9Int7ZXZlbnQuZXZlbnRJZH19IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9wPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaW5wdXQtZ3JvdXAiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aW5wdXQgdHlwZT0idGV4dCIgY2xhc3M9ImZvcm0tY29udHJvbCIgbmctY2xpY2s9ImFkZFRvQnlMaXN0KCRldmVudCxldmVudC5ldmVudElkKSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzPSJpbnB1dC1ncm91cC1hZGRvbiI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzPSJnbHlwaGljb24gZ2x5cGhpY29uLXNlYXJjaCI+PC9zcGFuPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3NwYW4+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3A+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWJsb2NrIiBuZy1jbGFzcz0ieydidG4tcHJpbWFyeSc6ZXZlbnQucGVuZGluZywnYnRuLWRhbmdlcic6IWV2ZW50LnBlbmRpbmd9Ij5TaGVkdWxlIEl0PC9idXR0b24+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3A+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8IS0tIHBhbmVsLWJvZHkgLS0+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgICAgPCEtLSBwYW5lbC1ib2R5IC0tPgogICAgPC9kaXY+CiAgICA8IS0tIHBhbmVsIC0tPgoKCjwvZGl2Pgo8IS0tIGNvbnRlbnRwYW5lbCAtLT4K","base64"),
+                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+CiAgPGgyPjxpIGNsYXNzPSJmYSBmYS1oYW5kLW8tdXAiPjwvaT4gQnV0dG9ucyA8c3Bhbj5TdWJ0aXRsZSBnb2VzIGhlcmUuLi48L3NwYW4+CiAgPC9oMj4KICA8ZGl2IGNsYXNzPSJicmVhZGNydW1iLXdyYXBwZXIiPgogICAgPHNwYW4gY2xhc3M9ImxhYmVsIj5Zb3UgYXJlIGhlcmU6PC9zcGFuPgogICAgPG9sIGNsYXNzPSJicmVhZGNydW1iIj4KICAgICAgPGxpPjxhIGhyZWY9ImluZGV4Lmh0bWwiPkJyYWNrZXQ8L2E+CiAgICAgIDwvbGk+CiAgICAgIDxsaT48YSBocmVmPSJidXR0b25zLmh0bWwiPlVJIEVsZW1lbnRzPC9hPgogICAgICA8L2xpPgogICAgICA8bGkgY2xhc3M9ImFjdGl2ZSI+QnV0dG9uczwvbGk+CiAgICA8L29sPgogIDwvZGl2Pgo8L2Rpdj4KCjxkaXYgY2xhc3M9ImNvbnRlbnRwYW5lbCI+CgogIDxkaXYgY2xhc3M9InBhbmVsIHBhbmVsLWRlZmF1bHQiIG5nLXJlcGVhdD0iZ2FtZSBpbiBnZXRHYW1lcygpIj4KICAgIDxkaXYgY2xhc3M9InBhbmVsLWhlYWRpbmcgYmFja2dyb3VuZC1hcXVhIHNsaWRpbmctcGFuZWwiIG5nLWNsaWNrPSJzbGlkZVBhbmVsKCRldmVudCkiPgogICAgICA8aDQgY2xhc3M9InBhbmVsLXRpdGxlIj57e2dhbWUuZXZlbnROYW1lfX08L2g0PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJwYW5lbC1ib2R5Ij4KICAgICAgPGRpdiBjbGFzcz0icm93IiBuZy1yZXBlYXQ9ImV2ZW50R3JvdXAgaW4gZ2FtZS5ldmVudHMiPgogICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC02IiBuZy1yZXBlYXQ9ImV2ZW50IGluIGV2ZW50R3JvdXAiPgogICAgICAgICAgPGRpdiBjbGFzcz0icGFuZWwgcGFuZWwtZGVmYXVsdCI+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InBhbmVsLWhlYWRpbmcgYmFja2dyb3VuZC1hcXVhIHNsaWRpbmctcGFuZWwgZXZlbnRzLXBhbmVsIiBuZy1jbGljaz0ic2xpZGVQYW5lbCgkZXZlbnQpIj4KICAgICAgICAgICAgICA8aDQgY2xhc3M9InBhbmVsLXRpdGxlIj5FdmVudCBJZDoge3tldmVudC5ldmVudElkfX0gV2VpZ2h0OiAmbHQ7e3tldmVudC53ZWlnaHRMaW1pdC51cHBlcn19a2cgQWdlOiZsdDt7e2V2ZW50LmFnZUxpbWl0LnVwcGVyfX0gWWVhcnM8L2g0PgogICAgICAgICAgICAgIDxkaXYgY2xhc3M9InN0YXR1cy1pbmRpY2F0b3IiIG5nLWNsYXNzPSJ7J2JhY2tncm91bmQtZ3JlZW4nOiFldmVudC5wZW5kaW5nLCdiYWNrZ3JvdW5kLXJlZCc6ZXZlbnQucGVuZGluZ30iIG5nLWF0dHItdGl0bGU9Int7ZXZlbnQucGVuZGluZz8ncGVuZGluZyc6J1NoZWR1bGVkJ319Ij48L2Rpdj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InBhbmVsLWJvZHkgYmFja2dyb3VuZC1hc2giPgogICAgICAgICAgICAgIDx0YWdzLWlucHV0IG5nLW1vZGVsPSJldmVudC5jYW5kaWRhdGVzR290QnkiPgogICAgICAgICAgICAgICAgPGF1dG8tY29tcGxldGUgc291cmNlPSJsb2FkQ2FuZGlkYXRlcygkcXVlcnkpIj48L2F1dG8tY29tcGxldGU+CiAgICAgICAgICAgICAgPC90YWdzLWlucHV0PgogICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1ibG9jayIgbmctY2xhc3M9InsnYnRuLXByaW1hcnknOmV2ZW50LnBlbmRpbmcsJ2J0bi1kYW5nZXInOiFldmVudC5wZW5kaW5nfSI+U2hlZHVsZSBJdDwvYnV0dG9uPgogICAgICAgICAgICAgIDwvcD4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDwhLS0gcGFuZWwtYm9keSAtLT4KICAgICAgICAgIDwvZGl2PgogICAgICAgIDwvZGl2PgogICAgICA8L2Rpdj4KICAgIDwvZGl2PgogICAgPCEtLSBwYW5lbC1ib2R5IC0tPgogIDwvZGl2PgogIDwhLS0gcGFuZWwgLS0+CgoKPC9kaXY+CjwhLS0gY29udGVudHBhbmVsIC0tPgo=","base64"),
                     controller: 'prepareChartCtrl'
                 }
             }
@@ -1822,7 +1800,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":"C:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\util\\api.js":[function(require,module,exports){
+},{"buffer":"c:\\Users\\Arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js":[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -1830,10 +1808,10 @@ module.exports = {
     videos: 'https://www.googleapis.com/youtube/v3/videos'
 };
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\bootstrap.min.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\bootstrap.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*!
  * Bootstrap v3.1.0 (http://getbootstrap.com)
@@ -1846,19 +1824,19 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap requires jQuery");+func
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\custom.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\custom.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\bootstrap.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\modernizr.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\toggles.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\retina.min.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.cookies.js");
-require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\bootstrap.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\modernizr.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\toggles.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\retina.min.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.cookies.js");
+require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 jQuery(window).load(function() {
     console.log('custom.js loaded');
@@ -2136,7 +2114,7 @@ jQuery(document).ready(function() {
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\bootstrap.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\bootstrap.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.cookies.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.cookies.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\modernizr.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\modernizr.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\retina.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\retina.min.js","C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\toggles.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\toggles.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\bootstrap.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\bootstrap.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.cookies.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.cookies.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\modernizr.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\modernizr.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\retina.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\retina.min.js","c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\toggles.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\toggles.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":[function(require,module,exports){
 (function (global){
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery v1.10.2 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
@@ -2151,10 +2129,10 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery Migrate v1.2.1 | (c) 2005, 2013 jQuery Foundation, Inc. and other contributors | jquery.org/license */
 jQuery.migrateMute===void 0&&(jQuery.migrateMute=!0),function(e,t,n){function r(n){var r=t.console;i[n]||(i[n]=!0,e.migrateWarnings.push(n),r&&r.warn&&!e.migrateMute&&(r.warn("JQMIGRATE: "+n),e.migrateTrace&&r.trace&&r.trace()))}function a(t,a,i,o){if(Object.defineProperty)try{return Object.defineProperty(t,a,{configurable:!0,enumerable:!0,get:function(){return r(o),i},set:function(e){r(o),i=e}}),n}catch(s){}e._definePropertyBroken=!0,t[a]=i}var i={};e.migrateWarnings=[],!e.migrateMute&&t.console&&t.console.log&&t.console.log("JQMIGRATE: Logging is active"),e.migrateTrace===n&&(e.migrateTrace=!0),e.migrateReset=function(){i={},e.migrateWarnings.length=0},"BackCompat"===document.compatMode&&r("jQuery is not compatible with Quirks Mode");var o=e("<input/>",{size:1}).attr("size")&&e.attrFn,s=e.attr,u=e.attrHooks.value&&e.attrHooks.value.get||function(){return null},c=e.attrHooks.value&&e.attrHooks.value.set||function(){return n},l=/^(?:input|button)$/i,d=/^[238]$/,p=/^(?:autofocus|autoplay|async|checked|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped|selected)$/i,f=/^(?:checked|selected)$/i;a(e,"attrFn",o||{},"jQuery.attrFn is deprecated"),e.attr=function(t,a,i,u){var c=a.toLowerCase(),g=t&&t.nodeType;return u&&(4>s.length&&r("jQuery.fn.attr( props, pass ) is deprecated"),t&&!d.test(g)&&(o?a in o:e.isFunction(e.fn[a])))?e(t)[a](i):("type"===a&&i!==n&&l.test(t.nodeName)&&t.parentNode&&r("Can't change the 'type' of an input or button in IE 6/7/8"),!e.attrHooks[c]&&p.test(c)&&(e.attrHooks[c]={get:function(t,r){var a,i=e.prop(t,r);return i===!0||"boolean"!=typeof i&&(a=t.getAttributeNode(r))&&a.nodeValue!==!1?r.toLowerCase():n},set:function(t,n,r){var a;return n===!1?e.removeAttr(t,r):(a=e.propFix[r]||r,a in t&&(t[a]=!0),t.setAttribute(r,r.toLowerCase())),r}},f.test(c)&&r("jQuery.fn.attr('"+c+"') may use property instead of attribute")),s.call(e,t,a,i))},e.attrHooks.value={get:function(e,t){var n=(e.nodeName||"").toLowerCase();return"button"===n?u.apply(this,arguments):("input"!==n&&"option"!==n&&r("jQuery.fn.attr('value') no longer gets properties"),t in e?e.value:null)},set:function(e,t){var a=(e.nodeName||"").toLowerCase();return"button"===a?c.apply(this,arguments):("input"!==a&&"option"!==a&&r("jQuery.fn.attr('value', val) no longer sets properties"),e.value=t,n)}};var g,h,v=e.fn.init,m=e.parseJSON,y=/^([^<]*)(<[\w\W]+>)([^>]*)$/;e.fn.init=function(t,n,a){var i;return t&&"string"==typeof t&&!e.isPlainObject(n)&&(i=y.exec(e.trim(t)))&&i[0]&&("<"!==t.charAt(0)&&r("$(html) HTML strings must start with '<' character"),i[3]&&r("$(html) HTML text after last tag is ignored"),"#"===i[0].charAt(0)&&(r("HTML string cannot start with a '#' character"),e.error("JQMIGRATE: Invalid selector string (XSS)")),n&&n.context&&(n=n.context),e.parseHTML)?v.call(this,e.parseHTML(i[2],n,!0),n,a):v.apply(this,arguments)},e.fn.init.prototype=e.fn,e.parseJSON=function(e){return e||null===e?m.apply(this,arguments):(r("jQuery.parseJSON requires a valid JSON string"),null)},e.uaMatch=function(e){e=e.toLowerCase();var t=/(chrome)[ \/]([\w.]+)/.exec(e)||/(webkit)[ \/]([\w.]+)/.exec(e)||/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(e)||/(msie) ([\w.]+)/.exec(e)||0>e.indexOf("compatible")&&/(mozilla)(?:.*? rv:([\w.]+)|)/.exec(e)||[];return{browser:t[1]||"",version:t[2]||"0"}},e.browser||(g=e.uaMatch(navigator.userAgent),h={},g.browser&&(h[g.browser]=!0,h.version=g.version),h.chrome?h.webkit=!0:h.webkit&&(h.safari=!0),e.browser=h),a(e,"browser",e.browser,"jQuery.browser is deprecated"),e.sub=function(){function t(e,n){return new t.fn.init(e,n)}e.extend(!0,t,this),t.superclass=this,t.fn=t.prototype=this(),t.fn.constructor=t,t.sub=this.sub,t.fn.init=function(r,a){return a&&a instanceof e&&!(a instanceof t)&&(a=t(a)),e.fn.init.call(this,r,a,n)},t.fn.init.prototype=t.fn;var n=t(document);return r("jQuery.sub() is deprecated"),t},e.ajaxSetup({converters:{"text json":e.parseJSON}});var b=e.fn.data;e.fn.data=function(t){var a,i,o=this[0];return!o||"events"!==t||1!==arguments.length||(a=e.data(o,t),i=e._data(o,t),a!==n&&a!==i||i===n)?b.apply(this,arguments):(r("Use of jQuery.fn.data('events') is deprecated"),i)};var j=/\/(java|ecma)script/i,w=e.fn.andSelf||e.fn.addBack;e.fn.andSelf=function(){return r("jQuery.fn.andSelf() replaced by jQuery.fn.addBack()"),w.apply(this,arguments)},e.clean||(e.clean=function(t,a,i,o){a=a||document,a=!a.nodeType&&a[0]||a,a=a.ownerDocument||a,r("jQuery.clean() is deprecated");var s,u,c,l,d=[];if(e.merge(d,e.buildFragment(t,a).childNodes),i)for(c=function(e){return!e.type||j.test(e.type)?o?o.push(e.parentNode?e.parentNode.removeChild(e):e):i.appendChild(e):n},s=0;null!=(u=d[s]);s++)e.nodeName(u,"script")&&c(u)||(i.appendChild(u),u.getElementsByTagName!==n&&(l=e.grep(e.merge([],u.getElementsByTagName("script")),c),d.splice.apply(d,[s+1,0].concat(l)),s+=l.length));return d});var Q=e.event.add,x=e.event.remove,k=e.event.trigger,N=e.fn.toggle,T=e.fn.live,M=e.fn.die,S="ajaxStart|ajaxStop|ajaxSend|ajaxComplete|ajaxError|ajaxSuccess",C=RegExp("\\b(?:"+S+")\\b"),H=/(?:^|\s)hover(\.\S+|)\b/,A=function(t){return"string"!=typeof t||e.event.special.hover?t:(H.test(t)&&r("'hover' pseudo-event is deprecated, use 'mouseenter mouseleave'"),t&&t.replace(H,"mouseenter$1 mouseleave$1"))};e.event.props&&"attrChange"!==e.event.props[0]&&e.event.props.unshift("attrChange","attrName","relatedNode","srcElement"),e.event.dispatch&&a(e.event,"handle",e.event.dispatch,"jQuery.event.handle is undocumented and deprecated"),e.event.add=function(e,t,n,a,i){e!==document&&C.test(t)&&r("AJAX events should be attached to document: "+t),Q.call(this,e,A(t||""),n,a,i)},e.event.remove=function(e,t,n,r,a){x.call(this,e,A(t)||"",n,r,a)},e.fn.error=function(){var e=Array.prototype.slice.call(arguments,0);return r("jQuery.fn.error() is deprecated"),e.splice(0,0,"error"),arguments.length?this.bind.apply(this,e):(this.triggerHandler.apply(this,e),this)},e.fn.toggle=function(t,n){if(!e.isFunction(t)||!e.isFunction(n))return N.apply(this,arguments);r("jQuery.fn.toggle(handler, handler...) is deprecated");var a=arguments,i=t.guid||e.guid++,o=0,s=function(n){var r=(e._data(this,"lastToggle"+t.guid)||0)%o;return e._data(this,"lastToggle"+t.guid,r+1),n.preventDefault(),a[r].apply(this,arguments)||!1};for(s.guid=i;a.length>o;)a[o++].guid=i;return this.click(s)},e.fn.live=function(t,n,a){return r("jQuery.fn.live() is deprecated"),T?T.apply(this,arguments):(e(this.context).on(t,this.selector,n,a),this)},e.fn.die=function(t,n){return r("jQuery.fn.die() is deprecated"),M?M.apply(this,arguments):(e(this.context).off(t,this.selector||"**",n),this)},e.event.trigger=function(e,t,n,a){return n||C.test(e)||r("Global events are undocumented and deprecated"),k.call(this,e,t,n||document,a)},e.each(S.split("|"),function(t,n){e.event.special[n]={setup:function(){var t=this;return t!==document&&(e.event.add(document,n+"."+e.guid,function(){e.event.trigger(n,null,t,!0)}),e._data(this,n,e.guid++)),!1},teardown:function(){return this!==document&&e.event.remove(document,n+"."+e._data(this,n)),!1}}})}(jQuery,window);
@@ -2163,10 +2141,10 @@ jQuery.migrateMute===void 0&&(jQuery.migrateMute=!0),function(e,t,n){function r(
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery UI - v1.10.3 - 2013-10-20
 * http://jqueryui.com
@@ -2180,10 +2158,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.cookies.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.cookies.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*jshint eqnull:true */
 /*!
@@ -2261,10 +2239,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /* jquery.sparkline 2.1.2 - http://omnipotent.net/jquery.sparkline/ 
 ** Licensed under the New BSD License - see above site for details */
@@ -2276,10 +2254,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function(a){var b=new Array;var c=new Array;a.fn.doAutosize=function(b){var c=a(this).data("minwidth"),d=a(this).data("maxwidth"),e="",f=a(this),g=a("#"+a(this).data("tester_id"));if(e===(e=f.val())){return}var h=e.replace(/&/g,"&").replace(/\s/g," ").replace(/</g,"<").replace(/>/g,">");g.html(h);var i=g.width(),j=i+b.comfortZone>=c?i+b.comfortZone:c,k=f.width(),l=j<k&&j>=c||j>c&&j<d;if(l){f.width(j)}};a.fn.resetAutosize=function(b){var c=a(this).data("minwidth")||b.minInputWidth||a(this).width(),d=a(this).data("maxwidth")||b.maxInputWidth||a(this).closest(".tagsinput").width()-b.inputPadding,e="",f=a(this),g=a("<tester/>").css({position:"absolute",top:-9999,left:-9999,width:"auto",fontSize:f.css("fontSize"),fontFamily:f.css("fontFamily"),fontWeight:f.css("fontWeight"),letterSpacing:f.css("letterSpacing"),whiteSpace:"nowrap"}),h=a(this).attr("id")+"_autosize_tester";if(!a("#"+h).length>0){g.attr("id",h);g.appendTo("body")}f.data("minwidth",c);f.data("maxwidth",d);f.data("tester_id",h);f.css("width",c)};a.fn.addTag=function(d,e){e=jQuery.extend({focus:false,callback:true},e);this.each(function(){var f=a(this).attr("id");var g=a(this).val().split(b[f]);if(g[0]==""){g=new Array}d=jQuery.trim(d);if(e.unique){var h=a(g).tagExist(d);if(h==true){a("#"+f+"_tag").addClass("not_valid")}}else{var h=false}if(d!=""&&h!=true){a("<span>").addClass("tag").append(a("<span>").text(d).append("  "),a("<a>",{href:"#",title:"Removing tag",text:"x"}).click(function(){return a("#"+f).removeTag(escape(d))})).insertBefore("#"+f+"_addTag");g.push(d);a("#"+f+"_tag").val("");if(e.focus){a("#"+f+"_tag").focus()}else{a("#"+f+"_tag").blur()}a.fn.tagsInput.updateTagsField(this,g);if(e.callback&&c[f]&&c[f]["onAddTag"]){var i=c[f]["onAddTag"];i.call(this,d)}if(c[f]&&c[f]["onChange"]){var j=g.length;var i=c[f]["onChange"];i.call(this,a(this),g[j-1])}}});return false};a.fn.removeTag=function(d){d=unescape(d);this.each(function(){var e=a(this).attr("id");var f=a(this).val().split(b[e]);a("#"+e+"_tagsinput .tag").remove();str="";for(i=0;i<f.length;i++){if(f[i]!=d){str=str+b[e]+f[i]}}a.fn.tagsInput.importTags(this,str);if(c[e]&&c[e]["onRemoveTag"]){var g=c[e]["onRemoveTag"];g.call(this,d)}});return false};a.fn.tagExist=function(b){return jQuery.inArray(b,a(this))>=0};a.fn.importTags=function(b){id=a(this).attr("id");a("#"+id+"_tagsinput .tag").remove();a.fn.tagsInput.importTags(this,b)};a.fn.tagsInput=function(d){var e=jQuery.extend({interactive:true,defaultText:"add a tag",minChars:0,width:"300px",height:"100px",autocomplete:{selectFirst:false},hide:true,delimiter:",",unique:true,removeWithBackspace:true,placeholderColor:"#666666",autosize:true,comfortZone:20,inputPadding:6*2},d);this.each(function(){if(e.hide){a(this).hide()}var d=a(this).attr("id");if(!d||b[a(this).attr("id")]){d=a(this).attr("id","tags"+(new Date).getTime()).attr("id")}var f=jQuery.extend({pid:d,real_input:"#"+d,holder:"#"+d+"_tagsinput",input_wrapper:"#"+d+"_addTag",fake_input:"#"+d+"_tag"},e);b[d]=f.delimiter;if(e.onAddTag||e.onRemoveTag||e.onChange){c[d]=new Array;c[d]["onAddTag"]=e.onAddTag;c[d]["onRemoveTag"]=e.onRemoveTag;c[d]["onChange"]=e.onChange}var g='<div id="'+d+'_tagsinput" class="tagsinput"><div id="'+d+'_addTag">';if(e.interactive){g=g+'<input id="'+d+'_tag" value="" data-default="'+e.defaultText+'" />'}g=g+'</div><div class="tags_clear"></div></div>';a(g).insertAfter(this);a(f.holder).css("width",e.width);a(f.holder).css("height",e.height);if(a(f.real_input).val()!=""){a.fn.tagsInput.importTags(a(f.real_input),a(f.real_input).val())}if(e.interactive){a(f.fake_input).val(a(f.fake_input).attr("data-default"));a(f.fake_input).css("color",e.placeholderColor);a(f.fake_input).resetAutosize(e);a(f.holder).bind("click",f,function(b){a(b.data.fake_input).focus()});a(f.fake_input).bind("focus",f,function(b){if(a(b.data.fake_input).val()==a(b.data.fake_input).attr("data-default")){a(b.data.fake_input).val("")}a(b.data.fake_input).css("color","#000000")});if(e.autocomplete_url!=undefined){autocomplete_options={source:e.autocomplete_url};for(attrname in e.autocomplete){autocomplete_options[attrname]=e.autocomplete[attrname]}if(jQuery.Autocompleter!==undefined){a(f.fake_input).autocomplete(e.autocomplete_url,e.autocomplete);a(f.fake_input).bind("result",f,function(b,c,f){if(c){a("#"+d).addTag(c[0]+"",{focus:true,unique:e.unique})}})}else if(jQuery.ui.autocomplete!==undefined){a(f.fake_input).autocomplete(autocomplete_options);a(f.fake_input).bind("autocompleteselect",f,function(b,c){a(b.data.real_input).addTag(c.item.value,{focus:true,unique:e.unique});return false})}}else{a(f.fake_input).bind("blur",f,function(b){var c=a(this).attr("data-default");if(a(b.data.fake_input).val()!=""&&a(b.data.fake_input).val()!=c){if(b.data.minChars<=a(b.data.fake_input).val().length&&(!b.data.maxChars||b.data.maxChars>=a(b.data.fake_input).val().length))a(b.data.real_input).addTag(a(b.data.fake_input).val(),{focus:true,unique:e.unique})}else{a(b.data.fake_input).val(a(b.data.fake_input).attr("data-default"));a(b.data.fake_input).css("color",e.placeholderColor)}return false})}a(f.fake_input).bind("keypress",f,function(b){if(b.which==b.data.delimiter.charCodeAt(0)||b.which==13){b.preventDefault();if(b.data.minChars<=a(b.data.fake_input).val().length&&(!b.data.maxChars||b.data.maxChars>=a(b.data.fake_input).val().length))a(b.data.real_input).addTag(a(b.data.fake_input).val(),{focus:true,unique:e.unique});a(b.data.fake_input).resetAutosize(e);return false}else if(b.data.autosize){a(b.data.fake_input).doAutosize(e)}});f.removeWithBackspace&&a(f.fake_input).bind("keydown",function(b){if(b.keyCode==8&&a(this).val()==""){b.preventDefault();var c=a(this).closest(".tagsinput").find(".tag:last").text();var d=a(this).attr("id").replace(/_tag$/,"");c=c.replace(/[\s]+x$/,"");a("#"+d).removeTag(escape(c));a(this).trigger("focus")}});a(f.fake_input).blur();if(f.unique){a(f.fake_input).keydown(function(b){if(b.keyCode==8||String.fromCharCode(b.which).match(/\w+|[áéíóúÁÉÍÓÚñÑ,/]+/)){a(this).removeClass("not_valid")}})}}});return this};a.fn.tagsInput.updateTagsField=function(c,d){var e=a(c).attr("id");a(c).val(d.join(b[e]))};a.fn.tagsInput.importTags=function(d,e){a(d).val("");var f=a(d).attr("id");var g=e.split(b[f]);for(i=0;i<g.length;i++){a(d).addTag(g[i],{focus:false,callback:false})}if(c[f]&&c[f]["onChange"]){var h=c[f]["onChange"];h.call(d,d,g[i])}}})(jQuery);
 ; browserify_shim__define__module__export__(typeof tagsInput != "undefined" ? tagsInput : window.tagsInput);
@@ -2287,10 +2265,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\modernizr.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\modernizr.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
  * Build: http://modernizr.com/download/#-fontface-backgroundsize-borderimage-borderradius-boxshadow-flexbox-flexboxlegacy-hsla-multiplebgs-opacity-rgba-textshadow-cssanimations-csscolumns-generatedcontent-cssgradients-cssreflections-csstransforms-csstransforms3d-csstransitions-applicationcache-canvas-canvastext-draganddrop-hashchange-history-audio-video-indexeddb-input-inputtypes-localstorage-postmessage-sessionstorage-websockets-websqldatabase-webworkers-geolocation-inlinesvg-smil-svg-svgclippaths-touch-webgl-shiv-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes-load
@@ -2301,10 +2279,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\retina.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\retina.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function(){function n(){}function r(e,t){this.path=e;if(typeof t!=="undefined"&&t!==null){this.at_2x_path=t;this.perform_check=false}else{this.at_2x_path=e.replace(/\.\w+$/,function(e){return"@2x"+e});this.perform_check=true}}function i(e){this.el=e;this.path=new r(this.el.getAttribute("src"),this.el.getAttribute("data-at2x"));var t=this;this.path.check_2x_variant(function(e){if(e)t.swap()})}var e=typeof exports=="undefined"?window:exports;var t={check_mime_type:true};e.Retina=n;n.configure=function(e){if(e==null)e={};for(var n in e)t[n]=e[n]};n.init=function(t){if(t==null)t=e;var n=t.onload||new Function;t.onload=function(){var e=document.getElementsByTagName("img"),t=[],r,s;for(r=0;r<e.length;r++){s=e[r];t.push(new i(s))}n()}};n.isRetina=function(){var t="(-webkit-min-device-pixel-ratio: 1.5),                      (min--moz-device-pixel-ratio: 1.5),                      (-o-min-device-pixel-ratio: 3/2),                      (min-resolution: 1.5dppx)";if(e.devicePixelRatio>1)return true;if(e.matchMedia&&e.matchMedia(t).matches)return true;return false};e.RetinaImagePath=r;r.confirmed_paths=[];r.prototype.is_external=function(){return!!(this.path.match(/^https?\:/i)&&!this.path.match("//"+document.domain))};r.prototype.check_2x_variant=function(e){var n,i=this;if(this.is_external()){return e(false)}else if(!this.perform_check&&typeof this.at_2x_path!=="undefined"&&this.at_2x_path!==null){return e(true)}else if(this.at_2x_path in r.confirmed_paths){return e(true)}else{n=new XMLHttpRequest;n.open("HEAD",this.at_2x_path);n.onreadystatechange=function(){if(n.readyState!=4){return e(false)}if(n.status>=200&&n.status<=399){if(t.check_mime_type){var s=n.getResponseHeader("Content-Type");if(s==null||!s.match(/^image/i)){return e(false)}}r.confirmed_paths.push(i.at_2x_path);return e(true)}else{return e(false)}};n.send()}};e.RetinaImage=i;i.prototype.swap=function(e){function n(){if(!t.el.complete){setTimeout(n,5)}else{t.el.setAttribute("width",t.el.offsetWidth);t.el.setAttribute("height",t.el.offsetHeight);t.el.setAttribute("src",e)}}if(typeof e=="undefined")e=this.path.at_2x_path;var t=this;n()};if(n.isRetina()){n.init(e)}})()
 ; browserify_shim__define__module__export__(typeof retina != "undefined" ? retina : window.retina);
@@ -2312,10 +2290,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\toggles.min.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\toggles.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function($){/*
  jQuery Toggles v2.0.4
@@ -2334,7 +2312,7 @@ v)})}})};})(jQuery);
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\index.js":[function(require,module,exports){
+},{"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"c:\\xampp\\htdocs\\hikick-india\\index.js":[function(require,module,exports){
 window.name = "NG_DEFER_BOOTSTRAP!";
 
 window._ = require('underscore');
@@ -2345,6 +2323,7 @@ window.lang = require('./app/lang/lang');
 require('angular');
 require('angular-ui-router');
 require('angular-bootstrap');
+require('ng-tags-input')
 
 require("jquery");
 require("jqueryUi");
@@ -2355,7 +2334,7 @@ require("jquerySparkline");
 require("toggles");
 require("retina");
 require("jqueryCookies");
-require("tagsInput");
+// require("tagsInput");
 require("custom");
 
 
@@ -2365,7 +2344,7 @@ angular.element().ready(function() {
     angular.resumeBootstrap([App['name']]);
 });
 
-},{"./app/lang/lang":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\lang\\lang.js","./app/modules/application/app.module":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\app\\modules\\application\\app.module.js","angular":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\angular\\angular.js","angular-bootstrap":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\angular-bootstrap\\ui-bootstrap.js","angular-ui-router":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\angular-ui-router\\release\\angular-ui-router.js","bootstrap":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\bootstrap.min.js","custom":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\custom.js","jquery":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js","jqueryCookies":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.cookies.js","jqueryMigrate":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","jquerySparkline":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js","jqueryUi":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","modernizr":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\modernizr.min.js","retina":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\retina.min.js","tagsInput":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\jquery.tagsinput.min.js","toggles":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\build\\resources\\lib\\bracket\\toggles.min.js","underscore":"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\underscore\\underscore.js"}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\angular-bootstrap\\ui-bootstrap.js":[function(require,module,exports){
+},{"./app/lang/lang":"c:\\xampp\\htdocs\\hikick-india\\app\\lang\\lang.js","./app/modules/application/app.module":"c:\\xampp\\htdocs\\hikick-india\\app\\modules\\application\\app.module.js","angular":"c:\\xampp\\htdocs\\hikick-india\\node_modules\\angular\\angular.js","angular-bootstrap":"c:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-bootstrap\\ui-bootstrap.js","angular-ui-router":"c:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-ui-router\\release\\angular-ui-router.js","bootstrap":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\bootstrap.min.js","custom":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\custom.js","jquery":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-1.10.2.min.js","jqueryCookies":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.cookies.js","jqueryMigrate":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","jquerySparkline":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery.sparkline.min.js","jqueryUi":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","modernizr":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\modernizr.min.js","ng-tags-input":"c:\\xampp\\htdocs\\hikick-india\\node_modules\\ng-tags-input\\build\\ng-tags-input.min.js","retina":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\retina.min.js","toggles":"c:\\xampp\\htdocs\\hikick-india\\build\\resources\\lib\\bracket\\toggles.min.js","underscore":"c:\\xampp\\htdocs\\hikick-india\\node_modules\\underscore\\underscore.js"}],"c:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-bootstrap\\ui-bootstrap.js":[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -6483,7 +6462,7 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "</ul>");
 }]);
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\angular-ui-router\\release\\angular-ui-router.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-ui-router\\release\\angular-ui-router.js":[function(require,module,exports){
 /**
  * State-based routing for AngularJS
  * @version v0.2.11
@@ -10143,7 +10122,7 @@ angular.module('ui.router.state')
   .filter('includedByState', $IncludedByStateFilter);
 })(window, window.angular);
 
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\angular\\angular.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\node_modules\\angular\\angular.js":[function(require,module,exports){
 /**
  * @license AngularJS v1.3.4
  * (c) 2010-2014 Google, Inc. http://angularjs.org
@@ -36059,7 +36038,9 @@ var styleDirective = valueFn({
 })(window, document);
 
 !window.angular.$$csp() && window.angular.element(document).find('head').prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}</style>');
-},{}],"C:\\xampp\\htdocs\\hikick-india-fresh-office\\node_modules\\underscore\\underscore.js":[function(require,module,exports){
+},{}],"c:\\xampp\\htdocs\\hikick-india\\node_modules\\ng-tags-input\\build\\ng-tags-input.min.js":[function(require,module,exports){
+/*! ngTagsInput v2.1.1-1 License: MIT */!function(){"use strict";function a(){var a={};return{on:function(b,c){return b.split(" ").forEach(function(b){a[b]||(a[b]=[]),a[b].push(c)}),this},trigger:function(b,c){return angular.forEach(a[b],function(a){a.call(null,c)}),this}}}function b(a,b){return a=a||[],a.length>0&&!angular.isObject(a[0])&&a.forEach(function(c,d){a[d]={},a[d][b]=c}),a}function c(a,b,c){for(var d=null,f=0;f<a.length;f++)if(e(a[f][c]).toLowerCase()===e(b[c]).toLowerCase()){d=a[f];break}return d}function d(a,b,c){if(!b)return a;var d=b.replace(/([.?*+^$[\]\\(){}|-])/g,"\\$1");return a.replace(new RegExp(d,"gi"),c)}function e(a){return angular.isUndefined(a)||null==a?"":a.toString().trim()}function f(a){return a.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}var g={backspace:8,tab:9,enter:13,escape:27,space:32,up:38,down:40,comma:188},h=9007199254740991,i=["text","email","url"],j=angular.module("ngTagsInput",[]);j.directive("tagsInput",["$timeout","$document","tagsInputConfig",function(d,f,j){function k(a,b){var d,f,g,h={};return d=function(b){return e(b[a.displayProperty])},f=function(b,c){b[a.displayProperty]=c},g=function(b){var e=d(b);return e&&e.length>=a.minLength&&e.length<=a.maxLength&&a.allowedTagsPattern.test(e)&&!c(h.items,b,a.displayProperty)},h.items=[],h.addText=function(a){var b={};return f(b,a),h.add(b)},h.add=function(c){var e=d(c);return a.replaceSpacesWithDashes&&(e=e.replace(/\s/g,"-")),f(c,e),g(c)?(h.items.push(c),b.trigger("tag-added",{$tag:c})):e&&b.trigger("invalid-tag",{$tag:c}),c},h.remove=function(a){var c=h.items.splice(a,1)[0];return b.trigger("tag-removed",{$tag:c}),c},h.removeLast=function(){var b,c=h.items.length-1;return a.enableEditingLastTag||h.selected?(h.selected=null,b=h.remove(c)):h.selected||(h.selected=h.items[c]),b},h}function l(a){return-1!==i.indexOf(a)}return{restrict:"E",require:"ngModel",scope:{tags:"=ngModel",onTagAdded:"&",onTagRemoved:"&"},replace:!1,transclude:!0,templateUrl:"ngTagsInput/tags-input.html",controller:["$scope","$attrs","$element",function(b,c,d){b.events=new a,j.load("tagsInput",b,c,{type:[String,"text",l],placeholder:[String,"Add a tag"],tabindex:[Number,null],removeTagSymbol:[String,String.fromCharCode(215)],replaceSpacesWithDashes:[Boolean,!0],minLength:[Number,3],maxLength:[Number,h],addOnEnter:[Boolean,!0],addOnSpace:[Boolean,!1],addOnComma:[Boolean,!0],addOnBlur:[Boolean,!0],allowedTagsPattern:[RegExp,/.+/],enableEditingLastTag:[Boolean,!1],minTags:[Number,0],maxTags:[Number,h],displayProperty:[String,"text"],allowLeftoverText:[Boolean,!1],addFromAutocompleteOnly:[Boolean,!1]}),b.tagList=new k(b.options,b.events),this.registerAutocomplete=function(){var a=d.find("input");return a.on("keydown",function(a){b.events.trigger("input-keydown",a)}),{addTag:function(a){return b.tagList.add(a)},focusInput:function(){a[0].focus()},getTags:function(){return b.tags},getCurrentTagText:function(){return b.newTag.text},getOptions:function(){return b.options},on:function(a,c){return b.events.on(a,c),this}}}}],link:function(a,c,h,i){var j,k=[g.enter,g.comma,g.space,g.backspace],l=a.tagList,m=a.events,n=a.options,o=c.find("input"),p=["minTags","maxTags","allowLeftoverText"];j=function(){i.$setValidity("maxTags",a.tags.length<=n.maxTags),i.$setValidity("minTags",a.tags.length>=n.minTags),i.$setValidity("leftoverText",n.allowLeftoverText?!0:!a.newTag.text)},m.on("tag-added",a.onTagAdded).on("tag-removed",a.onTagRemoved).on("tag-added",function(){a.newTag.text=""}).on("tag-added tag-removed",function(){i.$setViewValue(a.tags)}).on("invalid-tag",function(){a.newTag.invalid=!0}).on("input-change",function(){l.selected=null,a.newTag.invalid=null}).on("input-focus",function(){i.$setValidity("leftoverText",!0)}).on("input-blur",function(){n.addFromAutocompleteOnly||(n.addOnBlur&&l.addText(a.newTag.text),j())}).on("option-change",function(a){-1!==p.indexOf(a.name)&&j()}),a.newTag={text:"",invalid:null},a.getDisplayText=function(a){return e(a[n.displayProperty])},a.track=function(a){return a[n.displayProperty]},a.newTagChange=function(){m.trigger("input-change",a.newTag.text)},a.$watch("tags",function(c){a.tags=b(c,n.displayProperty),l.items=a.tags}),a.$watch("tags.length",function(){j()}),o.on("keydown",function(b){if(!b.isImmediatePropagationStopped||!b.isImmediatePropagationStopped()){var c,d,e=b.keyCode,f=b.shiftKey||b.altKey||b.ctrlKey||b.metaKey,h={};if(!f&&-1!==k.indexOf(e))if(h[g.enter]=n.addOnEnter,h[g.comma]=n.addOnComma,h[g.space]=n.addOnSpace,c=!n.addFromAutocompleteOnly&&h[e],d=!c&&e===g.backspace&&0===a.newTag.text.length,c)l.addText(a.newTag.text),a.$apply(),b.preventDefault();else if(d){var i=l.removeLast();i&&n.enableEditingLastTag&&(a.newTag.text=i[n.displayProperty]),a.$apply(),b.preventDefault()}}}).on("focus",function(){a.hasFocus||(a.hasFocus=!0,m.trigger("input-focus"),a.$apply())}).on("blur",function(){d(function(){var b=f.prop("activeElement"),d=b===o[0],e=c[0].contains(b);(d||!e)&&(a.hasFocus=!1,m.trigger("input-blur"))})}),c.find("div").on("click",function(){o[0].focus()})}}}]),j.directive("autoComplete",["$document","$timeout","$sce","tagsInputConfig",function(a,h,i,j){function k(a,d){var e,f,g,i={};return f=function(a,b){return a.filter(function(a){return!c(b,a,d.tagsInput.displayProperty)})},i.reset=function(){g=null,i.items=[],i.visible=!1,i.index=-1,i.selected=null,i.query=null,h.cancel(e)},i.show=function(){i.selected=null,i.visible=!0},i.load=function(c,j){h.cancel(e),e=h(function(){i.query=c;var e=a({$query:c});g=e,e.then(function(a){e===g&&(a=b(a.data||a,d.tagsInput.displayProperty),a=f(a,j),i.items=a.slice(0,d.maxResultsToShow),i.items.length>0?i.show():i.reset())})},d.debounceDelay,!1)},i.selectNext=function(){i.select(++i.index)},i.selectPrior=function(){i.select(--i.index)},i.select=function(a){0>a?a=i.items.length-1:a>=i.items.length&&(a=0),i.index=a,i.selected=i.items[a]},i.reset(),i}return{restrict:"E",require:"^tagsInput",scope:{source:"&"},templateUrl:"ngTagsInput/auto-complete.html",link:function(a,b,c,h){var l,m,n,o,p,q,r=[g.enter,g.tab,g.escape,g.up,g.down];j.load("autoComplete",a,c,{debounceDelay:[Number,100],minLength:[Number,3],highlightMatchedText:[Boolean,!0],maxResultsToShow:[Number,10],loadOnDownArrow:[Boolean,!1],loadOnEmpty:[Boolean,!1],loadOnFocus:[Boolean,!1]}),n=a.options,m=h.registerAutocomplete(),n.tagsInput=m.getOptions(),l=new k(a.source,n),o=function(a){return a[n.tagsInput.displayProperty]},p=function(a){return e(o(a))},q=function(a){return a&&a.length>=n.minLength||!a&&n.loadOnEmpty},a.suggestionList=l,a.addSuggestionByIndex=function(b){l.select(b),a.addSuggestion()},a.addSuggestion=function(){var a=!1;return l.selected&&(m.addTag(l.selected),l.reset(),m.focusInput(),a=!0),a},a.highlight=function(a){var b=p(a);return b=f(b),n.highlightMatchedText&&(b=d(b,f(l.query),"<em>$&</em>")),i.trustAsHtml(b)},a.track=function(a){return o(a)},m.on("tag-added tag-removed invalid-tag input-blur",function(){l.reset()}).on("input-change",function(a){q(a)?l.load(a,m.getTags()):l.reset()}).on("input-focus",function(){var a=m.getCurrentTagText();n.loadOnFocus&&q(a)&&l.load(a,m.getTags())}).on("input-keydown",function(b){var c=!1;b.stopImmediatePropagation=function(){c=!0,b.stopPropagation()},b.isImmediatePropagationStopped=function(){return c};var d=b.keyCode,e=!1;-1!==r.indexOf(d)&&(l.visible?d===g.down?(l.selectNext(),e=!0):d===g.up?(l.selectPrior(),e=!0):d===g.escape?(l.reset(),e=!0):(d===g.enter||d===g.tab)&&(e=a.addSuggestion()):d===g.down&&a.options.loadOnDownArrow&&(l.load(m.getCurrentTagText(),m.getTags()),e=!0),e&&(b.preventDefault(),b.stopImmediatePropagation(),a.$apply()))})}}}]),j.directive("tiTranscludeAppend",function(){return function(a,b,c,d,e){e(function(a){b.append(a)})}}),j.directive("tiAutosize",["tagsInputConfig",function(a){return{restrict:"A",require:"ngModel",link:function(b,c,d,e){var f,g,h=a.getTextAutosizeThreshold();f=angular.element('<span class="input"></span>'),f.css("display","none").css("visibility","hidden").css("width","auto").css("white-space","pre"),c.parent().append(f),g=function(a){var b,e=a;return angular.isString(e)&&0===e.length&&(e=d.placeholder),e&&(f.text(e),f.css("display",""),b=f.prop("offsetWidth"),f.css("display","none")),c.css("width",b?b+h+"px":""),a},e.$parsers.unshift(g),e.$formatters.unshift(g),d.$observe("placeholder",function(a){e.$modelValue||g(a)})}}}]),j.directive("tiBindAttrs",function(){return function(a,b,c){a.$watch(c.tiBindAttrs,function(a){angular.forEach(a,function(a,b){c.$set(b,a)})},!0)}}),j.provider("tagsInputConfig",function(){var a={},b={},c=3;this.setDefaults=function(b,c){return a[b]=c,this},this.setActiveInterpolation=function(a,c){return b[a]=c,this},this.setTextAutosizeThreshold=function(a){return c=a,this},this.$get=["$interpolate",function(d){var e={};return e[String]=function(a){return a},e[Number]=function(a){return parseInt(a,10)},e[Boolean]=function(a){return"true"===a.toLowerCase()},e[RegExp]=function(a){return new RegExp(a)},{load:function(c,f,g,h){var i=function(){return!0};f.options={},angular.forEach(h,function(h,j){var k,l,m,n,o,p;k=h[0],l=h[1],m=h[2]||i,n=e[k],o=function(){var b=a[c]&&a[c][j];return angular.isDefined(b)?b:l},p=function(a){f.options[j]=a&&m(a)?n(a):o()},b[c]&&b[c][j]?g.$observe(j,function(a){p(a),f.events.trigger("option-change",{name:j,newValue:a})}):p(g[j]&&d(g[j])(f.$parent))})},getTextAutosizeThreshold:function(){return c}}}]}),j.run(["$templateCache",function(a){a.put("ngTagsInput/tags-input.html",'<div class="host" tabindex="-1" ti-transclude-append=""><div class="tags" ng-class="{focused: hasFocus}"><ul class="tag-list"><li class="tag-item" ng-repeat="tag in tagList.items track by track(tag)" ng-class="{ selected: tag == tagList.selected }"><span ng-bind="getDisplayText(tag)"></span> <a class="remove-button" ng-click="tagList.remove($index)" ng-bind="options.removeTagSymbol"></a></li></ul><input class="input" ng-model="newTag.text" ng-change="newTagChange()" ng-trim="false" ng-class="{\'invalid-tag\': newTag.invalid}" ti-bind-attrs="{type: options.type, placeholder: options.placeholder, tabindex: options.tabindex}" ti-autosize=""></div></div>'),a.put("ngTagsInput/auto-complete.html",'<div class="autocomplete" ng-show="suggestionList.visible"><ul class="suggestion-list"><li class="suggestion-item" ng-repeat="item in suggestionList.items track by track(item)" ng-class="{selected: item == suggestionList.selected}" ng-click="addSuggestionByIndex($index)" ng-mouseenter="suggestionList.select($index)" ng-bind-html="highlight(item)"></li></ul></div>')}])}();
+},{}],"c:\\xampp\\htdocs\\hikick-india\\node_modules\\underscore\\underscore.js":[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -37476,4 +37457,4 @@ var styleDirective = valueFn({
   }
 }.call(this));
 
-},{}]},{},["C:\\xampp\\htdocs\\hikick-india-fresh-office\\index.js"]);
+},{}]},{},["c:\\xampp\\htdocs\\hikick-india\\index.js"]);

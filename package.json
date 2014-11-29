@@ -13,7 +13,8 @@
         "angular": "",
         "angular-bootstrap": "",
         "angular-ui-router": "",
-        "underscore": ""
+        "underscore": "",
+        "ng-tags-input": ""
     },
     "devDependencies": {
         "browserify": "^5.11.2",
