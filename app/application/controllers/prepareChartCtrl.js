@@ -1,7 +1,4 @@
 'use strict';
-var config = require('../../../config'),
-    api = require('../../../util/api'),
-    apiKey = config.apiKey;
 
 module.exports = function($scope, $http, $state) {
     // Minimize Button in Panels
