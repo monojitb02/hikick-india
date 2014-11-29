@@ -1649,8 +1649,9 @@ var unitHeight = 25,
             groups.push({
                 player1: playersInLevel[group * 2],
                 player2: playersInLevel[group * 2 + 1]
-            })
+            });
         }
+        return groups;
     };
 module.exports = function($scope, $http, $state) {
     $scope.levels = [{

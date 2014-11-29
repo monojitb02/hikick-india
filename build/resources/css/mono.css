@@ -1,0 +1,25 @@
+/******************** For view-chart **********************/
+
+.text-bottom-middle {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+}
+.border-right-bottom {
+    border-width: 0px 1px 1px 0px;
+    border-style: solid;
+}
+.border-bottom {
+    border-width: 0px 0px 1px;
+    border-style: solid;
+}
+.font-red-bold, .font-blue-bold {
+    font-weight: bold;
+}
+.font-red-bold {
+    color: #F00;
+}
+.font-blue-bold {
+    color: #00F;
+}
