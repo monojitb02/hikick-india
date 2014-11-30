@@ -22,10 +22,10 @@
       </div>
       <div class="row" ng-repeat="group in level.groups" style="margin-top: {{getOffset(level.levelId ,$index)}}">
         <div class="col-md-12 text-center border-bottom" style="height: {{unitHeight+'px'}}">
-          <span class="text-bottom-middle font-red-bold">{{group.player1.name}}&nbsp;&nbsp;&nbsp;(Id:{{group.player1.pcrticipantId}})</span>
+          <span class="text-bottom-middle font-red-bold">{{group.player1.name}}&nbsp;&nbsp;&nbsp;(Id:{{group.player1.participantId}})</span>
         </div>
         <div class="col-md-12 text-center border-right-bottom" style="height: {{getHeight(level.levelId)}}" ng-show="group.player2">
-          <span class="text-bottom-middle font-blue-bold">{{group.player2.name}}&nbsp;&nbsp;&nbsp;(Id:{{group.player1.pcrticipantId}})</span>
+          <span class="text-bottom-middle font-blue-bold">{{group.player2.name}}&nbsp;&nbsp;&nbsp;(Id:{{group.player2.participantId}})</span>
         </div>
       </div>
     </div>

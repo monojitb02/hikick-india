@@ -1332,9 +1332,10 @@ module.exports=require("c:\\xampp\\htdocs\\hikick-india\\app\\application\\contr
 },{"c:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js":"c:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js"}],"c:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\loginCtrl.js":[function(require,module,exports){
 'use strict';
 
-module.exports = function($scope, $state) {
+module.exports = function($scope, $state, $location) {
     $scope.login = function() {
-        $state.go('app.home');
+        // $state.go('app.home');
+        $location.path('/home');
     };
 }
 
@@ -1620,6 +1621,56 @@ var unitHeight = 25,
     /*getMaxPlayerPossible = function(originalNumber) {
         return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.log(2)));
     },*/
+
+    shedules = [{
+        event: 1,
+        participant: {
+            participantId: 1
+        },
+        currentLevel: 1,
+        secretSerialNumber: 1,
+        byFlag: false
+    }, {
+        event: 1,
+        participant: {
+            participantId: 9
+        },
+        currentLevel: 1,
+        secretSerialNumber: 8,
+        byFlag: true
+    }, {
+        event: 1,
+        participant: {
+            participantId: 2
+        },
+        currentLevel: 1,
+        secretSerialNumber: 3,
+        byFlag: false
+    }, {
+        event: 1,
+        participant: {
+            participantId: 3
+        },
+        currentLevel: 2,
+        secretSerialNumber: 4,
+        byFlag: false
+    }, {
+        event: 1,
+        participant: {
+            participantId: 4
+        },
+        currentLevel: 1,
+        secretSerialNumber: 5,
+        byFlag: true
+    }, {
+        event: 1,
+        participant: {
+            participantId: 5
+        },
+        currentLevel: 1,
+        secretSerialNumber: 7,
+        byFlag: false
+    }],
     getMaxLevel = function(players) { //returns top current lavel from all players
         return players.reduce(function(topPlayer, currentPlayer) {
             return (topPlayer.currentLevel > currentPlayer.currentLevel) ? topPlayer : currentPlayer;
@@ -1632,6 +1683,13 @@ var unitHeight = 25,
         var result = [];
         players = players.sort(playerShortById);
         for (var playerIndex = 0; playerIndex < players.length; playerIndex++) {
+            players[playerIndex] = {
+                name: players[playerIndex].participant.name,
+                participantId: players[playerIndex].participant.participantId,
+                secretSerialNumber: players[playerIndex].secretSerialNumber,
+                currentLevel: players[playerIndex].currentLevel,
+                event: players[playerIndex].event
+            }
             if (players[playerIndex].secretSerialNumber % 2 === 1) {
                 result.push(players[playerIndex], {});
             } else {
@@ -1641,60 +1699,40 @@ var unitHeight = 25,
         return result;
     },
     getGroupsForLevel = function(levelId, players) {
-        var playersInLevel = players.filter(function(player) {
-                return (player.currentLevel >= levelId);
-            }),
+        var playersInLevel,
             groups = [];
-        for (group = 0; group < playersInLevel.length / 2; group++) {
+        if (levelId === 1) {
+            playersInLevel = players;
+        } else {
+            playersInLevel = players.filter(function(player) {
+                return (player.currentLevel >= levelId);
+            });
+        }
+        for (var group = 0; group < playersInLevel.length / 2; group++) {
             groups.push({
                 player1: playersInLevel[group * 2],
                 player2: playersInLevel[group * 2 + 1]
-            })
+            });
         }
+        return groups;
+    },
+    getFormation = function(players) {
+        var maxLevel = getMaxLevel(players),
+            formatioArray = [];
+        players = insertBy(players);
+        console.log(players);
+        for (var level = 1; level <= maxLevel; level++) {
+            formatioArray.push({
+                levelId: level,
+                groups: getGroupsForLevel(level, players)
+            });
+        }
+        console.log(formatioArray[0].groups);
+        return formatioArray;
     };
 module.exports = function($scope, $http, $state) {
-    $scope.levels = [{
-        levelId: 1,
-        groups: [{
-            player1: {
-                name: 'mono',
-                pcrticipantId: 1
-            },
-            player2: {
-                name: 'anjan',
-                pcrticipantId: 2
-            }
-        }, {
-            player1: {
-                name: 'arup',
-                pcrticipantId: 3
-            },
-            player2: {
-                name: 'sumon',
-                pcrticipantId: 4
-            }
-        }]
-    }, {
-        levelId: 2,
-        groups: [{
-            player1: {
-                name: 'mono',
-                pcrticipantId: 1
-            },
-            player2: {
-                name: 'arup',
-                pcrticipantId: 3
-            }
-        }]
-    }, {
-        levelId: 3,
-        groups: [{
-            player1: {
-                name: 'mono',
-                pcrticipantId: 1
-            }
-        }]
-    }];
+
+    $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
     $scope.getHeight = function(levelId) {
         return (Math.pow(2, levelId) * unitHeight) + 'px';
@@ -1765,7 +1803,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
             url: '/viewChart',
             views: {
                 'pages': {
-                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+DQogIDxoMj4NCiAgICA8aSBjbGFzcz0iZmEgZmEtZmxhZyI+PC9pPiBTaGVkdWxlZCBTaGVldHMgDQogIDwvaDI+DQogIDxkaXYgY2xhc3M9ImJyZWFkY3J1bWItd3JhcHBlciI+DQogICAgPHNwYW4gY2xhc3M9ImxhYmVsIj5Zb3UgYXJlIGhlcmU6PC9zcGFuPg0KICAgIDxvbCBjbGFzcz0iYnJlYWRjcnVtYiI+DQogICAgICA8bGk+PGEgaHJlZj0iaW5kZXguaHRtbCI+QnJhY2tldDwvYT4NCiAgICAgIDwvbGk+DQogICAgICA8bGk+PGEgaHJlZj0iYnV0dG9ucy5odG1sIj5VSSBFbGVtZW50czwvYT4NCiAgICAgIDwvbGk+DQogICAgICA8bGkgY2xhc3M9ImFjdGl2ZSI+SWNvbnM8L2xpPg0KICAgIDwvb2w+DQogIDwvZGl2Pg0KPC9kaXY+DQoNCjxkaXYgY2xhc3M9ImNvbnRlbnRwYW5lbCAiPg0KICA8ZGl2IGNsYXNzPSJyb3ciPg0KICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0yIiBuZy1yZXBlYXQ9ImxldmVsIGluIGxldmVscyI+DQogICAgICA8ZGl2IGNsYXNzPSJsZXZlbC1oZWFkZXIgdGV4dC1jZW50ZXIiPg0KICAgICAgICA8aDQ+TGV2ZWwte3tsZXZlbC5sZXZlbElkfX08L2g0Pg0KICAgICAgPC9kaXY+DQogICAgICA8ZGl2IGNsYXNzPSJyb3ciIG5nLXJlcGVhdD0iZ3JvdXAgaW4gbGV2ZWwuZ3JvdXBzIiBzdHlsZT0ibWFyZ2luLXRvcDoge3tnZXRPZmZzZXQobGV2ZWwubGV2ZWxJZCAsJGluZGV4KX19Ij4NCiAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTEyIHRleHQtY2VudGVyIGJvcmRlci1ib3R0b20iIHN0eWxlPSJoZWlnaHQ6IHt7dW5pdEhlaWdodCsncHgnfX0iPg0KICAgICAgICAgIDxzcGFuIGNsYXNzPSJ0ZXh0LWJvdHRvbS1taWRkbGUgZm9udC1yZWQtYm9sZCI+e3tncm91cC5wbGF5ZXIxLm5hbWV9fSZuYnNwOyZuYnNwOyZuYnNwOyhJZDp7e2dyb3VwLnBsYXllcjEucGNydGljaXBhbnRJZH19KTwvc3Bhbj4NCiAgICAgICAgPC9kaXY+DQogICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0xMiB0ZXh0LWNlbnRlciBib3JkZXItcmlnaHQtYm90dG9tIiBzdHlsZT0iaGVpZ2h0OiB7e2dldEhlaWdodChsZXZlbC5sZXZlbElkKX19IiBuZy1zaG93PSJncm91cC5wbGF5ZXIyIj4NCiAgICAgICAgICA8c3BhbiBjbGFzcz0idGV4dC1ib3R0b20tbWlkZGxlIGZvbnQtYmx1ZS1ib2xkIj57e2dyb3VwLnBsYXllcjIubmFtZX19Jm5ic3A7Jm5ic3A7Jm5ic3A7KElkOnt7Z3JvdXAucGxheWVyMS5wY3J0aWNpcGFudElkfX0pPC9zcGFuPg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KICA8L2Rpdj4NCiAgPCEtLSBwYW5lbCAtLT4NCg0KPC9kaXY+DQo8IS0tIGNvbnRlbnRwYW5lbCAtLT4NCg==","base64"),
+                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+DQogIDxoMj4NCiAgICA8aSBjbGFzcz0iZmEgZmEtZmxhZyI+PC9pPiBTaGVkdWxlZCBTaGVldHMgDQogIDwvaDI+DQogIDxkaXYgY2xhc3M9ImJyZWFkY3J1bWItd3JhcHBlciI+DQogICAgPHNwYW4gY2xhc3M9ImxhYmVsIj5Zb3UgYXJlIGhlcmU6PC9zcGFuPg0KICAgIDxvbCBjbGFzcz0iYnJlYWRjcnVtYiI+DQogICAgICA8bGk+PGEgaHJlZj0iaW5kZXguaHRtbCI+QnJhY2tldDwvYT4NCiAgICAgIDwvbGk+DQogICAgICA8bGk+PGEgaHJlZj0iYnV0dG9ucy5odG1sIj5VSSBFbGVtZW50czwvYT4NCiAgICAgIDwvbGk+DQogICAgICA8bGkgY2xhc3M9ImFjdGl2ZSI+SWNvbnM8L2xpPg0KICAgIDwvb2w+DQogIDwvZGl2Pg0KPC9kaXY+DQoNCjxkaXYgY2xhc3M9ImNvbnRlbnRwYW5lbCAiPg0KICA8ZGl2IGNsYXNzPSJyb3ciPg0KICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0yIiBuZy1yZXBlYXQ9ImxldmVsIGluIGxldmVscyI+DQogICAgICA8ZGl2IGNsYXNzPSJsZXZlbC1oZWFkZXIgdGV4dC1jZW50ZXIiPg0KICAgICAgICA8aDQ+TGV2ZWwte3tsZXZlbC5sZXZlbElkfX08L2g0Pg0KICAgICAgPC9kaXY+DQogICAgICA8ZGl2IGNsYXNzPSJyb3ciIG5nLXJlcGVhdD0iZ3JvdXAgaW4gbGV2ZWwuZ3JvdXBzIiBzdHlsZT0ibWFyZ2luLXRvcDoge3tnZXRPZmZzZXQobGV2ZWwubGV2ZWxJZCAsJGluZGV4KX19Ij4NCiAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTEyIHRleHQtY2VudGVyIGJvcmRlci1ib3R0b20iIHN0eWxlPSJoZWlnaHQ6IHt7dW5pdEhlaWdodCsncHgnfX0iPg0KICAgICAgICAgIDxzcGFuIGNsYXNzPSJ0ZXh0LWJvdHRvbS1taWRkbGUgZm9udC1yZWQtYm9sZCI+e3tncm91cC5wbGF5ZXIxLm5hbWV9fSZuYnNwOyZuYnNwOyZuYnNwOyhJZDp7e2dyb3VwLnBsYXllcjEucGFydGljaXBhbnRJZH19KTwvc3Bhbj4NCiAgICAgICAgPC9kaXY+DQogICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0xMiB0ZXh0LWNlbnRlciBib3JkZXItcmlnaHQtYm90dG9tIiBzdHlsZT0iaGVpZ2h0OiB7e2dldEhlaWdodChsZXZlbC5sZXZlbElkKX19IiBuZy1zaG93PSJncm91cC5wbGF5ZXIyIj4NCiAgICAgICAgICA8c3BhbiBjbGFzcz0idGV4dC1ib3R0b20tbWlkZGxlIGZvbnQtYmx1ZS1ib2xkIj57e2dyb3VwLnBsYXllcjIubmFtZX19Jm5ic3A7Jm5ic3A7Jm5ic3A7KElkOnt7Z3JvdXAucGxheWVyMi5wYXJ0aWNpcGFudElkfX0pPC9zcGFuPg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KICA8L2Rpdj4NCiAgPCEtLSBwYW5lbCAtLT4NCg0KPC9kaXY+DQo8IS0tIGNvbnRlbnRwYW5lbCAtLT4NCg==","base64"),
                     controller: 'viewChartCtrl'
                 }
             }
