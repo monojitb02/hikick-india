@@ -7,7 +7,6 @@
 <div ng-if="listView()">
   <div class="pageheader clearfix">
     <h2 class="pull-left"><i class="fa fa-list"></i>Player's List</h2>
-
     <div class="pull-right filter-group">
       <form class="form-inline">
         <div class>
@@ -17,7 +16,6 @@
       </form>
     </div>
   </div>
-
   <div>
 
     <div class="contentpanel">
@@ -48,14 +46,14 @@
               <tr ng-repeat="eachAttender in attendiesList">
                 <td>{{$index + 1}}</td>
                 <!-- <td>{{eachAttender._id}}</td> -->
-                <td>{{eachAttender.companyProfile.name | name }}</td>
+                <td>{{eachAttender.companyProfile.name}}</td>
                 <td>{{eachAttender.companyProfile.email}}</td>
                 <td>{{eachAttender.companyProfile.designation.post}}</td>
-                <td>{{eachAttender.companyProfile.gender | gender}}</td>
+                <td>{{eachAttender.companyProfile.gender}}</td>
                 <td>
                   <div ng-show="eachAttender.companyProfile.manager._id" class="cursor-pointer" ng-click="loadAttendiesView(eachAttender.companyProfile.manager._id)">
-                    <img ng-src="{{eachAttender.companyProfile.manager.personalProfile.photoUrl | url}}" alt="" ng-show="eachAttender.companyProfile.manager.photoUrl" onerror="this.onerror=null;this.src='./resources/images/user.png';" class="small-profile-picture">
-                    <span class="manager-details">{{eachAttender.companyProfile.manager.companyProfile.name | name}}</span>
+                    <img ng-src="{{eachAttender.companyProfile.manager.personalProfile.photoUrl}}" alt="" ng-show="eachAttender.companyProfile.manager.photoUrl" onerror="this.onerror=null;this.src='./resources/images/user.png';" class="small-profile-picture">
+                    <span class="manager-details">{{}}</span>
                   </div>
                 </td>
                 <td class="action-td">

@@ -43,7 +43,6 @@ module.exports = function($scope, $state) {
     jQuery('.nav-parent > a').click(function() {
         var parent = jQuery(this).parent();
         var sub = parent.find('> ul');
-        console.log('in toggle');
         // Dropdown works only when leftpanel is not collapsed
         if (!jQuery('body').hasClass('leftpanel-collapsed')) {
             if (sub.is(':visible')) {
