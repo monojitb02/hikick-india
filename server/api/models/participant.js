@@ -59,6 +59,10 @@ participantSchema = new Schema({
         type: String,
         required: true
     },
+    contactNumber: {
+        type: Number,
+        required: true
+    },
     address: {
         type: String,
         required: true
