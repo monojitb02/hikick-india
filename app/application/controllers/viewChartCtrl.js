@@ -7,7 +7,8 @@ var unitHeight = 25,
     shedules = [{
         event: 1,
         participant: {
-            participantId: 1
+            participantId: 1,
+            name: 'dhfkjsf'
         },
         currentLevel: 1,
         secretSerialNumber: 1,
@@ -15,7 +16,8 @@ var unitHeight = 25,
     }, {
         event: 1,
         participant: {
-            participantId: 9
+            participantId: 9,
+            name: 'dhfkjsf'
         },
         currentLevel: 1,
         secretSerialNumber: 8,
@@ -23,7 +25,8 @@ var unitHeight = 25,
     }, {
         event: 1,
         participant: {
-            participantId: 2
+            participantId: 2,
+            name: 'dhfkjsf'
         },
         currentLevel: 1,
         secretSerialNumber: 3,
@@ -31,7 +34,8 @@ var unitHeight = 25,
     }, {
         event: 1,
         participant: {
-            participantId: 3
+            participantId: 3,
+            name: 'dhfkjsf'
         },
         currentLevel: 2,
         secretSerialNumber: 4,
@@ -39,7 +43,8 @@ var unitHeight = 25,
     }, {
         event: 1,
         participant: {
-            participantId: 4
+            participantId: 4,
+            name: 'dhfkjsf'
         },
         currentLevel: 1,
         secretSerialNumber: 5,
@@ -47,7 +52,8 @@ var unitHeight = 25,
     }, {
         event: 1,
         participant: {
-            participantId: 5
+            participantId: 5,
+            name: 'dhfkjsf'
         },
         currentLevel: 1,
         secretSerialNumber: 7,
@@ -65,12 +71,14 @@ var unitHeight = 25,
         var result = [];
         players = players.sort(playerShortById);
         for (var playerIndex = 0; playerIndex < players.length; playerIndex++) {
-            players[playerIndex] = {
-                name: players[playerIndex].participant.name,
-                participantId: players[playerIndex].participant.participantId,
-                secretSerialNumber: players[playerIndex].secretSerialNumber,
-                currentLevel: players[playerIndex].currentLevel,
-                event: players[playerIndex].event
+            if (players[playerIndex].participant) {
+                players[playerIndex] = {
+                    name: players[playerIndex].participant.name,
+                    participantId: players[playerIndex].participant.participantId,
+                    secretSerialNumber: players[playerIndex].secretSerialNumber,
+                    currentLevel: players[playerIndex].currentLevel,
+                    event: players[playerIndex].event
+                };
             }
             if (players[playerIndex].secretSerialNumber % 2 === 1) {
                 result.push(players[playerIndex], {});
@@ -102,18 +110,15 @@ var unitHeight = 25,
         var maxLevel = getMaxLevel(players),
             formatioArray = [];
         players = insertBy(players);
-        console.log(players);
         for (var level = 1; level <= maxLevel; level++) {
             formatioArray.push({
                 levelId: level,
                 groups: getGroupsForLevel(level, players)
             });
         }
-        console.log(formatioArray[0].groups);
         return formatioArray;
     };
 module.exports = function($scope, $http, $state) {
-
     $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
     $scope.getHeight = function(levelId) {

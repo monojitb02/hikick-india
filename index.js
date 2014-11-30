@@ -8,7 +8,7 @@ window.lang = require('./app/lang');
 require('angular');
 require('angular-ui-router');
 require('angular-bootstrap');
-require('ng-tags-input')
+require('ng-tags-input');
 
 require("jquery");
 require("jqueryUi");
@@ -21,6 +21,8 @@ require("retina");
 require("jqueryCookies");
 // require("tagsInput");
 require("custom");
+
+require('flipclock');
 
 
 var App = require('./app/application/app.module');
