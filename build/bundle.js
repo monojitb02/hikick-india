@@ -1322,7 +1322,7 @@ module.exports = function($scope, $http, $state) {
 'use strict';
 
 module.exports = function($scope, $http, $state) {
-    var clock = jQuery('.clock').FlipClock(0, {
+    var clock = jQuery('.clock').FlipClock(60, {
         countdown: true,
         clockFace: 'MinuteCounter'
     });
