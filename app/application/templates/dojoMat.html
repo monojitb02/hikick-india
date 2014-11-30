@@ -1,25 +1,82 @@
 <div class="pageheader">
-  <h2><i class="fa fa-trophy"></i> Dojo Mat-{{matId}}
+  <h2 class="pull-left"><i class="fa fa-trophy"></i> Dojo Mat-{{matId}}
   </h2>
-  <div class="controlls" ng-click="stop()">
+
+  <!-- <div class="clock col-sm-4 col-sm-offset-4"></div> -->
+
+  <div class="controlls">
     SetTimer:
     <input type="text">
   </div>
+  <span class="ui-spinner ui-widget ui-widget-content ui-corner-all">
+    <input type="text" id="minute" class="ui-spinner-input time-input" autocomplete="off" role="spinbutton" aria-valuenow="1">
+  </span>
+  <span class="time-devider">:</span>
+  <span class="ui-spinner ui-widget ui-widget-content ui-corner-all">
+    <input type="text" id="second" class="ui-spinner-input time-input" autocomplete="off" role="spinbutton" aria-valuenow="1">
+  </span>
+  <span>
+    <button class="btn btn-primary" ng-click="increasePoint(1,3)" ng-click="setTimer()">Set</button>
+  </span>
 </div>
 
 <div class="contentpanel">
   <div class="row">
-    <div class="col-sm-12 timer">
-      <div class="clock"></div>
+    <!-- red corner -->
+    <div class="col-sm-4 red-corner corner">
+      <h1 class="corner-name">Ao</h1>
+      <div class="input-group">
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-user"></span>
+        </span>
+        <input type="text" class="form-control" placeholder="Player1">
+      </div>
+      <div class="game-buttons">
+        <button class="btn btn-primary" ng-click="increasePoint(1,3)">
+          Ippon <span class="badge">3</span>
+        </button>
+        <button class="btn btn-primary" ng-click="increasePoint(1,2)">
+          Waza-ari <span class="badge">2</span>
+        </button>
+        <button class="btn btn-primary" ng-click="increasePoint(1,1)">
+          Yuko <span class="badge">1</span>
+        </button>
+      </div>
     </div>
-    <div class="col-sm-6 back-red">
-      fsdfhdksihf
+    <!-- mid part with timres and marks -->
+    <div class="col-sm-4">
+      <div class="row">
+        <div class="clock"></div>
+        <div class="col-sm-12 corner-both">
+          <div class="col-sm-12">
+            <h1 class="pull-left game-point">{{Player1Score}}</h1>
+            <h1 class="pull-right game-point">{{Player2Score}}</h1>
+          </div>
+          <button class="btn btn-block start-button" ng-class="{'btn-success':!timerRunning,'btn-danger':timerRunning}" ng-click="toggleTimer()">{{timerRunning?'Stop':'Start'}}</button>
+        </div>
+      </div>
     </div>
-    <!-- col-md-6 -->
-    <div class="col-sm-6 back-blue">
-      sdfdhsfgdsjfgh
+    <!-- blue corner -->
+    <div class="col-sm-4 blue-corner corner">
+      <h1 class="corner-name text-right">Aka</h1>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Player2">
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-user"></span>
+        </span>
+      </div>
+      <div class="text-right game-buttons">
+        <button class="btn btn-danger" ng-click="increasePoint(2,1)">
+          Yuko <span class="badge">1</span>
+        </button>
+        <button class="btn btn-danger" ng-click="increasePoint(2,2)">
+          Waza-ari <span class="badge">2</span>
+        </button>
+        <button class="btn btn-danger" ng-click="increasePoint(2,3)">
+          Ippon <span class="badge">3</span>
+        </button>
+      </div>
     </div>
-    <!-- col-md-6 -->
   </div>
   <!--row -->
 </div>

@@ -25,6 +25,12 @@
 }
 /******************** ForDojo Mat **************************/
 
+.clock {
+    z-index: 30;
+}
+.flip-clock-label {
+    display: none;
+}
 .timer {
     text-align: center;
     font-size: 60px;
@@ -32,9 +38,55 @@
     font-weight: bold;
     color: #555;
 }
-.back-red {
+.time-devider {
+    font-size: 55px;
+    line-height: 5px;
+    vertical-align: text-top;
+}
+.time-input {
+    width: 50px;
+    height: 30px;
+}
+.flip-clock-wrapper {
+    width: 300px;
+    float: none;
+    margin: 1em auto;
+}
+.red-corner {
     background-color: #F00;
 }
-.back-blue {
+.blue-corner {
     background-color: #00F;
+}
+.corner {
+    height: 600px;
+    padding-top: 20px;
+}
+.corner .input-group {
+    margin: 10px auto;
+}
+.corner-name {
+    font-size: 80px;
+    color: #fff;
+    margin-top: 0px;
+}
+.game-buttons button {
+    margin: 5px auto;
+}
+.start-button {
+    height: 80px;
+    font-size: 30px;
+}
+.corner-both {
+    height: 600px;
+    margin-top: -122px;
+    padding-top: 122px;
+    background: -webkit-linear-gradient(left, red, #ddd, blue);
+    background: -o-linear-gradient(right, red, #ddd, blue);
+    background: -moz-linear-gradient(right, red, #ddd, blue);
+    background: linear-gradient(to right, red, #ddd, blue);
+}
+.game-point {
+    font-size: 100px;
+    color: #fff;
 }

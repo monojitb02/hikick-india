@@ -36,6 +36,7 @@
         "jqueryCookies": "./build/resources/lib/bracket/jquery.cookies.js",
         "tagsInput": "./build/resources/lib/bracket/jquery.tagsinput.min.js",
         "custom": "./build/resources/lib/bracket/custom.js",
+        "mouseWheel": "./build/resources/lib/bracket/jquery.mousewheel.js",
         "flipclock": "./build/resources/lib/flipclock/flipclock.min.js"
     },
     "browserify-shim": {
@@ -76,6 +77,10 @@
         },
         "tagsInput": {
             "exports": "tagsInput",
+            "depends": ["jquery"]
+        },
+        "mouseWheel": {
+            "exports": "mouseWheel",
             "depends": ["jquery"]
         },
         "flipclock": {
