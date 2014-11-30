@@ -3,6 +3,10 @@
     "version": "0.0.1",
     "description": "Hikick-India",
     "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/monojitb02/hikick-india"
+    },
     "scripts": {
         "start": "watchify -t brfs index.js -o build/bundle.js -v",
         "bundle": "browserify -t brfs index.js -o build/bundle.js"
@@ -13,7 +17,8 @@
         "angular": "",
         "angular-bootstrap": "",
         "angular-ui-router": "",
-        "underscore": ""
+        "underscore": "",
+        "ng-tags-input": ""
     },
     "devDependencies": {
         "browserify": "^5.11.2",
@@ -30,7 +35,8 @@
         "retina": "./build/resources/lib/bracket/retina.min.js",
         "jqueryCookies": "./build/resources/lib/bracket/jquery.cookies.js",
         "tagsInput": "./build/resources/lib/bracket/jquery.tagsinput.min.js",
-        "custom": "./build/resources/lib/bracket/custom.js"
+        "custom": "./build/resources/lib/bracket/custom.js",
+        "flipclock": "./build/resources/lib/flipclock/flipclock.min.js"
     },
     "browserify-shim": {
         "jquery": {
@@ -70,6 +76,10 @@
         },
         "tagsInput": {
             "exports": "tagsInput",
+            "depends": ["jquery"]
+        },
+        "flipclock": {
+            "exports": "flipclock",
             "depends": ["jquery"]
         },
         "custom": {
