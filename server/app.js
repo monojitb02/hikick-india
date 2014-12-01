@@ -31,7 +31,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-app.use("/profile_pictures", lib.express.static("./assets/images"));
 app.use("/", lib.express.static("./public"));
 
 router(app);
