@@ -30,6 +30,6 @@ module.exports = function(app) {
     app.post('/api/logout', userController.logout);
     app.get('/api/candidate/view', userController.view);
     app.post('/api/candidate/add', multiparty, userController.add);
-    app.put('/api/candidate/update', multiparty, userController.updateOthers);
-    app.get('/api/candidate/search', userController.searchEmployee);
+    app.put('/api/candidate/update', multiparty, userController.update);
+    app.get('/api/candidate/search', userController.searchCandidate);
 };
