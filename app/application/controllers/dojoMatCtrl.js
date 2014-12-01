@@ -9,20 +9,33 @@ module.exports = function($scope, $http, $state) {
                 start: function() {
                     $scope.gameRunning = !$scope.gameRunning;
                     timeBreaks.push(new Date());
-                    console.log(timeBreaks);
-                    console.log('The clock has started!');
                 },
                 stop: function() {
                     $scope.gameRunning = !$scope.gameRunning;
                     timeBreaks.push(new Date());
-                    console.log(timeBreaks);
-                    console.log('The clock has stopped!');
                 }
             }
         }),
         timeBreaks = [],
-        Spinner = function(spinnerObj, buttons) {
-            var spinner = spinnerObj.spinner();
+        checkNumber = function(value) {
+            if (isNaN(value)) {
+                return 0;
+            }
+            if (isNaN(value)) {
+                return 0;
+            }
+            if (Number(value) >= 60) {
+                return 0;
+            }
+            if (Number(value) >= 60) {
+                return 0;
+            }
+            return Number(value);
+        },
+        Spinner = function(spinnerObj, spinCallback) {
+            var spinner = spinnerObj.spinner({
+                spin: spinCallback
+            });
             this.disableSpinner = function() {
                 if (spinner.spinner("option", "disabled")) {
                     spinner.spinner("enable");
@@ -37,21 +50,37 @@ module.exports = function($scope, $http, $state) {
                 spinner.spinner("value", value);
             };
         },
-        minute = new Spinner(jQuery("#minute"), jQuery(".ui-spinner-button")),
-        second = new Spinner(jQuery("#second"), jQuery(".ui-spinner-button"));
-    clock.setTime(defaultTimerSeconds);
-    $scope.defauleMatchTime = '180';
+        minute = new Spinner(jQuery("#minute"), function(event, ui) {
+            $scope.timerMinute = checkNumber(ui.value);
+            $scope.$apply();
+        }),
+        second = new Spinner(jQuery("#second"), function(event, ui) {
+            $scope.timerSecond = checkNumber(ui.value);
+            $scope.$apply();
+        });
+
+
+    // clock.setTime(defaultTimerSeconds);
+
     $scope.Player1Score = 0;
     $scope.Player2Score = 0;
-    console.log();
     $scope.matId = window.location.hash.split('dojoMat/')[1];
     $scope.toggleTimer = function() {
         clock.running ? clock.stop() : clock.start();
-        console.log(clock.getElapsed()); ////////////////////////Working here
-    }
+    };
+    $scope.setTimer = function() {
+        clock.setTime($scope.timerMinute * 60 + $scope.timerSecond);
+    };
+    $scope.resetTimer = function() {
+        jQuery("#second").val('0');
+        jQuery("#minute").val('3');
+        $scope.timerMinute = 3;
+        $scope.timerSecond = 0;
+        $scope.setTimer();
+    };
     $scope.gameRunning = clock.running;
     $scope.increasePoint = function(playerNumber, points) {
-        console.log('increase', playerNumber, points, $scope.Player1Score, $scope.Player2Score);
+        console.log('increase', playerNumber, points, $scope.timer, $scope.Player2Score);
         if ($scope.gameRunning) {
             if (playerNumber === 1) {
                 console.log('increases', playerNumber, points, $scope.Player1Score);
@@ -62,4 +91,5 @@ module.exports = function($scope, $http, $state) {
             }
         }
     }
+    $scope.resetTimer();
 }
