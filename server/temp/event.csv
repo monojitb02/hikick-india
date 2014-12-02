@@ -1,4 +1,4 @@
-eventId,eventName,gender,ageLimitLower,ageLimitUpper,weightLimitLower,weightLimitUpper
+_id,eventName,gender,ageLimitLower,ageLimitUpper,weightLimitLower,weightLimitUpper
 1,WEAPONS,M,0,13,0,1000
 2,WEAPONS,M,13,30,0,1000
 3,WEAPONS,M,30,1000,0,1000

@@ -4,7 +4,6 @@
  */
 'use strict';
 var lib = require('../../lib'),
-    roleModel = require('../models/role'),
     userModel = require('../models/user');
 
 module.exports = {
@@ -21,35 +20,26 @@ module.exports = {
         var workflow = lib.workflow(req, res);
         // console.log('checking: ', req.body, req.files);
         // if (!req.session)
-        if (req.path !== '/api/login' &&
-            req.path !== '/api/reset_password' &&
-            req.path !== '/api/app_details' &&
-            req.path !== '/assets/images' &&
-            req.path.split('/profile_pictures/')[0]) {
-            if ( /*!req.session.userId*/ !req.body.senderId &&
-                !req.query.senderId) {
+        if (req.path !== '/api/login') {
+            if (!req.session.userId) { /*!req.body.senderId && !req.query.senderId*/
                 workflow.outcome.errfor.message = lib.message.NOT_LOGGED_IN;
                 workflow.emit('response');
             } else {
-                next();
+                userModel
+                    .findOne({
+                        _id: req.session.userId
+                            // _id: senderId
+                    })
+                    .exec(function(err, data) {
+                        if (data) {
+                            req.sender = data;
+                            next();
+                        } else {
+                            workflow.outcome.errfor.message = lib.message.NOT_LOGGED_IN;
+                            workflow.emit('response');
+                        }
+                    });
             }
-        } else {
-            next();
-        }
-    },
-    populateUserDetails: function(req, res, next) {
-        var senderId = req.body.senderId ? req.body.senderId : req.query.senderId;
-        if (senderId) {
-            userModel
-                .findOne({
-                    // _id: req.session.userId                
-                    _id: senderId
-                })
-                .populate('companyProfile.role')
-                .exec(function(err, data) {
-                    req.sender = data;
-                    next();
-                });
         } else {
             next();
         }

@@ -81,16 +81,5 @@ module.exports = {
      *   attendance messages
      */
     NO_DATA_FOUND_IN_FILE: 'No data found in file',
-    ERROR_IN_READING_FILE: 'Error in reading file ',
-    INVALID_IN_TIME: 'Invalid inTime',
-    INVALID_OUT_TIME: 'Invalid outTime',
-    INVALID_IN_OR_OUT_TIME: 'InTime cannot be greater than outTime.',
-    ATTENDANCE_ADD_SUCCESSFUL: 'Successfully attendance added.',
-    ATTENDANCE_UPDATION_SUCCESSFUL: 'Attendance successfully updated.',
-    INVALID_MONTH: 'Invalid month.',
-    INVALID_YEAR: 'Invalid year.',
-    CSV_UPLOADED_SUCCESSFULLY: 'CSV uploaded successfully',
-    CSV_UPLOADED_PARTIALLY: 'CSV uploaded partially',
-    NO_ATTENDANCE_MONTH: 'No attendance found for this month.',
-    NO_ATTENDANCE_DAY: 'No attendance found for this day.'
+    ERROR_IN_READING_FILE: 'Error in reading file '
 };

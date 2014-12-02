@@ -77,4 +77,4 @@ tempParticipantSchema.index({
 }, {
     unique: true
 });
-module.exports = mongoose.model('tempCandidate', tempParticipantSchema);
+module.exports = mongoose.model('tempParticipant', tempParticipantSchema);

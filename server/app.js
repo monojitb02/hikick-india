@@ -1,7 +1,6 @@
 'use strict';
 var lib = require('./lib'),
     router = require('./router'),
-    jobScheduler = require('./api/cronjob'),
     server = lib.config.server,
     app = lib.express(),
     message = lib.message,
