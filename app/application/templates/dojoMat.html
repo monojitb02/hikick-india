@@ -49,45 +49,16 @@
 
       <div class="warning-holder">
         <div class="warning-controls col-sm-12">
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="first_warning_r">
-            <label for="first_warning_r" class="warning-lable">C</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="second_warning_r">
-            <label for="second_warning_r" class="warning-lable">K</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="third_warning_r">
-            <label for="third_warning_r" class="warning-lable">CH</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="fourth_warning_r">
-            <label for="fourth_warning_r" class="warning-lable">H</label>
+          <div class="col-sm-3 ckbox ckbox-warning" ng-repeat="warning in warningArray">
+            <input type="checkbox" id="{{'first_warning_r_'+warning}}" ng-checked="player1WarningArray1.indexOf(warning) > -1" ng-click="toggleWarning(warning,1,1)">
+            <label for="{{'first_warning_r_'+warning}}" class="warning-lable">{{warning}}</label>
           </div>
         </div>
+
         <div class="warning-controls col-sm-12">
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="first_warning_r_2">
-            <label for="first_warning_r_2" class="warning-lable">C</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="second_warning_r_2">
-            <label for="second_warning_r_2" class="warning-lable">K</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="third_warning_r_2">
-            <label for="third_warning_r_2" class="warning-lable">CH</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="fourth_warning_r_2">
-            <label for="fourth_warning_r_2" class="warning-lable">H</label>
+          <div class="col-sm-3 ckbox ckbox-warning" ng-repeat="warning in warningArray">
+            <input type="checkbox" id="{{'first_warning_r_2_'+warning}}" ng-checked="player1WarningArray2.indexOf(warning) > -1" ng-click="toggleWarning(warning,1,2)">
+            <label for="{{'first_warning_r_2_'+warning}}" class="warning-lable">{{warning}}</label>
           </div>
         </div>
       </div>
@@ -129,46 +100,16 @@
       </div>
       <div class="warning-holder">
         <div class="warning-controls col-sm-12">
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="first_warning_b">
-            <label for="first_warning_b" class="warning-lable">C</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="second_warning_b">
-            <label for="second_warning_b" class="warning-lable">K</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="third_warning_b">
-            <label for="third_warning_b" class="warning-lable">CH</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="fourth_warning_b">
-            <label for="fourth_warning_b" class="warning-lable">H</label>
+          <div class="col-sm-3 ckbox ckbox-warning" ng-repeat="warning in warningArray">
+            <input type="checkbox" id="{{'first_warning_b_'+warning}}" ng-checked="player2WarningArray1.indexOf(warning) > -1" ng-click="toggleWarning(warning,2,1)">
+            <label for="{{'first_warning_b_'+warning}}" class="warning-lable">{{warning}}</label>
           </div>
         </div>
 
         <div class="warning-controls col-sm-12">
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="first_warning_b_2">
-            <label for="first_warning_b_2" class="warning-lable">C</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" value="1" id="second_warning_b_2">
-            <label for="second_warning_b_2" class="warning-lable">K</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="third_warning_b_2">
-            <label for="third_warning_b_2" class="warning-lable">CH</label>
-          </div>
-
-          <div class="col-sm-3 ckbox ckbox-warning">
-            <input type="checkbox" id="fourth_warning_b_2">
-            <label for="fourth_warning_b_2" class="warning-lable">H</label>
+          <div class="col-sm-3 ckbox ckbox-warning" ng-repeat="warning in warningArray">
+            <input type="checkbox" id="{{'first_warning_b_2_'+warning}}" ng-checked="player2WarningArray2.indexOf(warning) > -1" ng-click="toggleWarning(warning,2,2)">
+            <label for="{{'first_warning_b_2_'+warning}}" class="warning-lable">{{warning}}</label>
           </div>
         </div>
       </div>

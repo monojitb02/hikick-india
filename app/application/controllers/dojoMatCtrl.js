@@ -57,10 +57,18 @@ module.exports = function($scope, $http, $state) {
         second = new Spinner(jQuery("#second"), function(event, ui) {
             $scope.timerSecond = checkNumber(ui.value);
             $scope.$apply();
-        });
+        }),
+        resetAll = function() { //reset everything
+
+        };
 
 
-    // clock.setTime(defaultTimerSeconds);
+    $scope.warningArray = ['C', 'K', 'CH', 'H'];
+    $scope.player1WarningArray1 = [];
+    $scope.player1WarningArray2 = [];
+    $scope.player2WarningArray1 = [];
+    $scope.player2WarningArray2 = [];
+
 
     $scope.Player1Score = 0;
     $scope.Player2Score = 0;
@@ -90,6 +98,42 @@ module.exports = function($scope, $http, $state) {
                 $scope.Player2Score = $scope.Player2Score + points;
             }
         }
-    }
+    };
+    $scope.toggleWarning = function(warning, player, warningLevel) {
+        var idx;
+        if (player === 1 && warningLevel === 1) {
+            idx = $scope.player1WarningArray1.indexOf(warning);
+            if (idx > -1) {
+                $scope.player1WarningArray1.splice(idx, 1);
+            } else {
+                $scope.player1WarningArray1.push(warning);
+            }
+        } else if (player === 1 && warningLevel === 2) {
+            idx = $scope.player1WarningArray2.indexOf(warning);
+            if (idx > -1) {
+                $scope.player1WarningArray2.splice(idx, 1);
+            } else {
+                $scope.player1WarningArray2.push(warning);
+            }
+
+        } else if (player === 2 && warningLevel === 1) {
+            idx = $scope.player2WarningArray1.indexOf(warning);
+            if (idx > -1) {
+                $scope.player2WarningArray1.splice(idx, 1);
+            } else {
+                $scope.player2WarningArray1.push(warning);
+            }
+
+        } else if (player === 2 && warningLevel === 2) {
+            idx = $scope.player2WarningArray2.indexOf(warning);
+            if (idx > -1) {
+                $scope.player2WarningArray2.splice(idx, 1);
+            } else {
+                $scope.player2WarningArray2.push(warning);
+            }
+        }
+        // console.log('toggleWarning', $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player2WarningArray1, $scope.player2WarningArray2)
+    };
+
     $scope.resetTimer();
 }

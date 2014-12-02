@@ -48,6 +48,7 @@ var lib = require('../../lib'),
                 type: Date
             }
         }],
+        redCornerWarnings: [String],
         blueCornerPoints: [{
             point: {
                 type: Number,
@@ -57,6 +58,7 @@ var lib = require('../../lib'),
                 type: Date
             }
         }],
+        blueCornerWarnings: [String],
         winner: {
             type: Schema.Types.ObjectId,
             ref: 'participant',
