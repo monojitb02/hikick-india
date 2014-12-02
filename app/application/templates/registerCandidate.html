@@ -15,7 +15,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Enter name.." class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" placeholder="Enter name.." class="form-control col-sm-11" ng-model="participant.name">
           </div>
         </div>
         <div class="form-group">
@@ -24,7 +24,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Enter instructor's name.." class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" placeholder="Enter instructor's name.." class="form-control col-sm-11" ng-model="participant.instructor">
           </div>
         </div>
         <div class="form-group">
@@ -34,11 +34,11 @@
           </label>
           <div class="col-sm-3 radio clearfix">
             <div class="rdio rdio-primary col-sm-3">
-              <input type="radio" value="M" id="male" name="gender" class="ng-pristine ng-untouched ng-valid">
+              <input type="radio" value="M" id="male" class="ng-pristine ng-untouched ng-valid" ng-model="participant.gender">
               <label for="male">Male</label>
             </div>
             <div class="rdio rdio-primary col-sm-3">
-              <input type="radio" value="F" id="female" name="gender" class="ng-pristine ng-untouched ng-valid">
+              <input type="radio" value="F" id="female" class="ng-pristine ng-untouched ng-valid" ng-model="participant.gender">
               <label for="female">Female</label>
             </div>
           </div>
@@ -50,7 +50,7 @@
           </label>
           <div class="col-sm-6">
             <p class="input-group">
-              <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt" is-open="opened" datepicker-options="dateOptions" ng-required="true" show-button-bar="false" max-date="{{today}}" disabled/>
+              <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dob" is-open="opened" datepicker-options="dateOptions" ng-required="true" show-button-bar="false" max-date="{{today}}" disabled/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
               </span>
@@ -63,7 +63,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Enter wieght.. (e.g 45.50 kg)" class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" placeholder="Enter wieght.. (e.g 45.50 kg)" class="form-control col-sm-11" ng-model="participant.weight">
           </div>
         </div>
         <div class="form-group">
@@ -72,7 +72,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-3">
-            <select name="role" class="form-control">
+            <select class="form-control" ng-model="participant.country">
               <option>Select</option>
               <option>India</option>
               <option>Bangladesh</option>
@@ -89,15 +89,15 @@
           </label>
           <div class="col-sm-6">
             <div class="ckbox ckbox-primary col-sm-4">
-              <input type="checkbox" id="chk-kata">
+              <input type="checkbox" id="chk-kata" ng-model="participent.choiceOfEvents.kata">
               <label for="chk-kata">Kata</label>
             </div>
             <div class="ckbox ckbox-primary col-sm-4">
-              <input type="checkbox" id="chk-Kumite">
+              <input type="checkbox" id="chk-Kumite" ng-model="participent.choiceOfEvents.kumite">
               <label for="chk-Kumite">Kumite</label>
             </div>
             <div class="ckbox ckbox-primary col-sm-4">
-              <input type="checkbox" id="chk-Weapons">
+              <input type="checkbox" id="chk-Weapons" ng-model="participent.choiceOfEvents.weapons">
               <label for="chk-Weapons">Weapons</label>
             </div>
           </div>
@@ -108,7 +108,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Contact Number" class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" placeholder="Contact Number" class="form-control col-sm-11" name="phoneNumber" ng-model="participent.contactNumber">
           </div>
         </div>
         <div class="form-group">
@@ -127,7 +127,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <textarea name="bio" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5"></textarea>
+            <textarea name="bio" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5" ng-model="participent.address"></textarea>
           </div>
         </div>
         <div class="form-group">

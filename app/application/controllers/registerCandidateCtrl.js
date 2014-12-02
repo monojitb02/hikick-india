@@ -2,11 +2,11 @@
 
 module.exports = function($scope, $http, $state) {
     //date picker handler
-    $scope.dt = '';
+    $scope.dob = '';
     $scope.today = new Date();
 
     $scope.clear = function() {
-        $scope.dt = null;
+        $scope.dob = null;
     };
 
     $scope.toggleMin = function() {
