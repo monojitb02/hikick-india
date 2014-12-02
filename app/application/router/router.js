@@ -1,7 +1,9 @@
 'use strict';
-var fs = require('fs');
 
-module.exports = function($stateProvider, $locationProvider, $urlRouterProvider) {
+var fs = require('fs');
+var utility = require('../../util');
+
+module.exports = function($stateProvider,$locationProvider, $urlRouterProvider) {
     window.console.log('Starting app');
     $stateProvider
         .state('login', {
@@ -78,8 +80,11 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
         });
 
     $urlRouterProvider.otherwise(function($injector) {
-        var $state = $injector.get('$state');
+        var $state = $injector.get('$state'),
+        id=utility.getCookie('uid');
+        if(id){
+            $state.go('app.home');
+        }
         $state.go('login');
     });
-
 };

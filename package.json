@@ -17,7 +17,6 @@
         "angular": "",
         "angular-bootstrap": "",
         "angular-ui-router": "",
-        "underscore": "",
         "ng-tags-input": ""
     },
     "devDependencies": {
@@ -26,6 +25,7 @@
     },
     "browser": {
         "jquery": "./build/resources/lib/bracket/jquery-1.10.2.min.js",
+        "jqueryValidate": "./build/resources/lib/bracket/jquery.validate.min.js",
         "jqueryUi": "./build/resources/lib/bracket/jquery-ui-1.10.3.min.js",
         "jqueryMigrate": "./build/resources/lib/bracket/jquery-migrate-1.2.1.min.js",
         "bootstrap": "./build/resources/lib/bracket/bootstrap.min.js",
@@ -41,6 +41,10 @@
     "browserify-shim": {
         "jquery": {
             "exports": "jquery"
+        },
+        "jqueryValidate": {
+            "exports": "jqueryValidate",
+            "depends": ["jquery"]
         },
         "jqueryUi": {
             "exports": "jqueryUi",
