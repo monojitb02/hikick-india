@@ -66,10 +66,6 @@ participantSchema = new Schema({
     address: {
         type: String,
         required: true
-    },
-    profilePictureFile: {
-        type: String,
-        required: false
     }
 }, {
     versionKey: false

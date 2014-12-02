@@ -10,69 +10,70 @@
     <div class="panel-body">
       <form class="form-horizontal form-bordered">
         <div class="form-group">
-          <label class="col-sm-3 control-label">Profile Picture</label>
+          <label class="col-sm-3 control-label">
+            Name
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-6">
-            <div class="col-sm-9 upload-image-group">
-              <div class="change-img profile-picture-container">
-                <img class="speaker-picture-small">
-              </div>
-              <div class="change-btn change-img-btn">
-                <input class="upload" type="file" id="choose" />
-                <a class="btn btn-primary">Upload Image</a>
-              </div>
-            </div>
+            <input type="text" placeholder="Enter name.." class="form-control col-sm-11" ng-model="participant.name">
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Name</label>
+          <label class="col-sm-3 control-label">
+            Instructor's Name
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Enter name.." class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" placeholder="Enter instructor's name.." class="form-control col-sm-11" ng-model="participant.instructor">
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Instructor's Name</label>
-          <div class="col-sm-6">
-            <input type="text" placeholder="Enter instructor's name.." class="form-control col-sm-11" name="phoneNumber">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-sm-3 control-label">Gender</label>
+          <label class="col-sm-3 control-label">
+            Gender
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-3 radio clearfix">
             <div class="rdio rdio-primary col-sm-3">
-              <input type="radio" value="M" id="male" name="gender" class="ng-pristine ng-untouched ng-valid">
+              <input type="radio" value="M" id="male" class="ng-pristine ng-untouched ng-valid" ng-model="participant.gender">
               <label for="male">Male</label>
             </div>
             <div class="rdio rdio-primary col-sm-3">
-              <input type="radio" value="F" id="female" name="gender" class="ng-pristine ng-untouched ng-valid">
+              <input type="radio" value="F" id="female" class="ng-pristine ng-untouched ng-valid" ng-model="participant.gender">
               <label for="female">Female</label>
             </div>
           </div>
         </div>
-        <div class="form-group" ng-show="profile.editCompanyProfile">
-          <label class="col-sm-3 control-label">Date of Birth
+        <div class="form-group">
+          <label class="col-sm-3 control-label">
+            Date of Birth
+            <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <div class="input-group col-sm-7">
-              <input name="DOB" type="text" class="form-control disabled-input-with-border" datepicker-popup="{{format}}" ng-model="employee.companyProfile.DOB" is-open="DOBOpened" datepicker-options="dateOptions" ng-required="true" close-text="Close" disabled="disabled" />
+            <p class="input-group">
+              <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dob" is-open="opened" datepicker-options="dateOptions" ng-required="true" show-button-bar="false" max-date="{{today}}" disabled/>
               <span class="input-group-btn">
-                  <button type="button" class="btn btn-default" ng-click="DOBOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
-                  </button>
-                </span>
-            </div>
-
+                <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span>
+            </p>
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Weight</label>
+          <label class="col-sm-3 control-label">
+            Weight
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Enter wieght.. (e.g 45.50 kg)" class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" placeholder="Enter wieght.. (e.g 45.50 kg)" class="form-control col-sm-11" ng-model="participant.weight">
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Country
+          <label class="col-sm-3 control-label">
+            Country
+            <span class="asterisk">*</span>
           </label>
           <div class="col-sm-3">
-            <select name="role" class="form-control">
+            <select class="form-control" ng-model="participant.country">
+              <option>Select</option>
               <option>India</option>
               <option>Bangladesh</option>
               <option>Nepal</option>
@@ -81,46 +82,58 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Choice of Events</label>
-          <div class="checkbox col-sm-2">
-            <label>
-              <input type="checkbox">Kata
-            </label>
-          </div>
-          <div class="checkbox col-sm-2">
-            <label>
-              <input type="checkbox">Kumite
-            </label>
-          </div>
-          <div class="checkbox col-sm-2">
-            <label>
-              <input type="checkbox">Weapons
-            </label>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-sm-3 control-label">Contact Number</label>
+
+          <label class="col-sm-3 text-right">
+            Choice of Events
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-6">
-            <input type="text" placeholder="Contact Number" class="form-control col-sm-11" name="phoneNumber">
+            <div class="ckbox ckbox-primary col-sm-4">
+              <input type="checkbox" id="chk-kata" ng-model="participent.choiceOfEvents.kata">
+              <label for="chk-kata">Kata</label>
+            </div>
+            <div class="ckbox ckbox-primary col-sm-4">
+              <input type="checkbox" id="chk-Kumite" ng-model="participent.choiceOfEvents.kumite">
+              <label for="chk-Kumite">Kumite</label>
+            </div>
+            <div class="ckbox ckbox-primary col-sm-4">
+              <input type="checkbox" id="chk-Weapons" ng-model="participent.choiceOfEvents.weapons">
+              <label for="chk-Weapons">Weapons</label>
+            </div>
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Email</label>
+          <label class="col-sm-3 control-label">
+            Contact Number
+            <span class="asterisk">*</span>
+          </label>
+          <div class="col-sm-6">
+            <input type="text" placeholder="Contact Number" class="form-control col-sm-11" name="phoneNumber" ng-model="participent.contactNumber">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">
+            Email
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-6">
             <input type="text" placeholder="email" class="form-control col-sm-11" name="phoneNumber">
           </div>
         </div>
         <!-- address-->
         <div class="form-group">
-          <label class="col-sm-3 control-label">Address</label>
+          <label class="col-sm-3 control-label">
+            Address
+            <span class="asterisk">*</span>
+          </label>
           <div class="col-sm-6">
-            <textarea name="bio" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5"></textarea>
+            <textarea name="bio" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5" ng-model="participent.address"></textarea>
           </div>
         </div>
         <div class="form-group">
           <div class="col-sm-6 col-sm-offset-3">
             <button class="btn btn-primary" type="button">Register</button>
-            <button class="btn btn-default">Reset</button>
+            <button class="btn btn-default pull-right">Reset</button>
           </div>
         </div>
       </form>

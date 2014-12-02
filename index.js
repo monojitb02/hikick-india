@@ -10,7 +10,7 @@ require('angular-ui-router');
 require('angular-bootstrap');
 require('ng-tags-input');
 
-window.$ = require("jquery");
+require("jquery");
 require("jqueryValidate");
 require("jqueryUi");
 require("jqueryMigrate");
