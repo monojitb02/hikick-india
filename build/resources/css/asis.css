@@ -1,1 +1,6 @@
-
+.ckbox label:before {
+    top: 3px !important;
+}
+.ckbox label:after {
+    top: 3px !important;
+}

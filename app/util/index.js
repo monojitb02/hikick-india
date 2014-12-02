@@ -2,7 +2,6 @@
 
 module.exports={
 	deleteCookie:function (name) {
-		console.log('delete');
 		document.cookie=name+'=;expires=Thu, 01Jan 1970 00:00:01 GMT; ';
 	},
 	setCookie:function (cname,cvalue) {
