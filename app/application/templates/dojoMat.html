@@ -32,7 +32,7 @@
         <span class="input-group-addon">
           <span class="glyphicon glyphicon-user"></span>
         </span>
-        <input type="text" class="form-control" placeholder="Player1">
+        <input type="text" class="form-control" placeholder="Select Player1" ng-disabled="matchStarted">
       </div>
 
       <div class="game-buttons">
@@ -74,6 +74,10 @@
             <h1 class="pull-right game-point">{{Player2Score}}</h1>
           </div>
           <button class="btn btn-block start-button" ng-class="{'btn-success':!gameRunning,'btn-danger':gameRunning}" ng-click="toggleTimer()">{{gameRunning?'Stop':'Start'}}</button>
+          <div class="category-heading-container row">
+            <div class="col-sm-12 text-center category-heading">Warning Category 1</div>
+            <div class="col-sm-12 text-center category-heading">Warning Category 2</div>
+          </div>
           <button class="btn btn-block submit-button" ng-click="submit()">Submit</button>
         </div>
       </div>
@@ -82,7 +86,7 @@
     <div class="col-sm-4 blue-corner corner">
       <h1 class="corner-name text-right">Aka</h1>
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Player2">
+        <input type="text" class="form-control" placeholder="Select Player2" ng-disabled="matchStarted">
         <span class="input-group-addon">
           <span class="glyphicon glyphicon-user"></span>
         </span>
