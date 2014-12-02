@@ -89,10 +89,10 @@
     height: 600px;
     margin-top: -122px;
     padding-top: 122px;
-    background: -webkit-linear-gradient(left, red, #ddd, blue);
-    background: -o-linear-gradient(right, red, #ddd, blue);
-    background: -moz-linear-gradient(right, red, #ddd, blue);
-    background: linear-gradient(to right, red, #ddd, blue);
+    background: -webkit-linear-gradient(left, red, #999, blue);
+    background: -o-linear-gradient(right, red, #999, blue);
+    background: -moz-linear-gradient(right, red, #999, blue);
+    background: linear-gradient(to right, red, #999, blue);
 }
 .game-point {
     font-size: 100px;
@@ -120,4 +120,14 @@
 }
 .red-corner .warning-holder {
     right: 0px;
+}
+.category-heading {
+    font-size: 20px;
+    font-weight: bold;
+    color: #F0D40E;
+    padding: 24px 0px;
+}
+.category-heading-container {
+    position: absolute;
+    bottom: 105px;
 }

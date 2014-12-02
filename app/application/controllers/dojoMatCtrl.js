@@ -1,6 +1,7 @@
 'use strict';
-var defaultTimerSeconds = 180;
-module.exports = function($scope, $http, $state) {
+var defaultTimerSeconds = 180,
+    submitGracePeriod = 5000;
+module.exports = function($scope, $http, $state, $timeout) {
     var clock = jQuery('.clock').FlipClock({
             countdown: true,
             autoStart: false,
@@ -8,6 +9,7 @@ module.exports = function($scope, $http, $state) {
             callbacks: {
                 start: function() {
                     $scope.gameRunning = !$scope.gameRunning;
+                    $scope.matchStarted = true;
                     timeBreaks.push(new Date());
                 },
                 stop: function() {
@@ -60,6 +62,11 @@ module.exports = function($scope, $http, $state) {
         }),
         resetAll = function() { //reset everything
 
+        },
+        freezeMatch = function() {
+            $timeout(function() {
+                $scope.matchEnded = true;
+            }, submitGracePeriod)
         };
 
 
@@ -68,6 +75,8 @@ module.exports = function($scope, $http, $state) {
     $scope.player1WarningArray2 = [];
     $scope.player2WarningArray1 = [];
     $scope.player2WarningArray2 = [];
+    $scope.matchStarted = false;
+    $scope.matchEnded = false;
 
 
     $scope.Player1Score = 0;
@@ -89,7 +98,7 @@ module.exports = function($scope, $http, $state) {
     $scope.gameRunning = clock.running;
     $scope.increasePoint = function(playerNumber, points) {
         console.log('increase', playerNumber, points, $scope.timer, $scope.Player2Score);
-        if ($scope.gameRunning) {
+        if ($scope.matchStarted && !$scope.matchEnded) {
             if (playerNumber === 1) {
                 console.log('increases', playerNumber, points, $scope.Player1Score);
                 $scope.Player1Score = $scope.Player1Score + points;
@@ -132,8 +141,12 @@ module.exports = function($scope, $http, $state) {
                 $scope.player2WarningArray2.push(warning);
             }
         }
+        console.log(clock.getTime().time);
         // console.log('toggleWarning', $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player2WarningArray1, $scope.player2WarningArray2)
     };
+    $scope.submit = function() {
+        freezeMatch();
+    }
 
     $scope.resetTimer();
 }
