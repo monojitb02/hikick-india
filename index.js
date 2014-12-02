@@ -20,6 +20,7 @@ require("jquerySparkline");
 require("toggles");
 require("retina");
 require("jqueryCookies");
+require("mouseWheel");
 // require("tagsInput");
 require("custom");
 
