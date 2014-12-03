@@ -1,4 +1,4 @@
-participantId,name,instructor,country,state,gender,clubName,dob,weight,kata ,kumite,weapons,email,contactNumber,address,profilePictureFile 
+registrationId,name,instructor,country,state,gender,clubName,dob,weight,kata ,kumite,weapons,email,contactNumber,address,profilePictureFile 
 3,A JAN,DILIP JANA ,India,WB,F,MARTIAL ARTS OF SPORTS KARATE ASSOCIATION,08/08/1987,44.5,1,1,1,lindalijana@gmail.com,+91 8296675411,HALISAHAR SHABE PUKUR,af81ca794146f2316d8172ac.jpg
 4,Brusli Jana,DILIP JANA ,India,WB,M,MARTIAL ARTS OF SPORTS KARATE ASSOCIATION,29/09/1989,50,1,1,1,brusli.jana@gmail.com,9330960207,Halisahar Saheb pukur. Po:- Nabanagar. Dist:- 24pgs(N)Pin :- 743136.,13abeaae2070746eb11ccae7e5.jpg
 5,sonu,suresh kumar,India,UP,M,MARTIAL ARTS OF SPORTS KARATE ASSOCIATION,06/11/1986,48,0,1,0,sonuigib2013@gmail.com,9717990204,"shiv puri vijay nagar by pass gali, no,2, h.no,50.a,bloock, sce,9, , neeraj pal ghazibad,201009",ff3032f91ef821e02f7209d11.jpg

@@ -9,7 +9,7 @@ var lib = require('../../lib'),
 module.exports = {
     dummyLogin: function(req, res, next) {
         userModel.findOne({
-                _id: "542a3a5aed25bb350faef507"
+                _id: "547cb1cdbd419a9357893bae"
             })
             .exec(function(errr, data) {
                 req.session.userId = data._id;
