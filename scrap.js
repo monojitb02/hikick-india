@@ -62,3 +62,69 @@ require("toggles");
 require("retina");
 require("jquery-cookies");
 require("custom");
+
+/*
+<div id="tags_added">
+  <ul ng-hide="!selectedParticipant.name" class="no-style">
+    <li class="clearfix">
+      <div class="clear-both">
+        <div class="col-sm-2 clearfix">
+          <img style="width: 100%" ng-src="{{selectedParticipant.profilePictureFile | url}}" onerror="this.onerror=null;this.src='./resources/images/user.png';">
+        </div>
+        <div class="col-sm-8 no-padding-left clearfix">
+          <div>{{selectedParticipant.name | name}}</div>
+          <span class="speaker-description">{{selectedParticipant.country}}</span>
+          <span class="speaker-description" ng-show="selectedParticipant.state">,{{selectedParticipant.state}}</span>
+          <span class="speaker-description">,{{selectedParticipant.clubName}}</span>
+        </div>
+        <div class="col-sm-2">
+          <span class="close" title="Remove Participant" ng-click="removeParticipant()" data-btn-name="close_speaker_search">×</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<input ng-hide="selectedParticipant.name" type="text" placeholder="Search Participant here..." ng-model="participantAutoSearch" ng-keyup="getManagerList()" class="form-control">
+
+<div ng-hide="!participantAutoSearch.trim().length" class="tag-suggestion search-result-margin" ng-show="displayResult">
+  <div class="search-result-close-block">
+    <span class="search-result-close-text">Managers found :</span>
+    <span class="close" title="Close search result" ng-click="closeSearchResult()">×</span>
+  </div>
+  <ul ng-hide="!participants.length" class="chosen-results no-style" role="menu">
+    <li ng-repeat="participant in participants">
+      <div class="clear-both">
+        <div class="col-sm-2 clearfix">
+          <img class="col-sm-12" ng-src="{{participant.profilePictureFile | url}}" onerror="this.onerror=null;this.src='./resources/images/user.png';">
+        </div>
+        <div class="col-sm-8 no-padding-left clearfix">
+          <div>{{participant.name | name}}</div>
+          <div>
+            <span class="speaker-description">{{participant.country}}</span>
+            <span class="speaker-description" ng-show="participant.state">,{{participant.state}}</span>
+            <span class="speaker-description">,{{participant.clubName}}</span>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-primary add-button pull-right" ng-click="addParticipant($index)">Add</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <div id="no_speaker" ng-hide="participants.length" class="text-center">
+    <span class="fa fa-spin fa-spinner"></span>
+  </div>
+</div>*/
+newTodoApp.directive('todoEnter', function() {
+    return function(scope, element, attrs) {
+        element.bind('keyup', function(event) {
+            if (event.which === 13) {
+                scope.$apply(function() {
+                    scope.$eval(attrs.todoEnter);
+                });
+                event.preventDefault();
+            }
+        });
+    };
+});
