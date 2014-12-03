@@ -9,15 +9,8 @@ module.exports = {
     expressSession: require('express-session'), //Acquiring express-session and exporting it as expressSession
     bodyParser: require('body-parser'), //Acquiring body-parser and exporting it as bodyParser
     cookieParser: require('cookie-parser'), //Acquiring cookie-parser and exporting it as cookieParser
-    csvParser: require('csv-parse'), //Acquiring csv-parse and exporting it as csvParse
-    nodemailer: require('nodemailer'), //Acquiring nodemailer and exporting it as nodemailer
-    nodemailerSmtp: require('nodemailer-smtp-transport'), //Acquiring nodemailer-smtp-transport and exporting it as nodemailerSmtp
-    multiparty: require('connect-multiparty'), //Acquiring connect-multiparty and exporting it as multiparty
-    fsExtra: require('fs.extra'), //Acquiring fs.extra and exporting it as fsExtra
     flat: require('flat'), //Acquiring flat and exporting it as flat
     puid: require('puid'), //Acquiring puid and exporting it as puid
-    mmMagic: require('mmmagic'),
-    scheduler: require('node-schedule'),
     workflow: require('./api/responses/workflow'), //Acquiring workflow and exporting it as workflow
     config: require('./config'), //Acquiring config and exporting it as config
     message: require('./api/lang') //Acquiring lang and exporting it as message,

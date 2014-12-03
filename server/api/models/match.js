@@ -10,7 +10,7 @@ var lib = require('../../lib'),
             required: true
         },
         event: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: 'event',
             required: true
         },

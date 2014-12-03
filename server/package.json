@@ -6,21 +6,14 @@
     "dependencies": {
         "MD5": "*",
         "body-parser": "*",
-        "connect-multiparty": "*",
         "cookie-parser": "*",
-        "csv-parse": "*",
         "express": "*",
         "express-session": "*",
         "flat": "*",
-        "fs.extra": "*",
         "mongoose": "*",
-        "node-schedule": "^0.1.13",
-        "nodemailer": "*",
-        "nodemailer-smtp-transport": "*",
         "puid": "*",
         "q": "*",
-        "underscore": "*",
-        "mmmagic": "*"
+        "underscore": "*"
     },
     "devDependencies": {
         "mocha": "*",
