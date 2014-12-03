@@ -3,7 +3,7 @@
 var fs = require('fs');
 var utility = require('../../util');
 
-module.exports = function($stateProvider,$locationProvider, $urlRouterProvider) {
+module.exports = function($stateProvider, $locationProvider, $urlRouterProvider) {
     window.console.log('Starting app');
     $stateProvider
         .state('login', {
@@ -81,10 +81,11 @@ module.exports = function($stateProvider,$locationProvider, $urlRouterProvider) 
 
     $urlRouterProvider.otherwise(function($injector) {
         var $state = $injector.get('$state'),
-        id=utility.getCookie('uid');
-        if(id){
+            id = utility.getCookie('uid');
+        if (id) {
             $state.go('app.home');
+        } else {
+            $state.go('login');
         }
-        $state.go('login');
     });
 };
