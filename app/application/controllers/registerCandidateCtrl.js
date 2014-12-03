@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = function($scope, $http, $state) {
+
     //date picker handler
     $scope.dob = '';
     $scope.today = new Date();

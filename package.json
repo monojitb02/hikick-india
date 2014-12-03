@@ -25,7 +25,7 @@
     },
     "browser": {
         "jquery": "./build/resources/lib/bracket/jquery-1.10.2.min.js",
-        "jqueryValidate": "./build/resources/lib/bracket/jquery.form-validator.min.js",
+        "jqueryValidate": "./build/resources/lib/bracket/jquery.validate.min.js",
         "jqueryUi": "./build/resources/lib/bracket/jquery-ui-1.10.3.min.js",
         "jqueryMigrate": "./build/resources/lib/bracket/jquery-migrate-1.2.1.min.js",
         "bootstrap": "./build/resources/lib/bracket/bootstrap.min.js",

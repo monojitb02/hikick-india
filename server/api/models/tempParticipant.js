@@ -5,7 +5,7 @@ var mongoose = require('../../lib').mongoose,
     tempParticipantSchema;
 
 tempParticipantSchema = new Schema({
-    registrationId: {
+    participantId: {
         type: Number,
         required: true
     },
@@ -73,7 +73,7 @@ tempParticipantSchema = new Schema({
     versionKey: false
 });
 tempParticipantSchema.index({
-    registrationId: 1
+    participantId: 1
 }, {
     unique: true
 });

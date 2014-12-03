@@ -4,3 +4,9 @@
 .ckbox label:after {
     top: 3px !important;
 }
+.registration-header {
+    margin-bottom: 15px !important;
+}
+.id-submit-btn {
+    padding: 8px 15px !important;
+}

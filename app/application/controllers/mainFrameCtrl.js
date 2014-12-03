@@ -121,12 +121,13 @@ module.exports = function($scope, $state) {
         }
 
     });
+
     //checking login status
-    var id=utility.getCookie('uid');
-    if(!id){
-       $state.go('login'); 
+    var id = utility.getCookie('uid');
+    if (!id) {
+        $state.go('login');
     }
-    $scope.logout=function(){
+    $scope.logout = function() {
         utility.deleteCookie('uid');
         $state.go('login');
     };
