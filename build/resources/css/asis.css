@@ -1,12 +1,22 @@
+.p-b-30 {
+    padding-bottom: 30px;
+}
+/************ library override *********/
+
 .ckbox label:before {
     top: 3px !important;
 }
 .ckbox label:after {
     top: 3px !important;
 }
+/*************** registration page *********************/
+
 .registration-header {
     margin-bottom: 15px !important;
 }
 .id-submit-btn {
     padding: 8px 15px !important;
+}
+.calender-btn {
+    padding: 8px 15px;
 }

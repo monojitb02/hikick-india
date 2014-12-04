@@ -9,11 +9,10 @@ var lib = require('./lib'),
      *controllers
      */
     userController = require('./api/controllers/userController'),
-    << << << < HEAD
-candidateController = require('./api/controllers/candidateController'),
-    temp_participantController = require('./api/controllers/temp_participantController'); === === =
-participantController = require('./api/controllers/participantController'),
-    tempParticipantController = require('./api/controllers/tempParticipantController'); >>> >>> > e312f5a07e7d7a7bd4151e13d3a02b4d9b2cf21b
+    //candidateController = require('./api/controllers/candidateController'),
+    temp_participantController = require('./api/controllers/temp_participantController'),
+    participantController = require('./api/controllers/participantController'),
+    tempParticipantController = require('./api/controllers/tempParticipantController');
 /*
  *utils
  */

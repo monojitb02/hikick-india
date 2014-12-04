@@ -15,7 +15,6 @@ module.exports = {
                 participantId: participantId
             })
             .exec(function(err, result) {
-                console.log('here', result);
                 if (err) {
                     deferred.reject(err);
                 } else {
