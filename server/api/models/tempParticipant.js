@@ -58,7 +58,7 @@ tempParticipantSchema = new Schema({
         required: true
     },
     contactNumber: {
-        type: Number,
+        type: String,
         required: true
     },
     address: {
@@ -77,4 +77,4 @@ tempParticipantSchema.index({
 }, {
     unique: true
 });
-module.exports = mongoose.model('tempParticipant', tempParticipantSchema);
+module.exports = mongoose.model('temp_participant', tempParticipantSchema);

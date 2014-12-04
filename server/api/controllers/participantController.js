@@ -4,80 +4,57 @@
   */
  'use strict';
  var lib = require('../../lib'),
-     q = lib.q,
-     md5 = lib.md5,
-     userModel = require('../models/user'),
      utils = require('../utils'),
-     puid = new lib.puid();
+     participantUtil = require('../utils/participantUtil');
 
  module.exports = {
-
-     /*
-      * get details of a perticular candidate
-      */
-     view: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             candidates = "lalalalla";
-         workflow.outcome.data = candidates; //from database
-         workflow.emit('response');
-         // if (err) {
-         //     workflow.emit('exception', err);
-         // }
-
-     },
      /**
       *  add a new candidate
       */
      add: function(req, res) {
          var workflow = lib.workflow(req, res),
-             userData = {};
-         lib._.each(req.body, function(value, key) {
-             if ((typeof value === 'string') &&
-                 ((value.indexOf('{') !== -1) || (value.indexOf('[') !== -1))) {
-                 userData[key] = JSON.parse(value);
-             } else {
-                 userData[key] = value;
-             }
-         });
-         req.body = userData;
+             participantData = req.body;
+
+         if (new Date(participantData.dob) === 'Invalid Date') {
+             workflow.outcome.errfor.message = lib.message.INVALID_DATE;
+             workflow.emit('response');
+             return;
+         }
+         if (isNaN(participantData.weight)) {
+             workflow.outcome.errfor.message = lib.message.INVALID_WEIGHT;
+             workflow.emit('response');
+             return;
+         }
+         if (participantData._id) {
+             console.log(participantData);
+             delete participantData._id;
+             console.log(participantData);
+         }
+         participantData.dob = new Date(participantData.dob);
+         participantData.weight = Number(participantData.weight);
+         participantUtil
+             .addParticipant(participantData)
+             .then(function(data) {
+                 workflow.outcome.data = data;
+                 workflow.emit('response');
+             }, function(err) {
+                 utils.errorNotifier(err, workflow);
+             })
+             .done();
      },
      /**
       * update candidates profile
       */
      update: function(req, res) {
          var workflow = lib.workflow(req, res),
-             permissions = req.sender.companyProfile.role.user.others,
-             userData = {};
-         lib._.each(req.body, function(value, key) {
-             if ((typeof value === 'string') &&
-                 ((value.indexOf('{') !== -1) || (value.indexOf('[') !== -1))) {
-                 userData[key] = JSON.parse(value);
-             } else {
-                 userData[key] = value;
-             }
-         });
-         req.body = userData;
-         if (req.body._id === undefined) {
+             participantData = req.body;
+         if (participantData._id === undefined) {
              workflow.outcome.errfor.message = lib.message.ID_REQUIRED;
              workflow.emit('response');
              return;
          }
-         if (req.files && req.files.profilePicture) {
-             if (req.files.profilePicture.size / (1024 * 1024) > 2) {
-                 workflow.outcome.errfor.message = lib.message.IMAGE_SIZE_LIMIT_EXCEEDED;
-                 workflow.emit('response');
-                 return;
-             } else {
-                 magic.detectFile(req.files.profilePicture.path, function(err, result) {
-                     if (err) {
-                         workflow.emit('exception', err);
-                     }
-                     console.log(result);
-                     userData.filePath = req.files.profilePicture.path;
-                 });
-             }
-         }
-         userUtils.updateCandidate(userData)
+         participantUtil
+             .updateParticipant(participantData)
              .then(function(data) {
                  workflow.outcome.data = data;
                  workflow.emit('response');
@@ -86,7 +63,60 @@
              })
              .done();
      },
-     searchCandidate: function(req, res) {
+     /*
+      * get details of all candidates
+      */
+     getAllParticipant: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         participantUtil
+             .getParticipantList()
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
+
+     /*
+      * get details of a perticular candidate during registration
+      */
+     getParticipant: function(req, res) {
+         var workflow = lib.workflow(req, res),
+             participantId = req.query.participantId;
+
+         if (participantId === undefined) {
+             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+             workflow.emit('response');
+             return;
+         }
+         participantId = Number(participantId);
+         participantUtil
+             .findParticipant({
+                 participantId: participantId
+             })
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
+
+     /**
+      * search candidates
+      */
+     search: function(req, res) {
          var workflow = lib.workflow(req, res),
              name = req.query.name,
              reg,
@@ -96,13 +126,14 @@
              workflow.emit('response');
              return;
          }
-         if (req.query.searchFor) {
-             searchOptoions = req.query.searchFor;
-         } else {
-             searchOptoions = ['admin', 'employee', 'manager'];
-         }
          reg = new RegExp(name.split(' ').join('|'));
-         userUtils.searchUsers(reg, req.sender.companyProfile.company, searchOptoions)
+         participantUtil
+             .getParticipantList({
+                 name: {
+                     $regex: reg,
+                     $options: 'i'
+                 }
+             })
              .then(function(data) {
                  if (data.length === 0) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
@@ -117,4 +148,109 @@
              .done();
      }
 
+
  };
+
+
+ // /**
+ //  * userController
+ //  *
+ //  */
+ // 'use strict';
+ // var lib = require('../../lib'),
+ //     tempParticipantModel = require('../models/tempParticipant'),
+ //     tempParticipantUtil = require('../utils/tempParticipantUtil'),
+ //     utils = require('../utils');
+
+ // module.exports = {
+
+ //     /*
+ //      * get details of all candidates
+ //      */
+ //     getAllParticipant: function(req, res) {
+ //         var workflow = lib.workflow(req, res);
+ //         tempParticipantModel
+ //             .find()
+ //             .exec(function(err, candidates) {
+ //                 if (err) {
+ //                     workflow.emit('exception', err);
+ //                     return;
+ //                 }
+ //                 if (candidates && candidates.length !== 0) {
+ //                     workflow.outcome.data = candidates;
+ //                     workflow.emit('response');
+ //                     return;
+ //                 }
+ //                 workflow.outcome.errfor.message = lib.message.NO_DATA;
+ //                 workflow.emit('response');
+ //             });
+ //     },
+
+ //     /*
+ //      * get details of a perticular candidate during registration
+ //      */
+
+ //     //TO_CHECK : possibe problel map with table
+ //     getParticipant: function(req, res) {
+ //         var workflow = lib.workflow(req, res),
+ //             registrationId = req.query.registrationId;
+
+ //         if (registrationId === undefined) {
+ //             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+ //             workflow.emit('response');
+ //             return;
+ //         }
+ //         registrationId = Number(registrationId);
+ //         tempParticipantUtil
+ //             .findParticipant({
+ //                 registrationId: registrationId
+ //             })
+ //             .then(function(data) {
+ //                 if (!data.length) {
+ //                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+ //                     workflow.emit('response');
+ //                 } else {
+ //                     workflow.outcome.data = data;
+ //                     workflow.emit('response');
+ //                 }
+ //             }, function(err) {
+ //                 workflow.emit('exception', err);
+ //             });
+ //     },
+
+ //     /**
+ //      * search candidates
+ //      */
+ //     search: function(req, res) {
+ //         var workflow = lib.workflow(req, res),
+ //             name = req.query.name,
+ //             reg,
+ //             searchOptoions;
+ //         if (!name) {
+ //             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+ //             workflow.emit('response');
+ //             return;
+ //         }
+ //         reg = new RegExp(name.split(' ').join('|'));
+ //         tempParticipantUtil
+ //             .findParticipant({
+ //                 name: {
+ //                     $regex: reg,
+ //                     $options: 'i'
+ //                 }
+ //             })
+ //             .then(function(data) {
+ //                 if (data.length === 0) {
+ //                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+ //                     workflow.emit('response');
+ //                 } else {
+ //                     workflow.outcome.data = data;
+ //                     workflow.emit('response');
+ //                 }
+ //             }, function(err) {
+ //                 workflow.emit('exception', err);
+ //             })
+ //             .done();
+ //     }
+
+ // };

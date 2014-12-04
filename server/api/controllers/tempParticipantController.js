@@ -5,35 +5,58 @@
  'use strict';
  var lib = require('../../lib'),
      tempParticipantModel = require('../models/tempParticipant'),
-     utils = require('../utils');
+     tempParticipantUtil = require('../utils/tempParticipantUtil');
 
  module.exports = {
 
      /*
-      * get details of a perticular candidate
+      * get details of all candidates
       */
-     view: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             candidates = "lalalalla",
-             queryObject = req.query.registrationId ? {
-                 registrationId: req.query.registrationId
-             } : {};
-
-         tempParticipantModel
-             .find()
-             .exec(function(err, candidates) {
-                 console.log(err, candidates);
-                 if (err) {
-                     workflow.emit('exception', err);
-                     return;
-                 }
-                 if (candidates && candidates.length !== 0) {
-                     workflow.outcome.data = candidates;
+     getAllParticipant: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         tempParticipantUtil
+             .getParticipantList()
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
                      workflow.emit('response');
-                     return;
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
                  }
-                 workflow.outcome.errfor.message = lib.message.NO_DATA;
-                 workflow.emit('response');
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
+
+     /*
+      * get details of a perticular candidate during registration
+      */
+
+     getParticipant: function(req, res) {
+         var workflow = lib.workflow(req, res),
+             registrationId = req.query.registrationId;
+
+         if (registrationId === undefined) {
+             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+             workflow.emit('response');
+             return;
+         }
+         registrationId = Number(registrationId);
+         tempParticipantUtil
+             .findParticipant({
+                 registrationId: registrationId
+             })
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data[0];
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
              });
      },
 
@@ -50,15 +73,16 @@
              workflow.emit('response');
              return;
          }
-         if (req.query.searchFor) {
-             searchOptoions = req.query.searchFor;
-         } else {
-             searchOptoions = ['admin', 'employee', 'manager'];
-         }
          reg = new RegExp(name.split(' ').join('|'));
-         userUtils.searchUsers(reg, req.sender.companyProfile.company, searchOptoions)
+         tempParticipantUtil
+             .getParticipantList({
+                 name: {
+                     $regex: reg,
+                     $options: 'i'
+                 }
+             })
              .then(function(data) {
-                 if (data.length === 0) {
+                 if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
                      workflow.emit('response');
                  } else {
