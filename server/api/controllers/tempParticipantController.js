@@ -5,24 +5,19 @@
  'use strict';
  var lib = require('../../lib'),
      tempParticipantModel = require('../models/tempParticipant'),
+     tempParticipantUtil = require('../utils/tempParticipantUtil'),
      utils = require('../utils');
 
  module.exports = {
 
      /*
-      * get details of a perticular candidate
+      * get details of all candidates
       */
-     view: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             candidates = "lalalalla",
-             queryObject = req.query.registrationId ? {
-                 registrationId: req.query.registrationId
-             } : {};
-
+     getAllParticipant: function(req, res) {
+         var workflow = lib.workflow(req, res);
          tempParticipantModel
              .find()
              .exec(function(err, candidates) {
-                 console.log(err, candidates);
                  if (err) {
                      workflow.emit('exception', err);
                      return;
@@ -34,6 +29,38 @@
                  }
                  workflow.outcome.errfor.message = lib.message.NO_DATA;
                  workflow.emit('response');
+             });
+     },
+
+     /*
+      * get details of a perticular candidate during registration
+      */
+
+     //TO_CHECK : possibe problel map with table
+     getParticipant: function(req, res) {
+         var workflow = lib.workflow(req, res),
+             registrationId = req.query.registrationId;
+
+         if (registrationId === undefined) {
+             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+             workflow.emit('response');
+             return;
+         }
+         registrationId = Number(registrationId);
+         tempParticipantUtil
+             .findParticipant({
+                 registrationId: registrationId
+             })
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
              });
      },
 
@@ -50,13 +77,14 @@
              workflow.emit('response');
              return;
          }
-         if (req.query.searchFor) {
-             searchOptoions = req.query.searchFor;
-         } else {
-             searchOptoions = ['admin', 'employee', 'manager'];
-         }
          reg = new RegExp(name.split(' ').join('|'));
-         userUtils.searchUsers(reg, req.sender.companyProfile.company, searchOptoions)
+         tempParticipantUtil
+             .findParticipant({
+                 name: {
+                     $regex: reg,
+                     $options: 'i'
+                 }
+             })
              .then(function(data) {
                  if (data.length === 0) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;

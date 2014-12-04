@@ -5,17 +5,14 @@ var lib = require('../../lib'),
 
 module.exports = {
     /**
-     *  get participant data by participantId
-     *  from database
+     *  get participant datafrom database
+     *
      */
-    findParticipant: function(participantId) {
+    findParticipant: function(searchObject) {
         var deferred = Q.defer();
         tempParticipantModel
-            .findOne({
-                participantId: participantId
-            })
+            .find(searchObject)
             .exec(function(err, result) {
-                console.log('here', result);
                 if (err) {
                     deferred.reject(err);
                 } else {

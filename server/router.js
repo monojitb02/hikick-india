@@ -9,11 +9,8 @@ var lib = require('./lib'),
      *controllers
      */
     userController = require('./api/controllers/userController'),
-    << << << < HEAD
-candidateController = require('./api/controllers/candidateController'),
-    temp_participantController = require('./api/controllers/temp_participantController'); === === =
-participantController = require('./api/controllers/participantController'),
-    tempParticipantController = require('./api/controllers/tempParticipantController'); >>> >>> > e312f5a07e7d7a7bd4151e13d3a02b4d9b2cf21b
+    participantController = require('./api/controllers/participantController'),
+    tempParticipantController = require('./api/controllers/tempParticipantController');
 /*
  *utils
  */
@@ -35,9 +32,8 @@ module.exports = function(app) {
     // app.put('/api/participant/update', participantController.update);
     // app.get('/api/participant/search', participantController.search);
     // app.get('/api/participant/get_clubs', participantController.getClubs);
-    app.get('/api/temp_participant/view', tempParticipantController.view);
     app.get('/api/temp_participant/search', tempParticipantController.search);
-
-    app.get('/api/temp_participant/find', temp_participantController.getParticipant);
+    app.get('/api/temp_participant/find', tempParticipantController.getParticipant);
+    app.get('/api/temp_participant/list', tempParticipantController.getAllParticipant);
 
 };
