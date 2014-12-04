@@ -12,9 +12,8 @@ module.exports = {
      * leave messages
      */
     FIELD_REQUIRED: 'Please fill all required fields.',
-    INVALID_DATE: 'Please give correct date.',
-    INVALID_START_AND_END_DATE: 'End date of leave cannot be earlier than start date.',
-    INVALID_START_DATE: 'Start date of leave cannot be earlier than today',
+    INVALID_DATE: 'Please give correct Date.',
+    INVALID_WEIGHT: 'Please give correct Weight.',
     NO_DATA: 'No data found',
 
     LEAVE_APPLICATION_SUCCESSFULL: 'Leave application is successful',

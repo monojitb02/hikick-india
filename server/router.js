@@ -27,11 +27,14 @@ module.exports = function(app) {
     app.post('/api/login', userController.login);
     app.post('/api/logout', userController.logout);
 
-    app.get('/api/participant/view', participantController.view);
-    // app.post('/api/participant/add', participantController.add);
-    // app.put('/api/participant/update', participantController.update);
-    // app.get('/api/participant/search', participantController.search);
-    // app.get('/api/participant/get_clubs', participantController.getClubs);
+    //Candidates Routs
+    app.post('/api/participant/add', participantController.add);
+    app.put('/api/participant/update', participantController.update);
+    app.get('/api/participant/search', participantController.search);
+    app.get('/api/participant/list', participantController.getAllParticipant);
+    app.get('/api/participant/find', participantController.getParticipant);
+
+    //Temporary Candidates Routs
     app.get('/api/temp_participant/search', tempParticipantController.search);
     app.get('/api/temp_participant/find', tempParticipantController.getParticipant);
     app.get('/api/temp_participant/list', tempParticipantController.getAllParticipant);
