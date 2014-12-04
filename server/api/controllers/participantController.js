@@ -15,12 +15,12 @@
          var workflow = lib.workflow(req, res),
              participantData = req.body;
 
-         if (new Date(participantData.dob) === 'Invalid Date') {
+         if (participantData.dob && new Date(participantData.dob) === 'Invalid Date') {
              workflow.outcome.errfor.message = lib.message.INVALID_DATE;
              workflow.emit('response');
              return;
          }
-         if (isNaN(participantData.weight)) {
+         if (participantData.weight && isNaN(participantData.weight)) {
              workflow.outcome.errfor.message = lib.message.INVALID_WEIGHT;
              workflow.emit('response');
              return;
@@ -45,6 +45,7 @@
      /**
       * update candidates profile
       */
+     //FIX_ME:choiceOfEvent part not updating
      update: function(req, res) {
          var workflow = lib.workflow(req, res),
              participantData = req.body;
@@ -56,10 +57,15 @@
          participantUtil
              .updateParticipant(participantData)
              .then(function(data) {
-                 workflow.outcome.data = data;
-                 workflow.emit('response');
+                 if (!data) {
+                     workflow.outcome.errfor.message = lib.message.UPDATE_NON_EXISTING_DOCUMENT_FAILED;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
              }, function(err) {
-                 workflow.emit('exception', err);
+                 utils.errorNotifier(err, workflow);
              })
              .done();
      },
@@ -95,10 +101,9 @@
              workflow.emit('response');
              return;
          }
-         participantId = Number(participantId);
          participantUtil
              .findParticipant({
-                 participantId: participantId
+                 _id: participantId
              })
              .then(function(data) {
                  if (!data.length) {

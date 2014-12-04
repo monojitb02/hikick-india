@@ -5,10 +5,10 @@ var mongoose = require('../../lib').mongoose,
     participantSchema;
 
 participantSchema = new Schema({
-    participantId: {
-        type: Number,
-        required: true
-    },
+    /* participantId: {
+         type: Number,
+         required: true
+     },*/
     name: {
         type: String,
         required: true
@@ -60,7 +60,7 @@ participantSchema = new Schema({
         required: true
     },
     contactNumber: {
-        type: Number,
+        type: String,
         required: true
     },
     address: {
@@ -70,9 +70,9 @@ participantSchema = new Schema({
 }, {
     versionKey: false
 });
-participantSchema.index({
+/*participantSchema.index({
     participantId: 1
 }, {
     unique: true
-});
+});*/
 module.exports = mongoose.model('participant', participantSchema);

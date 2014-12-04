@@ -17,6 +17,25 @@ module.exports = {
 
         return deferred.promise;
     },
+    updateParticipant: function(participantObject) {
+        var deferred = Q.defer(),
+            participantData = lib.flat(participantObject);
+        delete participantData._id;
+        participantModel
+            .findOneAndUpdate({
+                _id: participantObject._id
+            }, {
+                $set: participantData
+            })
+            .exec(function(err, result) {
+                if (err) {
+                    deferred.reject(err);
+                }
+                deferred.resolve(result);
+            });
+
+        return deferred.promise;
+    },
     /**
      *  get participant details registration data from database
      *
