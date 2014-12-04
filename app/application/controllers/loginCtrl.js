@@ -4,7 +4,8 @@ var utility = require('../../util');
 
 module.exports = function($scope, $state) {
 
-    var id = utility.getCookie('uid');
+    var id = utility.getCookie('uid'),
+        loginForm;
     if (id) {
         $state.go('app.home');
     }
@@ -13,21 +14,26 @@ module.exports = function($scope, $state) {
     $scope.password = 'asis';
 
     $scope.login = function() {
-        utility.setCookie('uid', $scope.uname);
-        $state.go('app.home');
-    };
-    /*jQuery.validator.setDefaults({
-        debug: true,
-        success: "valid"
-    });
-    jQuery("#login_form").validate({
-        rules: {
-            uname: {
-                required: true
-            },
-            password: {
-                required: true
-            }
+        console.log(loginForm.valid());
+        if (loginForm.valid()) {
+            utility.setCookie('uid', $scope.uname);
+            $state.go('app.home');
         }
-    });*/
+    };
+
+    $scope.$on('$viewContentLoaded', function() {
+        loginForm = jQuery("#login_form");
+        loginForm.validate({
+            rules: {
+                uname: {
+                    required: true,
+                    minlength: 4
+                },
+                password: {
+                    required: true,
+                    minlength: 4
+                }
+            }
+        });
+    });
 };
