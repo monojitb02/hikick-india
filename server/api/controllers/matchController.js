@@ -5,7 +5,8 @@
  'use strict';
  var lib = require('../../lib'),
      utils = require('../utils'),
-     participantUtil = require('../utils/participantUtil');
+     matchUtil = require('../utils/matchUtil'),
+     sheduleUtil = require('../utils/sheduleUtil');
 
  module.exports = {
      /**
@@ -32,7 +33,7 @@
          }
          participantData.dob = new Date(participantData.dob);
          participantData.weight = Number(participantData.weight);
-         participantUtil
+         matchUtil
              .addParticipant(participantData)
              .then(function(data) {
                  workflow.outcome.data = data;
@@ -54,7 +55,7 @@
              workflow.emit('response');
              return;
          }
-         participantUtil
+         matchUtil
              .updateParticipant(participantData)
              .then(function(data) {
                  if (!data) {
@@ -74,7 +75,7 @@
       */
      getAllParticipant: function(req, res) {
          var workflow = lib.workflow(req, res);
-         participantUtil
+         matchUtil
              .getParticipantList()
              .then(function(data) {
                  if (!data.length) {
@@ -101,7 +102,7 @@
              workflow.emit('response');
              return;
          }
-         participantUtil
+         matchUtil
              .findParticipant({
                  _id: participantId
              })
@@ -132,7 +133,7 @@
              return;
          }
          reg = new RegExp(name.split(' ').join('|'));
-         participantUtil
+         matchUtil
              .getParticipantList({
                  name: {
                      $regex: reg,

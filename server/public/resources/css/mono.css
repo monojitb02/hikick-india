@@ -1,0 +1,133 @@
+/******************** For view-chart **********************/
+
+.text-bottom-middle {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+}
+.border-right-bottom {
+    border-width: 0px 1px 1px 0px;
+    border-style: solid;
+}
+.border-bottom {
+    border-width: 0px 0px 1px;
+    border-style: solid;
+}
+.font-red-bold, .font-blue-bold {
+    font-weight: bold;
+}
+.font-red-bold {
+    color: #F00;
+}
+.font-blue-bold {
+    color: #00F;
+}
+/******************** ForDojo Mat **************************/
+
+.dojo-page-header {
+    overflow: auto;
+}
+.clock {
+    z-index: 30;
+}
+.flip-clock-label {
+    display: none;
+}
+.timer {
+    text-align: center;
+    font-size: 60px;
+    line-height: 60px;
+    font-weight: bold;
+    color: #555;
+}
+.time-devider {
+    font-size: 40px;
+    line-height: 10px;
+    vertical-align: text-top;
+}
+.time-input {
+    width: 50px;
+    height: 30px;
+}
+.flip-clock-wrapper {
+    width: 300px;
+    float: none;
+    margin: 1em auto;
+}
+.red-corner {
+    background-color: #F00;
+}
+.blue-corner {
+    background-color: #00F;
+}
+.corner {
+    height: 600px;
+    padding-top: 20px;
+}
+.corner .input-group {
+    margin: 10px auto;
+}
+.corner-name {
+    font-size: 80px;
+    color: #fff;
+    margin-top: 0px;
+}
+.game-buttons button {
+    margin: 5px auto;
+    font-size: 19px;
+}
+.start-button, .submit-button {
+    height: 80px;
+    font-size: 30px;
+}
+.submit-button {
+    position: absolute;
+    bottom: 20px;
+}
+.corner-both {
+    height: 600px;
+    margin-top: -122px;
+    padding-top: 122px;
+    background: -webkit-linear-gradient(left, red, #999, blue);
+    background: -o-linear-gradient(right, red, #999, blue);
+    background: -moz-linear-gradient(right, red, #999, blue);
+    background: linear-gradient(to right, red, #999, blue);
+}
+.game-point {
+    font-size: 100px;
+    color: #fff;
+}
+.warning-lable {
+    color: #fff;
+    padding-left: 0px!important;
+    width: 50%;
+}
+.warning-controls {
+    padding: 9px 0px 5px 10px;
+    border: 3px double;
+    background-color: #B2B2B2;
+    margin: 10px 0px;
+}
+.warning-holder {
+    overflow: auto;
+    position: absolute;
+    width: 90%;
+    bottom: 104px;
+}
+.blue-corner .warning-holder {
+    left: 0px;
+}
+.red-corner .warning-holder {
+    right: 0px;
+}
+.category-heading {
+    font-size: 20px;
+    font-weight: bold;
+    color: #F0D40E;
+    padding: 24px 0px;
+}
+.category-heading-container {
+    position: absolute;
+    bottom: 105px;
+}

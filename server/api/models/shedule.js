@@ -7,7 +7,7 @@ var lib = require('../../lib'),
     Schema = lib.mongoose.Schema,
     sheduleSchema = new Schema({
         event: {
-            type: String,
+            type: Schema.Types.ObjectId,
             ref: 'event',
             required: true
         },

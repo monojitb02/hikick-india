@@ -4,18 +4,18 @@
   */
  'use strict';
  var lib = require('../../lib'),
-     tempParticipantModel = require('../models/tempParticipant'),
-     tempParticipantUtil = require('../utils/tempParticipantUtil');
+     sheduleModel = require('../models/Shedule'),
+     sheduleUtil = require('../utils/SheduleUtil');
 
  module.exports = {
 
      /*
       * get details of all candidates
       */
-     getAllParticipant: function(req, res) {
+     getAllShedule: function(req, res) {
          var workflow = lib.workflow(req, res);
-         tempParticipantUtil
-             .getParticipantList()
+         sheduleUtil
+             .getSheduleList()
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
@@ -33,7 +33,7 @@
       * get details of a perticular candidate during registration
       */
 
-     getParticipant: function(req, res) {
+     getShedule: function(req, res) {
          var workflow = lib.workflow(req, res),
              registrationId = req.query.registrationId;
 
@@ -43,8 +43,8 @@
              return;
          }
          registrationId = Number(registrationId);
-         tempParticipantUtil
-             .findParticipant({
+         sheduleUtil
+             .findShedule({
                  registrationId: registrationId
              })
              .then(function(data) {
@@ -84,8 +84,8 @@
          } else {
              searchObject = Number(name);
          }
-         tempParticipantUtil
-             .getParticipantList(searchObject)
+         sheduleUtil
+             .getSheduleList(searchObject)
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
