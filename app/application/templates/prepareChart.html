@@ -1,48 +1,48 @@
 <div class="pageheader">
-  <h2><i class="fa fa-hand-o-up"></i> Buttons <span>Subtitle goes here...</span>
+    <h2><i class="fa fa-hand-o-up"></i> Buttons <span>Subtitle goes here...</span>
   </h2>
-  <div class="breadcrumb-wrapper">
-    <span class="label">You are here:</span>
-    <ol class="breadcrumb">
-      <li><a href="index.html">Bracket</a>
-      </li>
-      <li><a href="buttons.html">UI Elements</a>
-      </li>
-      <li class="active">Buttons</li>
-    </ol>
-  </div>
+    <div class="breadcrumb-wrapper">
+        <span class="label">You are here:</span>
+        <ol class="breadcrumb">
+            <li><a href="index.html">Bracket</a>
+            </li>
+            <li><a href="buttons.html">UI Elements</a>
+            </li>
+            <li class="active">Buttons</li>
+        </ol>
+    </div>
 </div>
 
 <div class="contentpanel">
 
-  <div class="panel panel-default" ng-repeat="game in getGames()">
-    <div class="panel-heading background-aqua sliding-panel" ng-click="slidePanel($event)">
-      <h4 class="panel-title">{{game.eventName}}</h4>
-    </div>
-    <div class="panel-body">
-      <div class="row" ng-repeat="eventGroup in game.events">
-        <div class="col-md-6" ng-repeat="event in eventGroup">
-          <div class="panel panel-default">
-            <div class="panel-heading background-aqua sliding-panel events-panel" ng-click="slidePanel($event)">
-              <h4 class="panel-title">Event Id: {{event.eventId}} Weight: &lt;{{event.weightLimit.upper}}kg Age:&lt;{{event.ageLimit.upper}} Years</h4>
-              <div class="status-indicator" ng-class="{'background-green':!event.pending,'background-red':event.pending}" ng-attr-title="{{event.pending?'pending':'Sheduled'}}"></div>
-            </div>
-            <div class="panel-body background-ash">
-              <tags-input ng-model="event.candidatesGotBy">
-                <auto-complete source="loadCandidates($query)"></auto-complete>
-              </tags-input>
-              <p>
-                <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}">Shedule It</button>
-              </p>
-            </div>
-            <!-- panel-body -->
-          </div>
+    <div class="panel panel-default" ng-repeat="game in getGames()">
+        <div class="panel-heading background-aqua sliding-panel" ng-click="slidePanel($event)">
+            <h4 class="panel-title">{{game.eventName}}</h4>
         </div>
-      </div>
+        <div class="panel-body">
+            <div class="row" ng-repeat="eventGroup in game.events">
+                <div class="col-md-6" ng-repeat="event in eventGroup">
+                    <div class="panel panel-default">
+                        <div class="panel-heading background-aqua sliding-panel events-panel" ng-click="slidePanel($event)">
+                            <h4 class="panel-title">Event Id: {{event.eventId}} Weight: {{(event.weightLimitUpper === 1000) ? '>' + event.weightLimitLower : '<' +event.weightLimitUpper}}kg Age:{{(event.ageLimitUpper===1000)?'>'+event.ageLimitLower:'<'+event.ageLimitUpper}} Years</h4>
+                            <div class="status-indicator" ng-class="{'background-green':!event.pending,'background-red':event.pending}" ng-attr-title="{{event.pending?'pending':'Sheduled'}}"></div>
+                        </div>
+                        <div class="panel-body background-ash">
+                            <tags-input ng-model="event.candidatesGotBy">
+                                <auto-complete source="loadCandidates($query)"></auto-complete>
+                            </tags-input>
+                            <p>
+                                <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}">Shedule It</button>
+                            </p>
+                        </div>
+                        <!-- panel-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- panel-body -->
     </div>
-    <!-- panel-body -->
-  </div>
-  <!-- panel -->
+    <!-- panel -->
 
 
 </div>

@@ -28,14 +28,28 @@
                  workflow.emit('exception', err);
              });
      },
-
+     getAllShedulableEvents: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         sheduleUtil
+             .getSheduleableEvents()
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
      /*
       * get details of a perticular candidate during registration
       */
-
-     getShedule: function(req, res) {
+     addShedule: function(req, res) {
          var workflow = lib.workflow(req, res),
-             registrationId = req.query.registrationId;
+             eventId = req.body.eventId;
 
          if (registrationId === undefined) {
              workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
@@ -58,46 +72,6 @@
              }, function(err) {
                  workflow.emit('exception', err);
              });
-     },
-
-     /**
-      * search candidates
-      */
-     search: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             name = req.query.name,
-             reg,
-             searchObject;
-         if (!name) {
-             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
-             workflow.emit('response');
-             return;
-         }
-         if (isNaN(name)) {
-             reg = new RegExp(name.split(' ').join('|'));
-             searchObject = {
-                 name: {
-                     $regex: reg,
-                     $options: 'i'
-                 }
-             };
-         } else {
-             searchObject = Number(name);
-         }
-         sheduleUtil
-             .getSheduleList(searchObject)
-             .then(function(data) {
-                 if (!data.length) {
-                     workflow.outcome.errfor.message = lib.message.NO_DATA;
-                     workflow.emit('response');
-                 } else {
-                     workflow.outcome.data = data;
-                     workflow.emit('response');
-                 }
-             }, function(err) {
-                 workflow.emit('exception', err);
-             })
-             .done();
      }
 
  };

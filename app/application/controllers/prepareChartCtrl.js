@@ -29,63 +29,44 @@ module.exports = function($scope, $http, $state) {
     var data = [{
         eventName: 'kata',
         eventId: 1,
-        ageLimit: {
-            upper: 5,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 5,
-            lower: 2
-        },
+        ageLimitUpper: 5,
+        ageLimitLower: 2,
+        weightLimitUpper: 5,
+        weightLimitLower: 2,
         pending: false,
-        candidatesGotBy: [23]
+        candidatesGotBy: [23],
+        maximumByCount: 5
     }, {
         eventName: 'kata',
         eventId: 3,
-        ageLimit: {
-            upper: 10,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 7,
-            lower: 2
-        },
+        ageLimitUpper: 5,
+        ageLimitLower: 2,
+        weightLimitUpper: 5,
+        weightLimitLower: 2,
         pending: false
     }, {
         eventName: 'kumite',
         eventId: 2,
-        ageLimit: {
-            upper: 5,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 5,
-            lower: 2
-        },
+        ageLimitUpper: 5,
+        ageLimitLower: 2,
+        weightLimitUpper: 5,
+        weightLimitLower: 2,
         pending: true
     }, {
         eventName: 'kata',
         eventId: 4,
-        ageLimit: {
-            upper: 10,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 7,
-            lower: 2
-        },
+        ageLimitUpper: 1000,
+        ageLimitLower: 2,
+        weightLimitUpper: 7,
+        weightLimitLower: 2,
         pending: false
     }, {
         eventName: 'weapons',
         eventId: 6,
-        ageLimit: {
-            upper: 5,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 5,
-            lower: 2
-        },
+        ageLimitUpper: 1000,
+        ageLimitLower: 32,
+        weightLimitUpper: 5,
+        weightLimitLower: 2,
         pending: true
     }];
 
@@ -141,4 +122,7 @@ module.exports = function($scope, $http, $state) {
     $scope.loadCandidates = function(query) {
         return ['a', 'b'];
     };
+    $scope.getWeightLimit = function(event) {
+        return
+    }
 }
