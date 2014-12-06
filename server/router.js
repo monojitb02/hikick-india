@@ -20,7 +20,7 @@ var lib = require('./lib'),
 
 module.exports = function(app) {
 
-    app.use(userPolicy.dummyLogin);
+    //app.use(userPolicy.dummyLogin);
     app.use(userPolicy.authenticate); //check if the client has a proper session or not and append details of the logged in user to req.sender
     app.use('/api/:operation', permissionPolicy.verifyPermissions); //verify permissions for the operation
 

@@ -8,36 +8,36 @@
         "url": "https://github.com/monojitb02/hikick-india"
     },
     "scripts": {
-        "start": "watchify -t brfs index.js -o build/bundle.js -v",
-        "bundle": "browserify -t brfs index.js -o build/bundle.js"
+        "start": "watchify -t brfs index.js -o server/public/bundle.js -v",
+        "bundle": "browserify -t brfs index.js -o server/public/bundle.js"
     },
     "dependencies": {
-        "brfs": "",
-        "browserify-shim": "",
-        "angular": "",
-        "angular-bootstrap": "",
-        "angular-ui-router": "",
-        "ng-tags-input": ""
+        "brfs": "1.2.0",
+        "browserify-shim": "3.8.0",
+        "angular": "1.3.4",
+        "angular-bootstrap": "0.11.0",
+        "angular-ui-router": "0.2.11",
+        "ng-tags-input": "2.1.1"
     },
     "devDependencies": {
         "browserify": "^5.11.2",
         "watchify": "^1.0.2"
     },
     "browser": {
-        "jquery": "./build/resources/lib/bracket/jquery-1.10.2.min.js",
-        "jqueryValidate": "./build/resources/lib/bracket/jquery.validate.min.js",
-        "jqueryUi": "./build/resources/lib/bracket/jquery-ui-1.10.3.min.js",
-        "jqueryMigrate": "./build/resources/lib/bracket/jquery-migrate-1.2.1.min.js",
-        "bootstrap": "./build/resources/lib/bracket/bootstrap.min.js",
-        "modernizr": "./build/resources/lib/bracket/modernizr.min.js",
-        "jquerySparkline": "./build/resources/lib/bracket/jquery.sparkline.min.js",
-        "toggles": "./build/resources/lib/bracket/toggles.min.js",
-        "retina": "./build/resources/lib/bracket/retina.min.js",
-        "jqueryCookies": "./build/resources/lib/bracket/jquery.cookies.js",
-        "tagsInput": "./build/resources/lib/bracket/jquery.tagsinput.min.js",
-        "custom": "./build/resources/lib/bracket/custom.js",
-        "mouseWheel": "./build/resources/lib/bracket/jquery.mousewheel.js",
-        "flipclock": "./build/resources/lib/flipclock/flipclock.min.js"
+        "jquery": "./server/public/resources/lib/bracket/jquery-1.10.2.min.js",
+        "jqueryValidate": "./server/public/resources/lib/bracket/jquery.validate.min.js",
+        "jqueryUi": "./server/public/resources/lib/bracket/jquery-ui-1.10.3.min.js",
+        "jqueryMigrate": "./server/public/resources/lib/bracket/jquery-migrate-1.2.1.min.js",
+        "bootstrap": "./server/public/resources/lib/bracket/bootstrap.min.js",
+        "modernizr": "./server/public/resources/lib/bracket/modernizr.min.js",
+        "jquerySparkline": "./server/public/resources/lib/bracket/jquery.sparkline.min.js",
+        "toggles": "./server/public/resources/lib/bracket/toggles.min.js",
+        "retina": "./server/public/resources/lib/bracket/retina.min.js",
+        "jqueryCookies": "./server/public/resources/lib/bracket/jquery.cookies.js",
+        "tagsInput": "./server/public/resources/lib/bracket/jquery.tagsinput.min.js",
+        "custom": "./server/public/resources/lib/bracket/custom.js",
+        "mouseWheel": "./server/public/resources/lib/bracket/jquery.mousewheel.js",
+        "flipclock": "./server/public/resources/lib/flipclock/flipclock.min.js"
     },
     "browserify-shim": {
         "jquery": {
