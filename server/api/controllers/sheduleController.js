@@ -4,18 +4,19 @@
   */
  'use strict';
  var lib = require('../../lib'),
-     tempParticipantModel = require('../models/tempParticipant'),
-     tempParticipantUtil = require('../utils/tempParticipantUtil');
+     sheduleModel = require('../models/shedule'),
+     sheduleUtil = require('../utils/sheduleUtil');
 
  module.exports = {
 
      /*
-      * get details of all candidates
+      * get shedule of a perticular event
       */
-     getAllParticipant: function(req, res) {
+     getShedule: function(req, res) {
          var workflow = lib.workflow(req, res);
-         tempParticipantUtil
-             .getParticipantList()
+         eventId = req.query.event_id
+         sheduleUtil
+             .getShedule(eventId)
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
@@ -28,14 +29,28 @@
                  workflow.emit('exception', err);
              });
      },
-
+     getSheduleStatus: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         sheduleUtil
+             .getSheduleStatus()
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
      /*
       * get details of a perticular candidate during registration
       */
-
-     getParticipant: function(req, res) {
+     addShedule: function(req, res) {
          var workflow = lib.workflow(req, res),
-             registrationId = req.query.registrationId;
+             eventId = req.body.eventId;
 
          if (registrationId === undefined) {
              workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
@@ -43,8 +58,8 @@
              return;
          }
          registrationId = Number(registrationId);
-         tempParticipantUtil
-             .findParticipant({
+         sheduleUtil
+             .findShedule({
                  registrationId: registrationId
              })
              .then(function(data) {
@@ -58,46 +73,6 @@
              }, function(err) {
                  workflow.emit('exception', err);
              });
-     },
-
-     /**
-      * search candidates
-      */
-     search: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             name = req.query.name,
-             reg,
-             searchObject;
-         if (!name) {
-             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
-             workflow.emit('response');
-             return;
-         }
-         if (isNaN(name)) {
-             reg = new RegExp(name.split(' ').join('|'));
-             searchObject = {
-                 name: {
-                     $regex: reg,
-                     $options: 'i'
-                 }
-             };
-         } else {
-             searchObject = Number(name);
-         }
-         tempParticipantUtil
-             .getParticipantList(searchObject)
-             .then(function(data) {
-                 if (!data.length) {
-                     workflow.outcome.errfor.message = lib.message.NO_DATA;
-                     workflow.emit('response');
-                 } else {
-                     workflow.outcome.data = data;
-                     workflow.emit('response');
-                 }
-             }, function(err) {
-                 workflow.emit('exception', err);
-             })
-             .done();
      }
 
  };

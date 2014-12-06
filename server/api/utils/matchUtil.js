@@ -1,12 +1,12 @@
 'use strict';
 var lib = require('../../lib'),
     Q = lib.q,
-    participantModel = require('../models/participant');
+    matchModel = require('../models/match');
 
 module.exports = {
-    addParticipant: function(participantObject) {
+    save: function(matchObject) {
         var deferred = Q.defer();
-        new participantModel(participantObject)
+        new matchModel(matchObject)
             .save(function(err, result) {
                 if (err) {
                     deferred.reject(err);
@@ -14,18 +14,17 @@ module.exports = {
                     deferred.resolve(result);
                 }
             });
-
         return deferred.promise;
     },
-    updateParticipant: function(participantObject) {
+    getShedules: function(matchObject) {
         var deferred = Q.defer(),
-            participantData = lib.flat(participantObject);
-        delete participantData._id;
-        participantModel
+            matchData = lib.flat(matchObject);
+        delete matchData._id;
+        matchModel
             .findOneAndUpdate({
-                _id: participantObject._id
+                _id: matchObject._id
             }, {
-                $set: participantData
+                $set: matchData
             })
             .exec(function(err, result) {
                 if (err) {
@@ -37,12 +36,12 @@ module.exports = {
         return deferred.promise;
     },
     /**
-     *  get participant details registration data from database
+     *  get match details data from database
      *
      */
     findParticipant: function(searchObject) {
         var deferred = Q.defer();
-        participantModel
+        matchModel
             .find(searchObject)
             .exec(function(err, result) {
                 if (err) {
@@ -55,13 +54,13 @@ module.exports = {
         return deferred.promise;
     },
     /**
-     *  get participant data from database
+     *  get match data from database
      *
      */
-    getParticipantList: function(searchObject) {
+    getSheduleList: function(searchObject) {
         var deferred = Q.defer();
-        participantModel
-            .find(searchObject, 'participantId name country state clubName')
+        matchModel
+            .find(searchObject)
             .exec(function(err, result) {
                 if (err) {
                     deferred.reject(err);

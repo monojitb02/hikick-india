@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = function($scope, $http, $state) {
+    var sheduleStatus = [];
     // Minimize Button in Panels
     $scope.slidePanel = function(event) {
         var target = event.target,
@@ -26,103 +27,94 @@ module.exports = function($scope, $http, $state) {
         height: 'auto',
         interactive: false
     });
-    var data = [{
-        eventName: 'kata',
-        eventId: 1,
-        ageLimit: {
-            upper: 5,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 5,
-            lower: 2
-        },
-        pending: false,
-        candidatesGotBy: [23]
-    }, {
-        eventName: 'kata',
-        eventId: 3,
-        ageLimit: {
-            upper: 10,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 7,
-            lower: 2
-        },
-        pending: false
-    }, {
-        eventName: 'kumite',
-        eventId: 2,
-        ageLimit: {
-            upper: 5,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 5,
-            lower: 2
-        },
-        pending: true
-    }, {
-        eventName: 'kata',
-        eventId: 4,
-        ageLimit: {
-            upper: 10,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 7,
-            lower: 2
-        },
-        pending: false
-    }, {
-        eventName: 'weapons',
-        eventId: 6,
-        ageLimit: {
-            upper: 5,
-            lower: 2
-        },
-        weightLimit: {
-            upper: 5,
-            lower: 2
-        },
-        pending: true
-    }];
+    /*    var sheduleStatus = [{
+            eventName: 'kata',
+            eventId: 1,
+            ageLimitUpper: 5,
+            ageLimitLower: 2,
+            weightLimitUpper: 5,
+            weightLimitLower: 2,
+            pending: false,
+            candidatesGotBy: [23],
+            maximumByCount: 5
+        }, {
+            eventName: 'kata',
+            eventId: 3,
+            ageLimitUpper: 5,
+            ageLimitLower: 2,
+            weightLimitUpper: 5,
+            weightLimitLower: 2,
+            pending: false
+        }, {
+            eventName: 'kumite',
+            eventId: 2,
+            ageLimitUpper: 5,
+            ageLimitLower: 2,
+            weightLimitUpper: 5,
+            weightLimitLower: 2,
+            pending: true
+        }, {
+            eventName: 'kata',
+            eventId: 4,
+            ageLimitUpper: 1000,
+            ageLimitLower: 2,
+            weightLimitUpper: 7,
+            weightLimitLower: 2,
+            pending: false
+        }, {
+            eventName: 'weapons',
+            eventId: 6,
+            ageLimitUpper: 1000,
+            ageLimitLower: 32,
+            weightLimitUpper: 5,
+            weightLimitLower: 2,
+            pending: true
+        }];
+    */
+    $http.get('/api/shedule/status')
+        .success(function(data, status, headers, config) {
+            if (data.success) {
+                sheduleStatus = data.data;
+            }
+        })
+        .error(function(data, status, headers, config) {
+
+        });
 
     var games = [],
-        ressult,
+        result,
         gameEvents = [],
         events,
         hasOdds,
         groupsCount;
-    for (var i = 0; i < data.length; i++) {
-        if (games.indexOf(data[i].eventName) === -1) {
-            games.push(data[i].eventName);
+    for (var i = 0; i < sheduleStatus.length; i++) {
+        if (games.indexOf(sheduleStatus[i].eventName) === -1) {
+            games.push(sheduleStatus[i].eventName);
         }
     }
     for (var gameIndex = 0; gameIndex < games.length; gameIndex++) {
-        events = data.filter(function(event) {
+        events = sheduleStatus.filter(function(event) {
             return (event.eventName === games[gameIndex]);
         });
         hasOdds = events.length % 2;
         groupsCount = Math.floor(events.length / 2);
-        ressult = {
+        result = {
             eventName: games[gameIndex],
             events: []
         };
         for (var i = 0; i < groupsCount; i++) {
-            ressult.events.push([events[(i * 2)], events[(i * 2 + 1)]]);
+            result.events.push([events[(i * 2)], events[(i * 2 + 1)]]);
         }
         if (hasOdds) {
-            ressult.events.push([events[(groupsCount * 2)]]);
+            result.events.push([events[(groupsCount * 2)]]);
         }
-        gameEvents.push(ressult);
+        gameEvents.push(result);
     }
     $scope.getGames = function() {
         return gameEvents;
     };
     $scope.getCandidatesGotBy = function(eventId) {
-        var eventData = data.filter(function(element) {
+        var eventData = sheduleStatus.filter(function(element) {
             return element.eventId === eventId;
         })[0];
         return eventData.candidatesGotBy || [];
@@ -141,4 +133,7 @@ module.exports = function($scope, $http, $state) {
     $scope.loadCandidates = function(query) {
         return ['a', 'b'];
     };
+    $scope.getWeightLimit = function(event) {
+        return
+    }
 }

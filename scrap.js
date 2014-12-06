@@ -128,3 +128,125 @@ newTodoApp.directive('todoEnter', function() {
         });
     };
 });
+
+
+
+// <select>
+//     <option value="" selected="">-Select-</option>
+//     <option value="AN">Andaman and Nicobar Islands</option>
+//     <option value="AP">Andhra Pradesh</option>
+//     <option value="AR">Arunachal Pradesh</option>
+//     <option value="AS">Assam</option>
+//     <option value="BR">Bihar</option>
+//     <option value="CH">Chandigarh</option>
+//     <option value="CT">Chhattisgarh</option>
+//     <option value="DN">Dadra and Nagar Haveli</option>
+//     <option value="DD">Daman and Diu</option>
+//     <option value="DL">Delhi</option>
+//     <option value="GA">Goa</option>
+//     <option value="GJ">Gujarat</option>
+//     <option value="HR">Haryana</option>
+//     <option value="HP">Himachal Pradesh</option>
+//     <option value="JK">Jammu and Kashmir</option>
+//     <option value="JR">Jharkhand</option>
+//     <option value="KA">Karnataka</option>
+//     <option value="KL">Kerala</option>
+//     <option value="LD">Lakshadweep</option>
+//     <option value="MP">Madhya Pradesh</option>
+//     <option value="MH">Maharashtra</option>
+//     <option value="MN">Manipur</option>
+//     <option value="ML">Meghalaya</option>
+//     <option value="MZ">Mizoram</option>
+//     <option value="NL">Nagaland</option>
+//     <option value="OR">Orissa</option>
+//     <option value="PY">Pondicherry</option>
+//     <option value="PB">Punjab</option>
+//     <option value="RJ">Rajasthan</option>
+//     <option value="SK">Sikkim</option>
+//     <option value="TN">Tamil Nadu</option>
+//     <option value="TE">Telangana</option>
+//     <option value="TR">Tripura</option>
+//     <option value="UL">Uttaranchal</option>
+//     <option value="UP">Uttar Pradesh</option>
+//     <option value="WB">West Bengal</option>
+// </select>
+
+
+{
+    AN: 'Andaman and Nicobar Islands',
+    AP: 'Andhra Pradesh',
+    AR: 'Arunachal Pradesh',
+    AS: 'Assam',
+    BR: 'Bihar',
+    CH: 'Chandigarh',
+    CT: 'Chhattisgarh',
+    DN: 'Dadra and Nagar Haveli',
+    DD: 'Daman and Diu',
+    DL: 'Delhi',
+    GA: 'Goa',
+    GJ: 'Gujarat',
+    HR: 'Haryana',
+    HP: 'Himachal Pradesh',
+    JK: 'Jammu and Kashmir',
+    JR: 'Jharkhand',
+    KA: 'Karnataka',
+    KL: 'Kerala',
+    LD: 'Lakshadweep',
+    MP: 'Madhya Pradesh',
+    MH: 'Maharashtra',
+    MN: 'Manipur',
+    ML: 'Meghalaya',
+    MZ: 'Mizoram',
+    NL: 'Nagaland',
+    OR: 'Orissa',
+    PY: 'Pondicherry',
+    PB: 'Punjab',
+    RJ: 'Rajasthan',
+    SK: 'Sikkim',
+    TN: 'Tamil Nadu',
+    TE: 'Telangana',
+    TR: 'Tripura',
+    UL: 'Uttaranchal',
+    UP: 'Uttar Pradesh',
+    WB: 'West Bengal'
+}
+
+{
+    'Andaman and Nicobar Islands': 'AN',
+    'Andhra Pradesh': 'AP',
+    'Arunachal Pradesh': 'AR',
+    'Assam': 'AS',
+    'Bihar': 'BR',
+    'Chandigarh': 'CH',
+    'Chhattisgarh': 'CT',
+    'Dadra and Nagar Haveli': 'DN',
+    'Daman and Diu': 'DD',
+    'Delhi': 'DL',
+    'Goa': 'GA',
+    'Gujarat': 'GJ',
+    'Haryana': 'HR',
+    'Himachal Pradesh': 'HP',
+    'Jammu and Kashmir': 'JK',
+    'Jharkhand': 'JR',
+    'Karnataka': 'KA',
+    'Kerala': 'KL',
+    'Lakshadweep': 'LD',
+    'Madhya Pradesh': 'MP',
+    'Maharashtra': 'MH',
+    'Manipur': 'MN',
+    'Meghalaya': 'ML',
+    'Mizoram': 'MZ',
+    'Nagaland': 'NL',
+    'Orissa': 'OR',
+    'Pondicherry': 'PY',
+    'Punjab': 'PB',
+    'Rajasthan': 'RJ',
+    'Sikkim': 'SK',
+    'Tamil Nadu': 'TN',
+    'Telangana': 'TE',
+    'Tripura': 'TR',
+    'Uttaranchal': 'UL',
+    'Uttar Pradesh': 'UP',
+    'West Bengal:'
+    WB '
+}

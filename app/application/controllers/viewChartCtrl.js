@@ -8,7 +8,7 @@ var unitHeight = 25,
         event: 1,
         participant: {
             participantId: 1,
-            name: 'dhfkjsf'
+            name: 'number1'
         },
         currentLevel: 1,
         secretSerialNumber: 1,
@@ -17,7 +17,7 @@ var unitHeight = 25,
         event: 1,
         participant: {
             participantId: 9,
-            name: 'dhfkjsf'
+            name: 'number8'
         },
         currentLevel: 1,
         secretSerialNumber: 8,
@@ -26,7 +26,7 @@ var unitHeight = 25,
         event: 1,
         participant: {
             participantId: 2,
-            name: 'dhfkjsf'
+            name: 'number3'
         },
         currentLevel: 1,
         secretSerialNumber: 3,
@@ -35,7 +35,7 @@ var unitHeight = 25,
         event: 1,
         participant: {
             participantId: 3,
-            name: 'dhfkjsf'
+            name: 'number4'
         },
         currentLevel: 2,
         secretSerialNumber: 4,
@@ -44,7 +44,7 @@ var unitHeight = 25,
         event: 1,
         participant: {
             participantId: 4,
-            name: 'dhfkjsf'
+            name: 'number5'
         },
         currentLevel: 1,
         secretSerialNumber: 5,
@@ -53,7 +53,7 @@ var unitHeight = 25,
         event: 1,
         participant: {
             participantId: 5,
-            name: 'dhfkjsf'
+            name: 'number7'
         },
         currentLevel: 1,
         secretSerialNumber: 7,

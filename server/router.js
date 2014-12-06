@@ -10,7 +10,9 @@ var lib = require('./lib'),
      */
     userController = require('./api/controllers/userController'),
     participantController = require('./api/controllers/participantController'),
-    tempParticipantController = require('./api/controllers/tempParticipantController');
+    tempParticipantController = require('./api/controllers/tempParticipantController'),
+    sheduleController = require('./api/controllers/sheduleController');
+/*
 /*
  *utils
  */
@@ -18,7 +20,7 @@ var lib = require('./lib'),
 
 module.exports = function(app) {
 
-    app.use(userPolicy.dummyLogin);
+    //app.use(userPolicy.dummyLogin);
     app.use(userPolicy.authenticate); //check if the client has a proper session or not and append details of the logged in user to req.sender
     app.use('/api/:operation', permissionPolicy.verifyPermissions); //verify permissions for the operation
 
@@ -38,5 +40,9 @@ module.exports = function(app) {
     app.get('/api/temp_participant/search', tempParticipantController.search);
     app.get('/api/temp_participant/find', tempParticipantController.getParticipant);
     app.get('/api/temp_participant/list', tempParticipantController.getAllParticipant);
+
+    //Shedule game Routs
+    app.get('/api/shedule/status', sheduleController.getSheduleStatus);
+
 
 };
