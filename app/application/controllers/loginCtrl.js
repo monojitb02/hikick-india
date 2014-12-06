@@ -24,7 +24,7 @@ module.exports = function($scope, $rootScope, $state, $http) {
                 data: {
                     email: $scope.email,
                     password: $scope.password,
-                    secure: true
+                    secure: false
                 }
             }).success(function(result) {
                 if (result.success) {

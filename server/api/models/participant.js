@@ -5,10 +5,10 @@ var mongoose = require('../../lib').mongoose,
     participantSchema;
 
 participantSchema = new Schema({
-    /* participantId: {
-         type: Number,
-         required: true
-     },*/
+    participantId: {
+        type: String,
+        required: true
+    },
     name: {
         type: String,
         required: true

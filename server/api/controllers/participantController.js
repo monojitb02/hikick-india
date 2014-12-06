@@ -69,6 +69,22 @@
              })
              .done();
      },
+     getCubs: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         participantUtil
+             .getCubNames()
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
      /*
       * get details of all candidates
       */

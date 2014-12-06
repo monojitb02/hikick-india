@@ -9,6 +9,19 @@
 
  module.exports = {
 
+     searchParticipantForBy: function(req, res) {
+         sheduleUtil
+             .searchParticipant(req.query.query, req.query.eventId)
+             .then(function(result) {
+                 if (!result.length) {
+                     res.send(['No Data Found']);
+                 } else {
+                     res.send(result);
+                 }
+             }, function() {
+                 res.send(['Searching faild']);
+             })
+     },
      /*
       * get shedule of a perticular event
       */
