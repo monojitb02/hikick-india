@@ -86,7 +86,7 @@
           </label>
           <div class="col-sm-6">
             <p class="input-group">
-              <input type="text" name="dob" class="form-control" datepicker-popup="{{format}}" ng-model="dob" is-open="opened" datepicker-options="dateOptions" ng-required="true" show-button-bar="false" max-date="{{today}}" disabled/>
+              <input type="text" name="dob" class="form-control" datepicker-popup="{{format}}" ng-model="participant.dob" is-open="opened" datepicker-options="dateOptions" ng-required="true" show-button-bar="false" max-date="{{today}}" disabled/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default calender-btn" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
               </span>
@@ -133,11 +133,11 @@
               <span class="asterisk">*</span>
             </label>
             <div class="col-sm-6">
-              <select class="form-control col-sm-3" ng-model="participant.clubName" ng-options="club.name for club in clubs"></select>
+              <select class="form-control col-sm-3" ng-model="club" ng-options="club.name for club in clubs"></select>
             </div>
           </div>
-          <div class="col-sm-6" ng-show="participant.clubName.name==='Others'">
-            <input type="text" name="club" placeholder="Enter club name.." class="form-control col-sm-6" ng-model="participant.club">
+          <div class="col-sm-6" ng-show="club.name==='Others'">
+            <input type="text" name="club" placeholder="Enter club name.." class="form-control col-sm-6" ng-model="participant.clubName">
           </div>
         </div>
 
@@ -148,15 +148,15 @@
           </label>
           <div class="col-sm-6">
             <div class="ckbox ckbox-primary col-sm-4">
-              <input type="checkbox" id="chk-kata" ng-model="participent.choiceOfEvents.kata">
+              <input type="checkbox" id="chk-kata" ng-model="participant.choiceOfEvents.kata">
               <label for="chk-kata">Kata</label>
             </div>
             <div class="ckbox ckbox-primary col-sm-4">
-              <input type="checkbox" id="chk-Kumite" ng-model="participent.choiceOfEvents.kumite">
+              <input type="checkbox" id="chk-Kumite" ng-model="participant.choiceOfEvents.kumite">
               <label for="chk-Kumite">Kumite</label>
             </div>
             <div class="ckbox ckbox-primary col-sm-4">
-              <input type="checkbox" id="chk-Weapons" ng-model="participent.choiceOfEvents.weapons">
+              <input type="checkbox" id="chk-Weapons" ng-model="participant.choiceOfEvents.weapons">
               <label for="chk-Weapons">Weapons</label>
             </div>
           </div>
@@ -167,7 +167,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" name="phno" placeholder="Contact Number" class="form-control col-sm-11" name="phoneNumber" ng-model="participent.contactNumber">
+            <input type="text" name="phno" placeholder="Contact Number" class="form-control col-sm-11" ng-model="participant.contactNumber">
           </div>
         </div>
         <div class="form-group">
@@ -176,7 +176,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" name="email" placeholder="email" class="form-control col-sm-11" name="phoneNumber">
+            <input type="text" name="email" placeholder="email" class="form-control col-sm-11" ng-model="participant.email">
           </div>
         </div>
         <!-- address-->
@@ -186,7 +186,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <textarea name="address" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5" ng-model="participent.address"></textarea>
+            <textarea name="address" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5" ng-model="participant.address"></textarea>
           </div>
         </div>
         <div class="form-group">

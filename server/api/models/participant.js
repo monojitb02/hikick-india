@@ -5,12 +5,8 @@ var mongoose = require('../../lib').mongoose,
     participantSchema;
 
 participantSchema = new Schema({
-    participantId: {
-<<<<<<< HEAD
+    registrationId: {
         type: String,
-=======
-        type: Number,
->>>>>>> d6d6cb7399abda06f4c5a13d10ba3b6d497155be
         required: true
     },
     name: {
@@ -26,8 +22,12 @@ participantSchema = new Schema({
         required: true
     },
     state: {
-        type: String,
-        required: false
+        name: {
+            type: String
+        },
+        value: {
+            type: String
+        }
     },
     gender: {
         type: String,

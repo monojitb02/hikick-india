@@ -7,5 +7,8 @@ module.exports = {
 
     //temp participant
     searchTempParticipant: baseUrl + '/temp_participant/search',
-    findTempParticipant: baseUrl + '/temp_participant/find'
+    findTempParticipant: baseUrl + '/temp_participant/find',
+
+    //participant
+    add: baseUrl + '/participant/add',
 };
