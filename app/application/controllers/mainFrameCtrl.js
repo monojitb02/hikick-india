@@ -1,24 +1,31 @@
 'use strict';
 var utility = require('../../util');
-module.exports = function($scope, $state) {
-    //require("custom");
-    /* // Minimize Button in Panels
-    jQuery('.minimize').click(function() {
-        var t = jQuery(this);
-        var p = t.closest('.panel');
-        if (!jQuery(this).hasClass('maximize')) {
-            p.find('.panel-body, .panel-footer').slideUp(200);
-            t.addClass('maximize');
-            t.html('&plus;');
-        } else {
-            p.find('.panel-body, .panel-footer').slideDown(200);
-            t.removeClass('maximize');
-            t.html('&minus;');
-        }
-        return false;
-    });
+var api = require('../../util/api');
+module.exports = function($scope, $rootScope, $state, $http) {
 
-*/
+    //checking login status
+    var id = utility.getCookie('uid');
+    if (!id) {
+        $state.go('login');
+    }
+    //logout user
+    $scope.logout = function() {
+        $http({ //get image urls from remote server
+            url: api.logout,
+            method: 'POST'
+        }).success(function(result) {
+            if (result.success) {
+                utility.deleteCookie('uid');
+                $state.go('login');
+            }
+        }).error(function() {
+            //TODO: show error message
+        });
+    };
+    $rootScope.$watch('user', function(value) {
+        $scope.name = value.name;
+    }, true);
+
     $scope.$on('$viewContentLoaded', function(event) {
         var originalHash = window.location.hash.replace(/\?.*$/, '');
         var activeListElement = jQuery('a[href="' + originalHash + '"]').closest("li");
@@ -121,15 +128,4 @@ module.exports = function($scope, $state) {
         }
 
     });
-
-    //checking login status
-    var id = utility.getCookie('uid');
-    if (!id) {
-        $state.go('login');
-    }
-    $scope.logout = function() {
-        utility.deleteCookie('uid');
-        $state.go('login');
-    };
-
 };
