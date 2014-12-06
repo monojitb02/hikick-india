@@ -1,12 +1,58 @@
 'use strict';
 
+var config = require('../../config');
+var api = require('../../util/api')
+
 module.exports = function($scope, $http, $state) {
 
     var registrationForm, findParticipantForm;
+    $scope.states = config.states;
+    $scope.clubs = [{
+        name: 'Royal Club'
+    }, {
+        name: 'Lions Club'
+    }, {
+        name: 'Others'
+    }];
     $scope.fetchParticipant = function() {
         if (findParticipantForm.valid()) {
-
+            $http({
+                url: api.searchTempParticipant,
+                method: 'GET',
+                params: {
+                    name: $scope.searchKey
+                }
+            }).success(function(result) {
+                if (result.success) {
+                    $scope.participants = result.data;
+                } else {
+                    $scope.message = result.errfor.message;
+                    $scope.showMessage = true;
+                }
+            }).error(function() {
+                $scope.message = lang.networkError;
+                $scope.showMessage = true;
+            });
         }
+    };
+    $scope.findParticipant = function() {
+        $http({
+            url: api.findTempParticipant,
+            method: 'GET',
+            params: {
+                registrationId: $scope.searchKey
+            }
+        }).success(function(result) {
+            if (result.success) {
+                $scope.participant = result.data;
+            } else {
+                $scope.message = result.errfor.message;
+                $scope.showMessage = true;
+            }
+        }).error(function() {
+            $scope.message = lang.networkError;
+            $scope.showMessage = true;
+        });
     };
     $scope.register = function() {
         if (registrationForm.valid()) {
@@ -52,9 +98,7 @@ module.exports = function($scope, $http, $state) {
         findParticipantForm.validate({
             rules: {
                 id: {
-                    required: true,
-                    number: true,
-                    maxlength: 10
+                    required: true
                 }
             }
         });

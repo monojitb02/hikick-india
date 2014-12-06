@@ -1,11 +1,13 @@
 'use strict';
 var utility = require('../../util');
 var api = require('../../util/api');
-module.exports = function($scope, $rootScope, $state, $http) {
+module.exports = function($scope, $state, $http) {
 
     //checking login status
-    var id = utility.getCookie('uid');
-    if (!id) {
+    var user = utility.getCookie('user');
+    if (user) {
+        $scope.name = JSON.parse(user).name;
+    } else {
         $state.go('login');
     }
     //logout user
@@ -15,16 +17,13 @@ module.exports = function($scope, $rootScope, $state, $http) {
             method: 'POST'
         }).success(function(result) {
             if (result.success) {
-                utility.deleteCookie('uid');
+                utility.deleteCookie('user');
                 $state.go('login');
             }
         }).error(function() {
             //TODO: show error message
         });
     };
-    $rootScope.$watch('user', function(value) {
-        $scope.name = value.name;
-    }, true);
 
     $scope.$on('$viewContentLoaded', function(event) {
         var originalHash = window.location.hash.replace(/\?.*$/, '');
@@ -42,10 +41,7 @@ module.exports = function($scope, $rootScope, $state, $http) {
             activeListElement.parents('.nav-parent').addClass('active nav-active');
             activeListElement.parents('ul').slideDown(200);
         }
-
     });
-
-
 
     jQuery('.nav-parent > a').click(function() {
         var parent = jQuery(this).parent();
