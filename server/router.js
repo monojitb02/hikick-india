@@ -10,7 +10,9 @@ var lib = require('./lib'),
      */
     userController = require('./api/controllers/userController'),
     participantController = require('./api/controllers/participantController'),
-    tempParticipantController = require('./api/controllers/tempParticipantController');
+    tempParticipantController = require('./api/controllers/tempParticipantController'),
+    sheduleController = require('./api/controllers/sheduleController');
+/*
 /*
  *utils
  */
@@ -38,5 +40,9 @@ module.exports = function(app) {
     app.get('/api/temp_participant/search', tempParticipantController.search);
     app.get('/api/temp_participant/find', tempParticipantController.getParticipant);
     app.get('/api/temp_participant/list', tempParticipantController.getAllParticipant);
+
+    //Shedule game Routs
+    app.get('/api/shedule/status', sheduleController.getSheduleStatus);
+
 
 };

@@ -50,7 +50,7 @@ module.exports = {
      * user messages
      */
     NOT_LOGGED_IN: 'You are not logged in',
-    ALREADY_LOGGED_IN: 'You are already logged in loguot first',
+    ALREADY_LOGGED_IN: 'You are already logged in logout first',
     AUTHENTICATION_FAILED: 'Authentication failed',
     INCOMPLETE_ATTRIBUTE_SET: 'Send proper attributes',
     LOGOUT_FAILED: 'Logout failed',

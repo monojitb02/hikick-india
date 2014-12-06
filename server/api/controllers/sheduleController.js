@@ -4,18 +4,19 @@
   */
  'use strict';
  var lib = require('../../lib'),
-     sheduleModel = require('../models/Shedule'),
-     sheduleUtil = require('../utils/SheduleUtil');
+     sheduleModel = require('../models/shedule'),
+     sheduleUtil = require('../utils/sheduleUtil');
 
  module.exports = {
 
      /*
-      * get details of all candidates
+      * get shedule of a perticular event
       */
-     getAllShedule: function(req, res) {
+     getShedule: function(req, res) {
          var workflow = lib.workflow(req, res);
+         eventId = req.query.event_id
          sheduleUtil
-             .getSheduleList()
+             .getShedule(eventId)
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
@@ -28,10 +29,10 @@
                  workflow.emit('exception', err);
              });
      },
-     getAllShedulableEvents: function(req, res) {
+     getSheduleStatus: function(req, res) {
          var workflow = lib.workflow(req, res);
          sheduleUtil
-             .getSheduleableEvents()
+             .getSheduleStatus()
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
