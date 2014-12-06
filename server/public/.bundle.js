@@ -1688,7 +1688,6 @@ module.exports = function($scope, $http, $state) {
         result,
         gameEvents = [],
         events,
-        hasOdds,
         groupsCount;
     // Minimize Button in Panels
     $scope.slidePanel = function(event) {
@@ -1711,7 +1710,8 @@ module.exports = function($scope, $http, $state) {
     };
     $http.get('/api/shedule/status')
         .success(function(data, status, headers, config) {
-            var games = [];
+            var games = [],
+                hasOdds;
             if (data.success) {
                 sheduleStatus = data.data;
                 for (var i = 0; i < sheduleStatus.length; i++) {

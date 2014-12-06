@@ -1,6 +1,7 @@
 'use strict';
 var lib = require('../../lib'),
     Q = lib.q,
+    applicationEndsOn = require('../../config').applicationEndsOn,
     sheduleModel = require('../models/shedule'),
     eventModel = require('../models/event'),
     participantModel = require('../models/participant'),
@@ -13,13 +14,11 @@ var lib = require('../../lib'),
             weight: {
                 $lt: eventObject.weightLimitUpper,
                 $gte: eventObject.weightLimitLower
+            },
+            dob: {
+                $lte: new Date(new Date(applicationEndsOn).setFullYear(applicationEndsOn.getFullYear() - eventObject.ageLimitLower)),
+                $gt: new Date(new Date(applicationEndsOn).setFullYear(applicationEndsOn.getFullYear() - eventObject.ageLimitUpper))
             }
-            //FIX_ME:check dob not age;
-            /*,
-                        age: {
-                            $lt: eventObject.ageLimitUpper,
-                            $gte: eventObject.ageLimitLower
-                        }*/
         };
         switch (eventObject.eventName) {
             case 'WEAPONS':
@@ -62,7 +61,6 @@ var lib = require('../../lib'),
                     deferred.reject(err);
                 } else {
                     events.forEach(function(event) {
-                        // event = event;
                         getParticipantForEvent(event)
                             .then(function(participants) {
                                 var tempEvent = event.toObject();
@@ -148,8 +146,6 @@ module.exports = {
                         participantUtil
                             .findParticipant(queryObject)
                             .then(function(searchResult) {
-                                console.log(queryObject);
-
                                 deferred.resolve(searchResult);
                             }, function() {
                                 deferred.reject();

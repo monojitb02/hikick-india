@@ -2,11 +2,9 @@
 
 module.exports = function($scope, $http, $state) {
     var sheduleStatus = [],
-        games = [],
         result,
         gameEvents = [],
         events,
-        hasOdds,
         groupsCount;
     // Minimize Button in Panels
     $scope.slidePanel = function(event) {
@@ -27,58 +25,10 @@ module.exports = function($scope, $http, $state) {
         if (docHeight > jQuery('.mainpanel').height())
             jQuery('.mainpanel').height(docHeight);
     };
-    /*
-        jQuery('#tags').tagsInput({
-            width: 'auto',
-            height: 'auto',
-            interactive: false
-        });*/
-    /*    var sheduleStatus = [{
-            eventName: 'kata',
-            eventId: 1,
-            ageLimitUpper: 5,
-            ageLimitLower: 2,
-            weightLimitUpper: 5,
-            weightLimitLower: 2,
-            pending: false,
-            candidatesGotBy: [23],
-            maximumByCount: 5
-        }, {
-            eventName: 'kata',
-            eventId: 3,
-            ageLimitUpper: 5,
-            ageLimitLower: 2,
-            weightLimitUpper: 5,
-            weightLimitLower: 2,
-            pending: false
-        }, {
-            eventName: 'kumite',
-            eventId: 2,
-            ageLimitUpper: 5,
-            ageLimitLower: 2,
-            weightLimitUpper: 5,
-            weightLimitLower: 2,
-            pending: true
-        }, {
-            eventName: 'kata',
-            eventId: 4,
-            ageLimitUpper: 1000,
-            ageLimitLower: 2,
-            weightLimitUpper: 7,
-            weightLimitLower: 2,
-            pending: false
-        }, {
-            eventName: 'weapons',
-            eventId: 6,
-            ageLimitUpper: 1000,
-            ageLimitLower: 32,
-            weightLimitUpper: 5,
-            weightLimitLower: 2,
-            pending: true
-        }];
-    */
     $http.get('/api/shedule/status')
         .success(function(data, status, headers, config) {
+            var games = [],
+                hasOdds;
             if (data.success) {
                 sheduleStatus = data.data;
                 for (var i = 0; i < sheduleStatus.length; i++) {
@@ -107,7 +57,7 @@ module.exports = function($scope, $http, $state) {
             }
         })
         .error(function(data, status, headers, config) {
-
+            //TO_DO:show error message
         });
 
     $scope.getGames = function() {

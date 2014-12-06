@@ -24,21 +24,23 @@ module.exports = {
      */
     getCubNames: function() {
         var deferred = Q.defer(),
-            result = [];
+            result = [],
+            response = [];
         participantModel
             .find({}, 'clubName')
             .exec(function(err, clubs) {
-                console.log(clubs);
                 if (err) {
                     deferred.reject(err);
                 } else {
                     clubs.forEach(function(club) {
                         if (club.clubName && result.indexOf(club.clubName) === -1) {
                             result.push(club.clubName);
+                            response.push({
+                                name: club.clubName
+                            });
                         }
-                        console.log(result, club.clubName);
                     })
-                    deferred.resolve(result);
+                    deferred.resolve(response);
                 }
             });
 

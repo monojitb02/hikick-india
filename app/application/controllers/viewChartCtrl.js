@@ -1,7 +1,7 @@
 'use strict';
 var unitHeight = 25,
     /*getMaxPlayerPossible = function(originalNumber) {
-        return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.log(2)));
+        return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
     },*/
 
     shedules = [{
