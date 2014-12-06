@@ -7,5 +7,6 @@ module.exports = {
     server: {
         host: 'localhost',
         port: process.env.PORT || 8000
-    }
+    },
+    applicationEndsOn: new Date('12/19/2014') // in MM/DD/YYYY format
 };

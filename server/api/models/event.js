@@ -29,7 +29,15 @@ var lib = require('../../lib'),
         weightLimitLower: {
             type: Number,
             required: true
-        }
+        },
+        gender: {
+            type: String,
+            required: true
+        },
+        pending: {
+            type: Boolean,
+            default: true
+        },
     }, {
         versionKey: false
     });

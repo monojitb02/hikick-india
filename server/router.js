@@ -35,6 +35,8 @@ module.exports = function(app) {
     app.get('/api/participant/search', participantController.search);
     app.get('/api/participant/list', participantController.getAllParticipant);
     app.get('/api/participant/find', participantController.getParticipant);
+    app.get('/api/participant/clubs', participantController.getCubs);
+
 
     //Temporary Candidates Routs
     app.get('/api/temp_participant/search', tempParticipantController.search);
@@ -43,6 +45,8 @@ module.exports = function(app) {
 
     //Shedule game Routs
     app.get('/api/shedule/status', sheduleController.getSheduleStatus);
+    app.get('/api/shedule/search_participant', sheduleController.searchParticipantForBy);
+
 
 
 };

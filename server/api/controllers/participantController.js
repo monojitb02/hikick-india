@@ -25,6 +25,13 @@
              workflow.emit('response');
              return;
          }
+         if (participantData.gender &&
+             participantData.gender !== 'M' &&
+             participantData.gender !== 'F') {
+             workflow.outcome.errfor.message = lib.message.INVALID_GENDER;
+             workflow.emit('response');
+             return;
+         }
          if (participantData._id) {
              console.log(participantData);
              delete participantData._id;
@@ -68,6 +75,22 @@
                  utils.errorNotifier(err, workflow);
              })
              .done();
+     },
+     getCubs: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         participantUtil
+             .getCubNames()
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
      },
      /*
       * get details of all candidates

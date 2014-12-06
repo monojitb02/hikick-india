@@ -6,7 +6,11 @@ var mongoose = require('../../lib').mongoose,
 
 participantSchema = new Schema({
     participantId: {
+<<<<<<< HEAD
         type: String,
+=======
+        type: Number,
+>>>>>>> d6d6cb7399abda06f4c5a13d10ba3b6d497155be
         required: true
     },
     name: {

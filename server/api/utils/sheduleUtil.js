@@ -1,18 +1,82 @@
 'use strict';
 var lib = require('../../lib'),
     Q = lib.q,
+    applicationEndsOn = require('../../config').applicationEndsOn,
     sheduleModel = require('../models/shedule'),
     eventModel = require('../models/event'),
     participantModel = require('../models/participant'),
-    getEvents = function() {
-        var deferred = Q.defer();
-        eventModel
-            .find()
-            .exec(function(err, result) {
+    participantUtil = require('../utils/participantUtil'),
+    getByCount = function(count) {
+        return Math.pow(2, Math.ceil(Math.log(count) / Math.LN2)) - count;
+    },
+    prepareQueryforEvent = function(eventObject) {
+        var queryObject = {
+            weight: {
+                $lt: eventObject.weightLimitUpper,
+                $gte: eventObject.weightLimitLower
+            },
+            dob: {
+                $lte: new Date(new Date(applicationEndsOn).setFullYear(applicationEndsOn.getFullYear() - eventObject.ageLimitLower)),
+                $gt: new Date(new Date(applicationEndsOn).setFullYear(applicationEndsOn.getFullYear() - eventObject.ageLimitUpper))
+            },
+            gender: eventObject.gender
+        };
+        switch (eventObject.eventName) {
+            case 'WEAPONS':
+                queryObject['choiceOfEvents.weapons'] = true;
+                break;
+            case 'KATA':
+                queryObject['choiceOfEvents.kata'] = true;
+                break;
+            case 'KUMITE':
+                queryObject['choiceOfEvents.kumite'] = true;
+                break;
+        };
+        return queryObject;
+    },
+    getParticipantForEvent = function(event) {
+        var deferred = Q.defer(),
+            queryObject = prepareQueryforEvent(event);
+        participantModel
+            .find(queryObject)
+            .exec(function(err, data) {
                 if (err) {
                     deferred.reject(err);
                 } else {
-                    deferred.resolve(result);
+                    deferred.resolve(data);
+                }
+            });
+        return deferred.promise;
+    },
+    getEvents = function() {
+        var deferred = Q.defer(),
+            resultTempStorage,
+            result = [],
+            errorCount = 0,
+            finished = false;
+        eventModel
+            .find()
+            .exec(function(err, events) {
+                var queryObject;
+                if (err) {
+                    deferred.reject(err);
+                } else {
+                    events.forEach(function(event) {
+                        getParticipantForEvent(event)
+                            .then(function(participants) {
+                                var tempEvent = event.toObject();
+                                tempEvent.maximumByCount = getByCount(participants.length);
+                                result.push(tempEvent);
+                            }, function(err) {
+                                errorCount++;
+                            })
+                            .done(function() {
+                                if (!finished && events.length === (errorCount + result.length)) {
+                                    finished = true;
+                                    deferred.resolve(result);
+                                }
+                            });
+                    })
                 }
             });
         return deferred.promise;
@@ -46,17 +110,52 @@ module.exports = {
      */
     getSheduleStatus: function() {
         var deferred = Q.defer(),
-            result = [],
-            resultTempStorage = {};
+            result = [];
         Q.all([getEvents(), getShedule()])
             .spread(function(events, shedules) {
                 events.forEach(function(event) {
-                    resultTempStorage = event;
+                    var resultTempStorage = event;
                     resultTempStorage.candidatesGotBy = shedules[event._id] || [];
-                    console.log(resultTempStorage)
                     result.push(resultTempStorage);
                 });
                 deferred.resolve(result);
+            });
+        return deferred.promise;
+    },
+    searchParticipant: function(query, eventId) {
+        var deferred = Q.defer(),
+            queryObject = {},
+            reg;
+        eventModel
+            .findOne({
+                eventId: eventId
+            })
+            .exec(function(err, eventDetails) {
+                if (err) {
+                    deferred.reject(err);
+                } else {
+                    if (eventDetails) {
+                        queryObject = prepareQueryforEvent(eventDetails);
+                        if (isNaN(query)) {
+                            queryObject.name = {
+                                $regex: new RegExp(query.split(' ').join('|')),
+                                $options: 'i'
+                            }
+                        } else {
+                            queryObject.participantId = Number(query);
+                        }
+                        console.log(queryObject);
+                        participantUtil
+                            .findParticipant(queryObject)
+                            .then(function(searchResult) {
+                                deferred.resolve(searchResult);
+                            }, function() {
+                                deferred.reject();
+                            })
+                    } else {
+                        deferred.reject();
+                    }
+                }
             });
         return deferred.promise;
     },
@@ -66,7 +165,7 @@ module.exports = {
      *
      */
     //TO_DO:not verified
-    getShedule: function(eventId) {
+    getCompeteShedule: function(eventId) {
         var deferred = Q.defer(),
             event;
         sheduleModel
@@ -82,7 +181,6 @@ module.exports = {
                         result.forEach(function(sheduleObject) {
                             lib._.omit(sheduleObject, 'event');
                         });
-                        console.log(result);
                     }
                     deferred.resolve({
                         event: event,
