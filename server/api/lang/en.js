@@ -14,6 +14,7 @@ module.exports = {
     FIELD_REQUIRED: 'Please fill all required fields.',
     INVALID_DATE: 'Please give correct Date.',
     INVALID_WEIGHT: 'Please give correct Weight.',
+    INVALID_GENDER: 'Please select correct Gender.',
     NO_DATA: 'No data found',
 
     LEAVE_APPLICATION_SUCCESSFULL: 'Leave application is successful',

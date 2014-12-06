@@ -18,7 +18,8 @@ var lib = require('../../lib'),
             dob: {
                 $lte: new Date(new Date(applicationEndsOn).setFullYear(applicationEndsOn.getFullYear() - eventObject.ageLimitLower)),
                 $gt: new Date(new Date(applicationEndsOn).setFullYear(applicationEndsOn.getFullYear() - eventObject.ageLimitUpper))
-            }
+            },
+            gender: eventObject.gender
         };
         switch (eventObject.eventName) {
             case 'WEAPONS':
@@ -143,6 +144,7 @@ module.exports = {
                         } else {
                             queryObject.participantId = Number(query);
                         }
+                        console.log(queryObject);
                         participantUtil
                             .findParticipant(queryObject)
                             .then(function(searchResult) {
@@ -163,7 +165,7 @@ module.exports = {
      *
      */
     //TO_DO:not verified
-    getShedule: function(eventId) {
+    getCompeteShedule: function(eventId) {
         var deferred = Q.defer(),
             event;
         sheduleModel

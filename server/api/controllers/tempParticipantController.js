@@ -82,7 +82,9 @@
                  }
              };
          } else {
-             searchObject = Number(name);
+             searchObject = {
+                 registrationId: Number(name)
+             };
          }
          tempParticipantUtil
              .getParticipantList(searchObject)
@@ -91,7 +93,7 @@
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
                      workflow.emit('response');
                  } else {
-                     workflow.outcome.data = data;
+                     workflow.outcome.data = data.slice(0, 10);
                      workflow.emit('response');
                  }
              }, function(err) {

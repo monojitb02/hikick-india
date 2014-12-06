@@ -25,6 +25,13 @@
              workflow.emit('response');
              return;
          }
+         if (participantData.gender &&
+             participantData.gender !== 'M' &&
+             participantData.gender !== 'F') {
+             workflow.outcome.errfor.message = lib.message.INVALID_GENDER;
+             workflow.emit('response');
+             return;
+         }
          if (participantData._id) {
              console.log(participantData);
              delete participantData._id;

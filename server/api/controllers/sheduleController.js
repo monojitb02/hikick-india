@@ -10,13 +10,17 @@
  module.exports = {
 
      searchParticipantForBy: function(req, res) {
+         var participants = [];
          sheduleUtil
              .searchParticipant(req.query.query, req.query.eventId)
              .then(function(result) {
                  if (!result.length) {
                      res.send(['No Data Found']);
                  } else {
-                     res.send(result);
+                     result.forEach(function(participant) {
+                         participants.push('Name :' + participant.name + ' ID : ' + participant.participantId + '  ')
+                     })
+                     res.send(participants);
                  }
              }, function() {
                  res.send(['Searching faild']);
@@ -25,7 +29,7 @@
      /*
       * get shedule of a perticular event
       */
-     getShedule: function(req, res) {
+     getCompeteShedule: function(req, res) {
          var workflow = lib.workflow(req, res);
          eventId = req.query.event_id
          sheduleUtil
