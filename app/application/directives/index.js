@@ -1,16 +1,22 @@
 'use strict';
 
 var Directive = angular.module('app.directive', [])
-    .directive('enterEvent', function() {
-        return function(scope, element, attrs) {
-            element.bind('keyup', function(event) {
-                if (event.which === 13) {
-                    scope.$apply(function() {
-                        scope.$eval(attrs.enterEvent);
-                    });
-                    event.preventDefault();
+    .directive('capitalize', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, element, attrs, modelCtrl) {
+                var capitalize = function(inputValue) {
+                    if (inputValue == undefined) inputValue = '';
+                    var capitalized = inputValue.toUpperCase();
+                    if (capitalized !== inputValue) {
+                        modelCtrl.$setViewValue(capitalized);
+                        modelCtrl.$render();
+                    }
+                    return capitalized;
                 }
-            });
+                modelCtrl.$parsers.push(capitalize);
+                capitalize(scope[attrs.ngModel]);
+            }
         };
     });
 
