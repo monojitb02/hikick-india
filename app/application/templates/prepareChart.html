@@ -29,11 +29,11 @@
                         </div>
                         <div class="panel-body background-ash">
                             <tags-input ng-model="event.candidatesGotBy" placeholder="Add candidates in list to give them by" add-on-blur="false" add-from-autocomplete-only="true" max-tags="{{event.maximumByCount}}">
-                                <auto-complete source="loadCandidates($query,event.eventId)" min-length="2"></auto-complete>
+                                <auto-complete source="searchCandidates($query,event.eventId)" min-length="2"></auto-complete>
                             </tags-input>
                             <p>
-                                <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}">
-                                    Shedule It<span class="badge pull-right">{{event.maximumByCount}}</span>
+                                <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}" ng-click="submitShedule(event)">
+                                    Shedule It<span class="badge pull-right">{{event.maximumByCount-event.candidatesGotBy.length}}</span>
                                 </button>
                             </p>
                         </div>

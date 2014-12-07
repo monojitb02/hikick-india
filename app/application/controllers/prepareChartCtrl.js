@@ -63,24 +63,14 @@ module.exports = function($scope, $http, $state) {
     $scope.getGames = function() {
         return gameEvents;
     };
-    $scope.getCandidatesGotBy = function(eventId) {
-        var eventData = sheduleStatus.filter(function(element) {
-            return element.eventId === eventId;
-        })[0];
-        return eventData.candidatesGotBy || [];
-    };
-    $scope.tags = [{
-        text: 'just'
-    }, {
-        text: 'some'
-    }, {
-        text: 'cool'
-    }, {
-        text: 'tags'
-    }];
-
-    // $scope.tags = ['just', 'some', 'cool', 'tags'];
-    $scope.loadCandidates = function(query, eventId) {
+    /* deprecated function
+        $scope.getCandidatesGotBy = function(eventId) {
+            var eventData = sheduleStatus.filter(function(element) {
+                return element.eventId === eventId;
+            })[0];
+            return eventData.candidatesGotBy || [];
+        };*/
+    $scope.searchCandidates = function(query, eventId) {
         return $http.get('/api/shedule/search_participant?query=' + query + '&eventId=' + eventId);
     };
     $scope.getWeightLimit = function(event) {
@@ -92,7 +82,7 @@ module.exports = function($scope, $http, $state) {
         } else {
             return 'under ' + event.weightLimitUpper + ' kg';
         }
-    }
+    };
     $scope.getAgeLimit = function(event) {
         if (event.ageLimitUpper === 1000 && event.ageLimitLower === 0) {
             return 'N/A';
@@ -103,4 +93,7 @@ module.exports = function($scope, $http, $state) {
             return 'under ' + event.ageLimitUpper + ' Years';
         }
     };
+    $scope.submitShedule = function(event) {
+        console.log(event);
+    }
 }
