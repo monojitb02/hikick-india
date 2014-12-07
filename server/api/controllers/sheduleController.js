@@ -24,7 +24,7 @@
                  }
              }, function() {
                  res.send(['Searching faild']);
-             })
+             });
      },
      /*
       * get shedule of a perticular event
@@ -55,7 +55,9 @@
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
                      workflow.emit('response');
                  } else {
-                     workflow.outcome.data = data;
+                     workflow.outcome.data = data.sort(function(first, second) {
+                         return first.eventId > second.eventId ? 1 : -1
+                     });
                      workflow.emit('response');
                  }
              }, function(err) {
@@ -66,27 +68,31 @@
       * get details of a perticular candidate during registration
       */
      addShedule: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             eventId = req.body.eventId;
+         var workflow = lib.workflow(req, res);
 
-         if (registrationId === undefined) {
+         if (req.body.eventId === undefined) {
              workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
              workflow.emit('response');
              return;
          }
-         registrationId = Number(registrationId);
          sheduleUtil
-             .findShedule({
-                 registrationId: registrationId
-             })
-             .then(function(data) {
-                 if (!data.length) {
-                     workflow.outcome.errfor.message = lib.message.NO_DATA;
-                     workflow.emit('response');
-                 } else {
-                     workflow.outcome.data = data[0];
-                     workflow.emit('response');
-                 }
+             .sheduleEvent(req.body.eventId, req.body.candidateGiveBy)
+             .then(function() {
+                 sheduleUtil
+                     .getSheduleStatus()
+                     .then(function(data) {
+                         if (!data.length) {
+                             workflow.outcome.errfor.message = lib.message.NO_DATA;
+                             workflow.emit('response');
+                         } else {
+                             workflow.outcome.data = data.sort(function(first, second) {
+                                 return first.eventId > second.eventId ? 1 : -1
+                             });
+                             workflow.emit('response');
+                         }
+                     }, function(err) {
+                         workflow.emit('exception', err);
+                     });
              }, function(err) {
                  workflow.emit('exception', err);
              });

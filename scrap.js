@@ -432,3 +432,103 @@ getPlayers = function(level, group, player) {
 //     };
 
 // };
+
+
+
+
+
+
+
+
+
+var participants = [{
+    "participantId": 13,
+    "name": "AKASH BOSE",
+    "instructor": "SENSCI DILIP JANA",
+    "country": "India",
+    "state": "WB",
+    "gender": "M",
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION",
+    "dob": "14/08/1997",
+    "weight": 95,
+    "kata": 1,
+    "kumite": 1,
+    "weapons": 0,
+    "email": "bishajit.lord@gmail.com",
+    "contactNumber": "9433969162",
+    "address": "NORTH 24 PARGANAS KOL 124 BARASAT DUCKBANGLOW MORE MOLINA APPERTMENT 4TH FLOOR",
+    "profilePictureFile": "24f55c5f445be8da110ad00a95.jpg"
+}, {
+    "participantId": 1,
+    "name": "AKASH BOSE",
+    "instructor": "SENSCI DILIP JANA",
+    "country": "India",
+    "state": "WB",
+    "gender": "M",
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION",
+    "dob": "14/08/1997",
+    "weight": 95,
+    "kata": 1,
+    "kumite": 1,
+    "weapons": 0,
+    "email": "bishajit.lord@gmail.com",
+    "contactNumber": "9433969162",
+    "address": "NORTH 24 PARGANAS KOL 124 BARASAT DUCKBANGLOW MORE MOLINA APPERTMENT 4TH FLOOR",
+    "profilePictureFile": "24f55c5f445be8da110ad00a95.jpg"
+}]
+var getMaxPlayerPossible = function(originalNumber) {
+    if (originalNumber === 1) {
+        return 1;
+    }
+    return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
+};
+var getFixtures = function(participants, participantsGotBy) {
+    var maximumSerialNo = getMaxPlayerPossible(participants.length),
+        secretSerialNo1,
+        secretSerialNo2,
+        player1,
+        player2,
+        possiblePlayer2array = [],
+        resultArray = [];
+    console.log('maximumSerialNo', maximumSerialNo);
+    if (!participants.length) {
+        return [];
+    }
+
+    for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
+        console.log('groupId', groupId);
+        secretSerialNo1 = groupId * 2 + 1;
+        secretSerialNo2 = secretSerialNo1 + 1;
+        if (participants.length === 1) {
+            player1 = participants[0];
+        } else {
+            player1 = participants.splice(Math.round((Math.random() * participants.length)), 1)[0];
+        }
+        if (participantsGotBy.filter(function(participant) {
+                return participant.participantId === player1.participantId;
+            }).length) {
+            player1.byFlag = true;
+            player1.secretSerialNo = secretSerialNo1;
+            resultArray.push(player1);
+        } else {
+            possiblePlayer2array = participants.filter(function(participant) {
+                return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
+            });
+            if (possiblePlayer2array.length) {
+                player2 = possiblePlayer2array.splice(Math.round(Math.random() * possiblePlayer2array.length), 1)[0];
+            } else {
+                player2 = participants.splice(Math.round(Math.random() * participants.length), 1)[0];
+            }
+            console.log('player2', player2);
+            participants = participants.filter(function(participant) {
+                return participant.participantId !== player2.participantId;
+            });
+            player1.secretSerialNo = secretSerialNo1;
+            resultArray.push(player1);
+            player2.secretSerialNo = secretSerialNo2;
+            resultArray.push(player2);
+        }
+    }
+    return resultArray;
+};
+getFixtures(participants, []);
