@@ -79,4 +79,10 @@ participantSchema.index({
 }, {
     unique: true
 });
+participantSchema.index({
+    name: 1,
+    email: 1
+}, {
+    unique: true
+});
 module.exports = mongoose.model('participant', participantSchema);

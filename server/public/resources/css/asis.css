@@ -12,16 +12,28 @@
 .alert {
     margin: 20px 0;
 }
+.input-group-btn {
+    vertical-align: top !important;
+}
 /*************** registration page *********************/
 
-.registration-header {
-    margin-bottom: 15px !important;
+.header-searchbox {
+    position: absolute;
+    top: 15px;
+    right: 0;
+}
+.search-btn-header {
+    border-radius: 0 3px 3px 0 !important;
+    border: 0 !important;
+    top: 0px;
+    padding: 8px 10px !important;
+    margin-right: 0 !important;
 }
 .id-submit-btn {
     padding: 8px 15px !important;
 }
 .calender-btn {
-    padding: 8px 15px;
+    padding: 8px 15px !important;
 }
 .clear-both {
     clear: both;

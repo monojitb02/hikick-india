@@ -34,7 +34,7 @@ tempParticipantSchema = new Schema({
         required: false
     },
     dob: {
-        type: Date,
+        type: String,
         required: true
     },
     weight: {

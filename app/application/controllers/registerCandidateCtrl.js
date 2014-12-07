@@ -2,44 +2,23 @@
 
 var config = require('../../config');
 var api = require('../../util/api');
+
 var findState = function(states, stateCode) {
-        for (var i in states) {
-            if (states[i].value === stateCode.trim()) {
-                return states[i];
-            }
+    for (var i in states) {
+        if (states[i].value === stateCode.trim()) {
+            return states[i];
         }
-    },
-    getClubNames = function() {
-        $http({
-            url: api.searchTempParticipant,
-            method: 'GET'
-        }).success(function(result) {
-            if (result.success) {
-                $scope.clubs = result.data;
-                $scope.clubs.push({
-                    name: 'Others'
-                });
-            }
-        }).error(function() {
-            $scope.message = lang.networkError;
-            $scope.showMessage = true;
-        });
-    };
+    }
+};
 
 module.exports = function($scope, $http, $state) {
 
-    var registrationForm, findParticipantForm;
+    var registrationForm;
     $scope.states = config.states;
     $scope.participant = {};
-    $scope.clubs = [{
-        name: 'Royal Club'
-    }, {
-        name: 'Lions Club'
-    }, {
-        name: 'Others'
-    }];
-    $scope.fetchParticipant = function() {
-        if (findParticipantForm.valid()) {
+    //$scope.participant.gender = 'M';
+    $scope.searchParticipant = function() {
+        if ($scope.searchKey) {
             $http({
                 url: api.searchTempParticipant,
                 method: 'GET',
@@ -48,6 +27,7 @@ module.exports = function($scope, $http, $state) {
                 }
             }).success(function(result) {
                 if (result.success) {
+                    $scope.showSearchResult = true;
                     $scope.participants = result.data;
                 } else {
                     $scope.message = result.errfor.message;
@@ -59,22 +39,55 @@ module.exports = function($scope, $http, $state) {
             });
         }
     };
-    $scope.findParticipant = function() {
+    $scope.findParticipant = function(participant) {
         $http({
             url: api.findTempParticipant,
             method: 'GET',
             params: {
-                registrationId: $scope.searchKey
+                registrationId: participant.registrationId
             }
         }).success(function(result) {
+            var dob;
             if (result.success) {
+                $scope.showSearchResult = false;
                 $scope.participant = result.data;
+                dob = result.data.dob.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$2,$1,$3");
+                $scope.participant.dob = new Date(dob).toISOString();
                 $scope.participant.state = findState($scope.states, $scope.participant.state);
                 $scope.participant.choiceOfEvents = {
                     kata: $scope.participant.kata,
                     kumite: $scope.participant.kumite,
                     weapons: $scope.participant.weapons,
                 };
+
+                $http({
+                    url: api.clubs,
+                    method: 'GET'
+                }).success(function(result) {
+                    var clubs = [];
+                    if (result.success) {
+                        for (var i in result.data) {
+                            clubs.push(result.data[i]);
+                        }
+                    }
+                    clubs.push({
+                        name: 'Others'
+                    });
+                    $scope.clubs = clubs;
+
+                    clubs = $scope.clubs.filter(function(club) {
+                        return (club.name === $scope.participant.clubName)
+                    })
+                    $scope.club = clubs.length ? clubs[0] : $scope.clubs[$scope.clubs.length - 1];
+                }).error(function() {
+                    $scope.clubs.push({
+                        name: 'Others'
+                    });
+                    $scope.club = $scope.clubs[$scope.clubs.length - 1];
+                });
+
+
+                $scope.searchKey = '';
             } else {
                 $scope.message = result.errfor.message;
                 $scope.showMessage = true;
@@ -86,8 +99,11 @@ module.exports = function($scope, $http, $state) {
     };
     $scope.register = function() {
         if (registrationForm.valid()) {
-            $scope.participant.registrationId = $scope.searchKey; //......................TODO
-            $scope.participant.clubName = $scope.participant.clubName | $scope.club.name;
+            $scope.participant.participantId = String(new Date().getTime()).substr(7, 13);
+            if ($scope.club.name !== 'Others') {
+                $scope.participant.clubName = $scope.club.name;
+            }
+
             $http({
                 url: api.add,
                 method: 'POST',
@@ -105,12 +121,17 @@ module.exports = function($scope, $http, $state) {
             });
         }
     };
+    $scope.checkEnter = function($event) {
+        if ($event.keyCode === 13) {
+            $scope.searchParticipant();
+        }
+    };
     $scope.reset = function() {
         $scope.participant = {};
     };
 
     //date picker handler
-    $scope.participant.dob = '';
+    $scope.participant.dob = new Date().toISOString();
     $scope.today = new Date();
 
     $scope.clear = function() {
@@ -140,14 +161,6 @@ module.exports = function($scope, $http, $state) {
 
     //validator initialize
     $scope.$on('$viewContentLoaded', function() {
-        findParticipantForm = jQuery('#find_participant_form');
-        findParticipantForm.validate({
-            rules: {
-                id: {
-                    required: true
-                }
-            }
-        });
         registrationForm = jQuery('#registration_form');
         registrationForm.validate({
             rules: {
