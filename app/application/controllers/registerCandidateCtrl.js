@@ -1,24 +1,116 @@
 'use strict';
 
+var config = require('../../config');
+var api = require('../../util/api');
+var findState = function(states, stateCode) {
+        for (var i in states) {
+            if (states[i].value === stateCode.trim()) {
+                return states[i];
+            }
+        }
+    },
+    getClubNames = function() {
+        $http({
+            url: api.searchTempParticipant,
+            method: 'GET'
+        }).success(function(result) {
+            if (result.success) {
+                $scope.clubs = result.data;
+                $scope.clubs.push({
+                    name: 'Others'
+                });
+            }
+        }).error(function() {
+            $scope.message = lang.networkError;
+            $scope.showMessage = true;
+        });
+    };
+
 module.exports = function($scope, $http, $state) {
 
     var registrationForm, findParticipantForm;
+    $scope.states = config.states;
+    $scope.participant = {};
+    $scope.clubs = [{
+        name: 'Royal Club'
+    }, {
+        name: 'Lions Club'
+    }, {
+        name: 'Others'
+    }];
     $scope.fetchParticipant = function() {
         if (findParticipantForm.valid()) {
-
+            $http({
+                url: api.searchTempParticipant,
+                method: 'GET',
+                params: {
+                    name: $scope.searchKey
+                }
+            }).success(function(result) {
+                if (result.success) {
+                    $scope.participants = result.data;
+                } else {
+                    $scope.message = result.errfor.message;
+                    $scope.showMessage = true;
+                }
+            }).error(function() {
+                $scope.message = lang.networkError;
+                $scope.showMessage = true;
+            });
         }
+    };
+    $scope.findParticipant = function() {
+        $http({
+            url: api.findTempParticipant,
+            method: 'GET',
+            params: {
+                registrationId: $scope.searchKey
+            }
+        }).success(function(result) {
+            if (result.success) {
+                $scope.participant = result.data;
+                $scope.participant.state = findState($scope.states, $scope.participant.state);
+                $scope.participant.choiceOfEvents = {
+                    kata: $scope.participant.kata,
+                    kumite: $scope.participant.kumite,
+                    weapons: $scope.participant.weapons,
+                };
+            } else {
+                $scope.message = result.errfor.message;
+                $scope.showMessage = true;
+            }
+        }).error(function() {
+            $scope.message = lang.networkError;
+            $scope.showMessage = true;
+        });
     };
     $scope.register = function() {
         if (registrationForm.valid()) {
+            $scope.participant.registrationId = $scope.searchKey; //......................TODO
+            $scope.participant.clubName = $scope.participant.clubName | $scope.club.name;
+            $http({
+                url: api.add,
+                method: 'POST',
+                data: $scope.participant
+            }).success(function(result) {
+                if (result.success) {
 
+                } else {
+                    $scope.message = result.errfor.message;
+                    $scope.showMessage = true;
+                }
+            }).error(function() {
+                $scope.message = lang.networkError;
+                $scope.showMessage = true;
+            });
         }
     };
     $scope.reset = function() {
-        registrationForm.resetForm();
+        $scope.participant = {};
     };
 
     //date picker handler
-    $scope.dob = '';
+    $scope.participant.dob = '';
     $scope.today = new Date();
 
     $scope.clear = function() {
@@ -52,9 +144,7 @@ module.exports = function($scope, $http, $state) {
         findParticipantForm.validate({
             rules: {
                 id: {
-                    required: true,
-                    number: true,
-                    maxlength: 10
+                    required: true
                 }
             }
         });

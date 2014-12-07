@@ -5,11 +5,7 @@ var api = require('../../util/api')
 
 module.exports = function($scope, $rootScope, $state, $http) {
 
-    var id = utility.getCookie('uid'),
-        loginForm;
-    if (id) {
-        $state.go('app.home');
-    }
+    var loginForm;
 
     //dummy login
     $scope.email = 'admin.hikickindia@gmail.com';
@@ -18,7 +14,7 @@ module.exports = function($scope, $rootScope, $state, $http) {
     //login user
     $scope.login = function() {
         if (loginForm.valid()) {
-            $http({ //get image urls from remote server
+            $http({
                 url: api.login,
                 method: 'POST',
                 data: {
@@ -28,8 +24,7 @@ module.exports = function($scope, $rootScope, $state, $http) {
                 }
             }).success(function(result) {
                 if (result.success) {
-                    $rootScope.user = result.data;
-                    utility.setCookie('uid', result.data._id);
+                    utility.setCookie('user', JSON.stringify(result.data));
                     $state.go('app.home');
                 } else {
                     $scope.message = result.errfor.message;

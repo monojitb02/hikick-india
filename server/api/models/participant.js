@@ -5,8 +5,8 @@ var mongoose = require('../../lib').mongoose,
     participantSchema;
 
 participantSchema = new Schema({
-    participantId: {
-        type: Number,
+    registrationId: {
+        type: String,
         required: true
     },
     name: {
@@ -22,8 +22,12 @@ participantSchema = new Schema({
         required: true
     },
     state: {
-        type: String,
-        required: false
+        name: {
+            type: String
+        },
+        value: {
+            type: String
+        }
     },
     gender: {
         type: String,
@@ -70,9 +74,9 @@ participantSchema = new Schema({
 }, {
     versionKey: false
 });
-/*participantSchema.index({
+participantSchema.index({
     participantId: 1
 }, {
     unique: true
-});*/
+});
 module.exports = mongoose.model('participant', participantSchema);
