@@ -4,7 +4,7 @@ var fs = require('fs');
 var utility = require('../../util');
 
 module.exports = function($stateProvider, $locationProvider, $urlRouterProvider) {
-    window.console.log('Starting app');
+    //console.log('Starting app');
     $stateProvider
         .state('login', {
             url: '/login',

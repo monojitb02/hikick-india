@@ -1,5 +1,5 @@
 jQuery(window).load(function() {
-    console.log('custom.js loaded');
+    // console.log('custom.js loaded');
     // Page Preloader
     jQuery('#status').fadeOut();
     jQuery('#preloader').delay(350).fadeOut(function() {

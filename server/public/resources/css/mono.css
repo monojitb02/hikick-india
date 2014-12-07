@@ -23,6 +23,9 @@
 .font-blue-bold {
     color: #00F;
 }
+.last-level {
+    display: none;
+}
 /******************** ForDojo Mat **************************/
 
 .dojo-page-header {

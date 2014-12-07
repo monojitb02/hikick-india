@@ -46,8 +46,7 @@
                  workflow.emit('response');
              }, function(err) {
                  utils.errorNotifier(err, workflow);
-             })
-             .done();
+             });
      },
      /**
       * update candidates profile

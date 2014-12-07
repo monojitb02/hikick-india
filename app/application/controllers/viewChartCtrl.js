@@ -1,9 +1,10 @@
 'use strict';
 var unitHeight = 25,
-    /*getMaxPlayerPossible = function(originalNumber) {
-        return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
-    },*/
-
+    /*
+        getMaxPlayerPossible = function(originalNumber) {
+            return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
+        },
+    */
     shedules = [{
         event: 1,
         participant: {
@@ -60,9 +61,7 @@ var unitHeight = 25,
         byFlag: false
     }],
     getMaxLevel = function(players) { //returns top current lavel from all players
-        return players.reduce(function(topPlayer, currentPlayer) {
-            return (topPlayer.currentLevel > currentPlayer.currentLevel) ? topPlayer : currentPlayer;
-        }).currentLevel;
+        return Math.ceil(Math.log(players.length) / Math.LN2) + 1;
     },
     playerShortById = function(player1, player2) {
         return (player1.secretSerialNumber > player2.secretSerialNumber) ? 1 : -1;
@@ -88,21 +87,20 @@ var unitHeight = 25,
         }
         return result;
     },
-    getGroupsForLevel = function(levelId, players) {
-        var playersInLevel,
-            groups = [];
-        if (levelId === 1) {
-            playersInLevel = players;
-        } else {
-            playersInLevel = players.filter(function(player) {
-                return (player.currentLevel >= levelId);
-            });
-        }
-        for (var group = 0; group < playersInLevel.length / 2; group++) {
+    getGroupsForLevel = function(players, level, maxLevel) {
+        var groups = [];
+        if (level === maxLevel) {
             groups.push({
-                player1: playersInLevel[group * 2],
-                player2: playersInLevel[group * 2 + 1]
+                player1: getPlayers(players, level, group, 1),
+                player2: {},
             });
+        } else {
+            for (var group = 1; group <= Math.pow(2, maxLevel - level - 1); group++) {
+                groups.push({
+                    player1: getPlayers(players, level, group, 1),
+                    player2: getPlayers(players, level, group, 2),
+                });
+            }
         }
         return groups;
     },
@@ -113,14 +111,38 @@ var unitHeight = 25,
         for (var level = 1; level <= maxLevel; level++) {
             formatioArray.push({
                 levelId: level,
-                groups: getGroupsForLevel(level, players)
+                groups: getGroupsForLevel(players, level, maxLevel)
             });
         }
+        // console.log(formatioArray);
         return formatioArray;
+    },
+    //TO_DO:have to test and implement it 
+    getPlayers = function(players, level, group, player) {
+        var bandWidth = Math.pow(2, (level - 1)),
+            threshold = 2 * (group - 1) + player,
+            lowerLimit = bandWidth * (threshold - 1),
+            upperLimit = bandWidth * (threshold),
+            result = players.filter(function(player) {
+                return (player.currentLevel >= level &&
+                    player.secretSerialNumber > lowerLimit &&
+                    player.secretSerialNumber <= upperLimit)
+            });
+        if (result.length > 1) {
+            console.log('somthing fishy');
+        }
+        if (result.length) {
+            return result[0];
+        } else {
+            return {};
+        }
     };
 module.exports = function($scope, $http, $state) {
     $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
+    $scope.isLastLevel = function(levelId) {
+        return levelId === getMaxLevel(shedules);
+    };
     $scope.getHeight = function(levelId) {
         return (Math.pow(2, levelId) * unitHeight) + 'px';
     };
