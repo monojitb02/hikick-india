@@ -24,6 +24,8 @@ module.exports = function($scope, $rootScope, $state, $http, $timeout) {
                 }
             }).success(function(result) {
                 if (result.success) {
+                    delete result.data.password;
+                    delete result.data.email;
                     utility.setCookie('user', JSON.stringify(result.data));
                     $state.go('app.home');
                 } else {
@@ -38,6 +40,9 @@ module.exports = function($scope, $rootScope, $state, $http, $timeout) {
             }).error(function() {
                 $scope.message = lang.networkError;
                 $scope.showMessage = true;
+                $timeout(function() {
+                    $scope.showMessage = false;
+                }, 2000);
             });
         }
     };

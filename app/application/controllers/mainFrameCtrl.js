@@ -7,6 +7,10 @@ module.exports = function($scope, $state, $http) {
     var user = utility.getCookie('user');
     if (user) {
         $scope.name = JSON.parse(user).name;
+        $scope.role = JSON.parse(user).role;
+        if ($scope.role.dojoMat1 || $scope.role.dojoMat2 || $scope.role.dojoMat3 || $scope.role.dojoMat4) {
+            $scope.showDojo = true;
+        }
     } else {
         $state.go('login');
     }

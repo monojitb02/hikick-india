@@ -11,12 +11,33 @@ var findState = function(states, stateCode) {
     }
 };
 
-module.exports = function($scope, $http, $state) {
+module.exports = function($scope, $http, $state, $timeout, $modal) {
 
-    var registrationForm;
+    var registrationForm,
+        hideMessage = function() {
+            $timeout(function() {
+                $scope.showMessage = false;
+            }, 2000);
+        };
     $scope.states = config.states;
     $scope.participant = {};
-    //$scope.participant.gender = 'M';
+    $scope.participant.gender = 'M';
+
+    $scope.reset = function() {
+        $scope.participant = {};
+        $scope.participant.gender = 'M';
+    };
+    //opens the modal window and create controller for it
+    $scope.openModal = function(size) {
+        var modalInstance = $modal.open({
+            template: require('fs').readFileSync(__dirname + '/../templates/registrationModal.html'),
+            controller: 'registrationModalCtrl',
+            size: size,
+            scope: $scope
+
+        });
+    };
+
     $scope.searchParticipant = function() {
         if ($scope.searchKey) {
             $http({
@@ -32,10 +53,12 @@ module.exports = function($scope, $http, $state) {
                 } else {
                     $scope.message = result.errfor.message;
                     $scope.showMessage = true;
+                    hideMessage();
                 }
             }).error(function() {
                 $scope.message = lang.networkError;
                 $scope.showMessage = true;
+                hideMessage();
             });
         }
     };
@@ -91,10 +114,12 @@ module.exports = function($scope, $http, $state) {
             } else {
                 $scope.message = result.errfor.message;
                 $scope.showMessage = true;
+                hideMessage();
             }
         }).error(function() {
             $scope.message = lang.networkError;
             $scope.showMessage = true;
+            hideMessage();
         });
     };
     $scope.register = function() {
@@ -110,14 +135,16 @@ module.exports = function($scope, $http, $state) {
                 data: $scope.participant
             }).success(function(result) {
                 if (result.success) {
-
+                    $scope.openModal('sm');
                 } else {
                     $scope.message = result.errfor.message;
                     $scope.showMessage = true;
+                    hideMessage();
                 }
             }).error(function() {
                 $scope.message = lang.networkError;
                 $scope.showMessage = true;
+                hideMessage();
             });
         }
     };
@@ -126,22 +153,10 @@ module.exports = function($scope, $http, $state) {
             $scope.searchParticipant();
         }
     };
-    $scope.reset = function() {
-        $scope.participant = {};
-    };
 
     //date picker handler
-    $scope.participant.dob = new Date().toISOString();
+    $scope.participant.dob = new Date();
     $scope.today = new Date();
-
-    $scope.clear = function() {
-        $scope.dob = null;
-    };
-
-    $scope.toggleMin = function() {
-        $scope.minDate = $scope.minDate ? null : new Date();
-    };
-    $scope.toggleMin();
 
     $scope.open = function($event) {
         $event.preventDefault();

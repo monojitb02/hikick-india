@@ -11,6 +11,7 @@ var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'ap
     .controller('viewChartCtrl', require('./controllers/viewChartCtrl'))
     .controller('dojoMatCtrl', require('./controllers/dojoMatCtrl'))
     .controller('gameHistoryCtrl', require('./controllers/gameHistoryCtrl'))
+    .controller('registrationModalCtrl', require('./controllers/registrationModalCtrl'))
     .config(require('./router/router'));
 
 module.exports = App;

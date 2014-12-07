@@ -55,6 +55,7 @@
 .tag-suggestion ul {
     padding: 0px;
     margin: 0px;
+    cursor: pointer;
 }
 .tag-suggestion li {
     background: none repeat scroll 0 0 #FFFFFF;
