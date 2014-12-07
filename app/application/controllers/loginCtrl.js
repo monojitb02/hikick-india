@@ -3,7 +3,7 @@
 var utility = require('../../util');
 var api = require('../../util/api')
 
-module.exports = function($scope, $rootScope, $state, $http) {
+module.exports = function($scope, $rootScope, $state, $http, $timeout) {
 
     var loginForm;
 
@@ -29,6 +29,11 @@ module.exports = function($scope, $rootScope, $state, $http) {
                 } else {
                     $scope.message = result.errfor.message;
                     $scope.showMessage = true;
+                    $scope.email = '';
+                    $scope.password = '';
+                    $timeout(function() {
+                        $scope.showMessage = false;
+                    }, 2000);
                 }
             }).error(function() {
                 $scope.message = lang.networkError;

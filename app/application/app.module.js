@@ -1,5 +1,5 @@
 'use strict';
-var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput']) //, 'app.home', 'app.search', 'app.player'
+var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput'])
     .controller('mainFrameCtrl', require('./controllers/mainFrameCtrl'))
     .controller('loginCtrl', require('./controllers/loginCtrl'))
     .controller('homeCtrl', require('./controllers/homeCtrl'))
