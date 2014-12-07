@@ -589,7 +589,7 @@ module.exports = function($scope, $http, $state) {
             if ($scope.club.name !== 'Others') {
                 $scope.participant.clubName = $scope.club.name;
             }
-
+            $scope.participant.clubName = $scope.participant.clubName.toUpperCase();
             $http({
                 url: api.add,
                 method: 'POST',
