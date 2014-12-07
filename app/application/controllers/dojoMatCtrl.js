@@ -1,7 +1,7 @@
 'use strict';
 var defaultTimerSeconds = 180,
     submitGracePeriod = 5000;
-module.exports = function($scope, $http, $state, $timeout) {
+module.exports = function($scope, $http, $state, $timeout, $interval) {
     var clock = jQuery('.clock').FlipClock({
             countdown: true,
             autoStart: false,
@@ -10,23 +10,20 @@ module.exports = function($scope, $http, $state, $timeout) {
                 start: function() {
                     $scope.gameRunning = !$scope.gameRunning;
                     $scope.matchStarted = true;
-                    timeBreaks.push(new Date());
+                    $scope.timeBreaks.push(new Date());
                 },
                 stop: function() {
                     $scope.gameRunning = !$scope.gameRunning;
-                    timeBreaks.push(new Date());
+                    $scope.timeBreaks.push(new Date());
+                    if (clock.getTime().time === 0) {
+                        console.log('ended');
+                        freezeMatch();
+                    }
                 }
             }
         }),
-        timeBreaks = [],
         checkNumber = function(value) {
             if (isNaN(value)) {
-                return 0;
-            }
-            if (isNaN(value)) {
-                return 0;
-            }
-            if (Number(value) >= 60) {
                 return 0;
             }
             if (Number(value) >= 60) {
@@ -64,13 +61,38 @@ module.exports = function($scope, $http, $state, $timeout) {
 
         },
         freezeMatch = function() {
+            blockFreeze = false;
+            $scope.showProgress = true;
+            $interval(function() {
+                $scope.pgrogressValue += (100 / 50);
+            }, 100, 50)
             $timeout(function() {
-                $scope.matchEnded = true;
-            }, submitGracePeriod)
-        };
+                $scope.showProgress = false;
+                $scope.pgrogressValue = 2;
+                if (blockFreeze) {
+                    blockFreeze = false;
+                } else {
+                    console.log('matchEnded');
+                    $scope.matchEnded = true;
+                }
+            }, submitGracePeriod);
+        },
+        blockFreeze = false;
 
 
     $scope.warningArray = ['C', 'K', 'CH', 'H'];
+    var array = [];
+    for (var i = 1; i <= 53; i++) {
+        array.push({
+            name: String(i)
+        });
+    }
+    $scope.eventIds = array;
+    $scope.getMatches = function() {
+        console.log('connecting to server');
+    };
+
+    $scope.selectedEvent = {};
     $scope.player1WarningArray1 = [];
     $scope.player1WarningArray2 = [];
     $scope.player2WarningArray1 = [];
@@ -78,15 +100,22 @@ module.exports = function($scope, $http, $state, $timeout) {
     $scope.matchStarted = false;
     $scope.matchEnded = false;
 
-
+    $scope.pgrogressValue = 2;
     $scope.Player1Score = 0;
     $scope.Player2Score = 0;
+    $scope.Player1ScoreArray = [];
+    $scope.Player2ScoreArray = [];
+    $scope.timeBreaks = [];
+
     $scope.matId = window.location.hash.split('dojoMat/')[1];
     $scope.toggleTimer = function() {
         clock.running ? clock.stop() : clock.start();
     };
     $scope.setTimer = function() {
         clock.setTime($scope.timerMinute * 60 + $scope.timerSecond);
+        blockFreeze = true;
+        $scope.showProgress = false;
+        $scope.pgrogressValue = 2;
     };
     $scope.resetTimer = function() {
         jQuery("#second").val('0');
@@ -94,17 +123,36 @@ module.exports = function($scope, $http, $state, $timeout) {
         $scope.timerMinute = 3;
         $scope.timerSecond = 0;
         $scope.setTimer();
+        $scope.showProgress = false;
+        $scope.pgrogressValue = 2;
     };
     $scope.gameRunning = clock.running;
     $scope.increasePoint = function(playerNumber, points) {
-        console.log('increase', playerNumber, points, $scope.timer, $scope.Player2Score);
         if ($scope.matchStarted && !$scope.matchEnded) {
             if (playerNumber === 1) {
-                console.log('increases', playerNumber, points, $scope.Player1Score);
                 $scope.Player1Score = $scope.Player1Score + points;
+                $scope.Player1ScoreArray.push({
+                    point: points,
+                    time: new Date()
+                });
             } else if (playerNumber === 2) {
-                console.log('increases', playerNumber, points, $scope.Player2Score);
                 $scope.Player2Score = $scope.Player2Score + points;
+                $scope.Player2ScoreArray.push({
+                    point: points,
+                    time: new Date()
+                });
+            }
+        }
+    };
+    $scope.undo = function(player) {
+        var popped;
+        if ($scope.matchStarted && !$scope.matchEnded) {
+            if (player === 1) {
+                popped = $scope.Player1ScoreArray.pop();
+                $scope.Player1Score = $scope.Player1Score - popped.point;
+            } else if (player === 2) {
+                popped = $scope.Player2ScoreArray.pop();
+                $scope.Player2Score = $scope.Player2Score - popped.point;
             }
         }
     };
@@ -141,11 +189,14 @@ module.exports = function($scope, $http, $state, $timeout) {
                 $scope.player2WarningArray2.push(warning);
             }
         }
-        console.log(clock.getTime().time);
+
         // console.log('toggleWarning', $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player2WarningArray1, $scope.player2WarningArray2)
     };
     $scope.submit = function() {
-        freezeMatch();
+
+    };
+    $scope.updateMatchList = function() {
+
     }
 
     $scope.resetTimer();

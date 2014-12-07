@@ -86,8 +86,8 @@ module.exports = function($scope, $http, $state) {
     };
     $scope.register = function() {
         if (registrationForm.valid()) {
-            $scope.participant.registrationId = $scope.searchKey; //......................TODO
-            $scope.participant.clubName = $scope.participant.clubName | $scope.club.name;
+            $scope.participant.participantId = $scope.searchKey; //......................TODO
+            $scope.participant.clubName = $scope.participant.clubName /* | $scope.club.name*/ ;
             $http({
                 url: api.add,
                 method: 'POST',

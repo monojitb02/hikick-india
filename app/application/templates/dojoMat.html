@@ -5,7 +5,37 @@
   <!-- <div class="clock col-sm-4 col-sm-offset-4"></div> -->
 
   <div class="pull-right">
-    SetTimer:
+    Set Event:
+    <select class="form-control inline-box" ng-model="selectedEvent" ng-options="eventId.name for eventId in eventIds" ng-disabled="matchStarted">
+      <!-- ng-change="getMatches()"
+      <option value="{{eventId}}" ng-repeat="evenId in getEventIds">{{eventId}}</option> -->
+    </select> Select Match:
+    <div class="match-list">
+      <input type="text" class="form-control inline-box select-match-box" placeholder="Player1 VS Player2" ng-disabled="matchStarted" ng-focus="showMatchList=true">
+      <!-- ng-blur="showMatchList=false" -->
+
+      <div ng-show="showMatchList" class="tag-suggestion search-result-box">
+        <div class="search-result-close-block">
+          <span class="search-result-close-text">Fixtures found : {{fixtureList.length}}</span>
+          <span class="close" title="Close search result" ng-click="showMatchList=false">×</span>
+        </div>
+        <ul ng-show="fixtureList.length" class="chosen-results no-style" role="menu">
+          <li ng-repeat="fixture in fixtureList" ng-click="getPlayers(fixture)">
+            <div class="clear-both">
+              <div class="col-sm-8 no-padding-left clearfix">
+                <span>{{fixture.player1}}</span>
+                <span class="vs">Vs</span>
+                <span>,{{fixture.player2}}</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div ng-hide="fixtureList" class="text-center">
+          <span class="fa fa-spin fa-spinner no-special-styling"></span>
+        </div>
+      </div>
+
+    </div> Set Timer:
     <span class="ui-spinner ui-widget ui-widget-content ui-corner-all">
       <input type="text" id="minute" class="ui-spinner-input time-input" ng-model="timerMinute" autocomplete="off" role="spinbutton" aria-valuenow="1">
     </span>
@@ -32,7 +62,7 @@
         <span class="input-group-addon">
           <span class="glyphicon glyphicon-user"></span>
         </span>
-        <input type="text" class="form-control" placeholder="Select Player1" ng-disabled="matchStarted">
+        <input type="text" class="form-control" placeholder="Select Player1" ng-disabled="true">
       </div>
 
       <div class="game-buttons">
@@ -46,6 +76,14 @@
           Ippon <span class="badge">3</span>
         </button>
       </div>
+
+      <div class="text-center undo-button">
+        <button class="btn btn-primary" ng-click="undo(1)" title="Undo last" ng-disabled="Player1ScoreArray.length === 0">
+          <i class="fa fa-undo"></i>
+          <!-- <span class="badge">1</span> -->
+        </button>
+      </div>
+
 
       <div class="warning-holder">
         <div class="warning-controls col-sm-12">
@@ -78,6 +116,9 @@
             <div class="col-sm-12 text-center category-heading">Warning Category 1</div>
             <div class="col-sm-12 text-center category-heading">Warning Category 2</div>
           </div>
+          <progressbar class="progress-striped active timeout-bar" max="100" value="pgrogressValue" type="danger" ng-show="showProgress">
+            <i>{{pgrogressValue}} %</i>
+          </progressbar>
           <button class="btn btn-block submit-button" ng-click="submit()">Submit</button>
         </div>
       </div>
@@ -85,12 +126,14 @@
     <!-- blue corner -->
     <div class="col-sm-4 blue-corner corner">
       <h1 class="corner-name text-right">Aka</h1>
+
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Select Player2" ng-disabled="matchStarted">
+        <input type="text" class="form-control" placeholder="Select Player2" ng-disabled="true">
         <span class="input-group-addon">
           <span class="glyphicon glyphicon-user"></span>
         </span>
       </div>
+
       <div class="text-right game-buttons">
         <button class="btn btn-danger" ng-click="increasePoint(2,1)">
           Yuko <span class="badge">1</span>
@@ -102,6 +145,14 @@
           Ippon <span class="badge">3</span>
         </button>
       </div>
+
+      <div class="text-center undo-button">
+        <button class="btn btn-danger" ng-click="undo(2)" title="Undo last" ng-disabled="Player2ScoreArray.length === 0">
+          <i class="fa fa-undo"></i>
+          <!--  <span class="badge">1</span> -->
+        </button>
+      </div>
+
       <div class="warning-holder">
         <div class="warning-controls col-sm-12">
           <div class="col-sm-3 ckbox ckbox-warning" ng-repeat="warning in warningArray">

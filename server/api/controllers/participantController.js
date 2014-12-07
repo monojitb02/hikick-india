@@ -35,7 +35,7 @@
          if (participantData._id) {
              console.log(participantData);
              delete participantData._id;
-             console.log(participantData);
+             // console.log(participantData);
          }
          participantData.dob = new Date(participantData.dob);
          participantData.weight = Number(participantData.weight);

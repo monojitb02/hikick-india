@@ -28,8 +28,31 @@
 }
 /******************** ForDojo Mat **************************/
 
+.no-special-styling {
+    font-size: 16px!important;
+    border: 0px!important;
+}
+.search-result-box {
+    position: absolute;
+    top: 42;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
 .dojo-page-header {
     overflow: auto;
+}
+.inline-box {
+    display: inline;
+    width: auto;
+    margin-right: 15px;
+}
+.match-list {
+    display: inline-block;
+    position: relative;
+}
+.select-match-box {
+    width: 250px;
 }
 .clock {
     z-index: 30;
@@ -101,6 +124,14 @@
     font-size: 100px;
     color: #fff;
 }
+.undo-button .btn {
+    margin: 54px auto 20px;
+    height: 66px;
+    font-size: 40px;
+}
+.timeout-bar {
+    margin-top: 10px;
+}
 .warning-lable {
     color: #fff;
     padding-left: 0px!important;
@@ -111,12 +142,13 @@
     border: 3px double;
     background-color: #B2B2B2;
     margin: 10px 0px;
+    border-radius: 10px;
 }
 .warning-holder {
-    overflow: auto;
-    position: absolute;
-    width: 90%;
-    bottom: 104px;
+    /*  overflow: auto;
+   position: absolute;
+   width: 90%;
+   bottom: 104px; */
 }
 .blue-corner .warning-holder {
     left: 0px;

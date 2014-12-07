@@ -5,7 +5,7 @@ var mongoose = require('../../lib').mongoose,
     participantSchema;
 
 participantSchema = new Schema({
-    registrationId: {
+    participantId: {
         type: String,
         required: true
     },

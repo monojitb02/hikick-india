@@ -1,5 +1,5 @@
 'use strict';
-
+var api = require('../../util/api');
 module.exports = function($scope, $http, $state) {
     var sheduleStatus = [],
         result,
@@ -25,8 +25,11 @@ module.exports = function($scope, $http, $state) {
         if (docHeight > jQuery('.mainpanel').height())
             jQuery('.mainpanel').height(docHeight);
     };
-    $http.get('/api/shedule/status')
-        .success(function(data, status, headers, config) {
+    $http({
+            url: api.sheduleGame,
+            method: 'GET'
+        })
+        .success(function(data) {
             var games = [],
                 hasOdds;
             if (data.success) {
