@@ -241,7 +241,6 @@ module.exports = {
                         } else {
                             queryObject.participantId = Number(query);
                         }
-                        console.log(queryObject);
                         participantUtil
                             .findParticipant(queryObject)
                             .then(function(searchResult) {
