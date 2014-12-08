@@ -18,7 +18,7 @@
                      res.send(['No Data Found']);
                  } else {
                      result.forEach(function(participant) {
-                         participants.push('Name :' + participant.name + ' ID : ' + participant.participantId + '  ')
+                         participants.push(participant.name + ' ID: ' + participant.participantId + '  ')
                      })
                      res.send(participants);
                  }

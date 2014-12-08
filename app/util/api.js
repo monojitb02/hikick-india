@@ -14,5 +14,6 @@ module.exports = {
     clubs: baseUrl + '/participant/clubs',
 
     //shedules
-    sheduleGame: baseUrl + '/shedule/status'
+    sheduleSatus: baseUrl + '/shedule/status',
+    sheduleEvent: baseUrl + '/shedule/sheduleEvent'
 };
