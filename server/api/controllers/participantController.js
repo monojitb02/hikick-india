@@ -125,7 +125,7 @@
          }
          participantUtil
              .findParticipant({
-                 _id: participantId
+                 participantId: participantId
              })
              .then(function(data) {
                  if (!data.length) {

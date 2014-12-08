@@ -90,7 +90,7 @@ module.exports = {
     getParticipantList: function(searchObject) {
         var deferred = Q.defer();
         participantModel
-            .find(searchObject, 'participantId name country gender dob weight choiceOfEvents')
+            .find(searchObject, 'participantId name country dob weight')
             .exec(function(err, result) {
                 if (err) {
                     deferred.reject(err);
