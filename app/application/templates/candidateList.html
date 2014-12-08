@@ -1,82 +1,62 @@
 <div class="pageheader">
   <h2>
     <i class="fa fa-list"></i> 
-    User's List
+    Candidate's List
  </h2>
-</div>
-<div ng-if="listView()">
-  <div class="pageheader clearfix">
-    <h2 class="pull-left"><i class="fa fa-list"></i>Player's List</h2>
-    <div class="pull-right filter-group">
-      <form class="form-inline">
-        <div class>
-          <button class="btn btn-success"><i class="fa fa-plus"></i>Regiter Player</button>
-          <input class="form-control" type="text" placeholder="Search">
-        </div>
-      </form>
-    </div>
+  <div class="col-sm-6 header-searchbox">
+    <p class="input-group">
+      <input type="text" placeholder="Search participant.." class="form-control col-sm-11" ng-keyup="checkEnter($event)" ng-model="searchKey">
+      <span class="input-group-btn">
+        <button type="button" class="glyphicon glyphicon-search search-btn-header" ng-click="searchParticipant()"></button>
+      </span>
+    </p>
   </div>
-  <div>
+</div>
 
-    <div class="contentpanel">
-      <!-- Old Pagination-->
-      <pagination total-items="pagination.totalItems" ng-model="currentPage" max-size="pagination.maxSize" class="pagination-sm pull-right" items-per-page="pagination.itemsPerPage" boundary-links="true" rotate="false" num-pages="numPages"></pagination>
+<alert type="danger" ng-show="showMessage" close="showMessage=false">
+  {{message}}
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+</alert>
+<div class="contentpanel">
+  <!-- Pagination-->
+  <pagination boundary-links="true" total-items="participants.length" items-per-page="itemsPerPage" max-size="10" ng-model="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 
-    </div>
-
-    <div class="row">
-
-      <div class="col-sm-12">
-
-        <div class="table-responsive">
-          <table class="table table-striped mb30">
-            <thead class="attender-list-padding">
-              <tr>
-                <th>#</th>
-                <!-- <th>id</th> -->
-                <th>Name</th>
-                <th>Email</th>
-                <th>Designation</th>
-                <th>Gender</th>
-                <th>Manager</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody class="attender-list-padding">
-              <tr ng-repeat="eachAttender in attendiesList">
-                <td>{{$index + 1}}</td>
-                <!-- <td>{{eachAttender._id}}</td> -->
-                <td>{{eachAttender.companyProfile.name}}</td>
-                <td>{{eachAttender.companyProfile.email}}</td>
-                <td>{{eachAttender.companyProfile.designation.post}}</td>
-                <td>{{eachAttender.companyProfile.gender}}</td>
-                <td>
-                  <div ng-show="eachAttender.companyProfile.manager._id" class="cursor-pointer" ng-click="loadAttendiesView(eachAttender.companyProfile.manager._id)">
-                    <img ng-src="{{eachAttender.companyProfile.manager.personalProfile.photoUrl}}" alt="" ng-show="eachAttender.companyProfile.manager.photoUrl" onerror="this.onerror=null;this.src='./resources/images/user.png';" class="small-profile-picture">
-                    <span class="manager-details">{{}}</span>
-                  </div>
-                </td>
-                <td class="action-td">
-                  <a class="btn btn-info cursor-pointer" ng-if="addUser" ng-click="loadEmployeeView(eachAttender._id)">
-                    <i class="fa fa-eye icon"></i>View
-                  </a>
-                  <a class="btn btn-primary cursor-pointer" ng-if="editUser" ng-click="loadEmployeeEditView(eachAttender._id)">
-                    <i class="fa fa-edit icon"></i>Edit
-                  </a>
-                  <a class="btn btn-success cursor-pointer block-unblock-button" ng-show="blockUser && eachAttender.companyProfile.isActive" ng-click="userBlock(eachAttender._id, $index)">
-                    <i class="fa fa-warning icon"></i>Block
-                  </a>
-                  <a class="btn btn-danger cursor-pointer block-unblock-button" ng-show="blockUser && !eachAttender.companyProfile.isActive" ng-click="userUnblock(eachAttender._id, $index)">
-                    <i class="fa fa-warning icon"></i>Unblock
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="table-responsive">
+        <table class="table table-striped mb30">
+          <thead class="attender-list-padding">
+            <tr>
+              <th>Name</th>
+              <th>Instructor's Name</th>
+              <th>Age</th>
+              <th>Weight</th>
+              <th>Phone No</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody class="attender-list-padding">
+            <tr ng-repeat="participant in participants">
+              <td>{{participant.name}}</td>
+              <td>{{participant.instructor}}</td>
+              <td>{{participant.age}}</td>
+              <td>{{participant.weight}}</td>
+              <td>{{participant.contactNumber}}</td>
+              <td class="action-td">
+                <a class="btn btn-info cursor-pointer" ng-click="">
+                  <i class="fa fa-eye icon"></i>View
+                </a>
+                <a class="btn btn-primary cursor-pointer" ng-click="">
+                  <i class="fa fa-edit icon"></i>Edit
+                </a>
+                <a class="btn btn-warning cursor-pointer" ng-click="">
+                  <i class="fa fa-warning icon"></i>Delete
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
   </div>
-</div>
 </div>
