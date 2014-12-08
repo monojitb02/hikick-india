@@ -5,7 +5,37 @@ module.exports = function($scope, $http, $state) {
         result,
         gameEvents = [],
         events,
-        groupsCount;
+        groupsCount,
+        refreshSheduleStatus = function(sheduleStatus) {
+            var games = [],
+                hasOdds,
+                eventsFormations = [];
+            for (var i = 0; i < sheduleStatus.length; i++) {
+                if (games.indexOf(sheduleStatus[i].eventName) === -1) {
+                    games.push(sheduleStatus[i].eventName);
+                }
+            }
+            for (var gameIndex = 0; gameIndex < games.length; gameIndex++) {
+                events = sheduleStatus.filter(function(event) {
+                    return (event.eventName === games[gameIndex]);
+                });
+                hasOdds = events.length % 2;
+                groupsCount = Math.floor(events.length / 2);
+                result = {
+                    eventName: games[gameIndex],
+                    events: []
+                };
+                for (var i = 0; i < groupsCount; i++) {
+                    result.events.push([events[(i * 2)], events[(i * 2 + 1)]]);
+                }
+                if (hasOdds) {
+                    result.events.push([events[(groupsCount * 2)]]);
+                }
+                eventsFormations.push(result);
+            }
+            return eventsFormations;
+        };
+
     // Minimize Button in Panels
     $scope.slidePanel = function(event) {
         var target = event.target,
@@ -26,37 +56,12 @@ module.exports = function($scope, $http, $state) {
             jQuery('.mainpanel').height(docHeight);
     };
     $http({
-            url: api.sheduleGame,
+            url: api.sheduleSatus,
             method: 'GET'
         })
         .success(function(data) {
-            var games = [],
-                hasOdds;
             if (data.success) {
-                sheduleStatus = data.data;
-                for (var i = 0; i < sheduleStatus.length; i++) {
-                    if (games.indexOf(sheduleStatus[i].eventName) === -1) {
-                        games.push(sheduleStatus[i].eventName);
-                    }
-                }
-                for (var gameIndex = 0; gameIndex < games.length; gameIndex++) {
-                    events = sheduleStatus.filter(function(event) {
-                        return (event.eventName === games[gameIndex]);
-                    });
-                    hasOdds = events.length % 2;
-                    groupsCount = Math.floor(events.length / 2);
-                    result = {
-                        eventName: games[gameIndex],
-                        events: []
-                    };
-                    for (var i = 0; i < groupsCount; i++) {
-                        result.events.push([events[(i * 2)], events[(i * 2 + 1)]]);
-                    }
-                    if (hasOdds) {
-                        result.events.push([events[(groupsCount * 2)]]);
-                    }
-                    gameEvents.push(result);
-                }
+                gameEvents = refreshSheduleStatus(data.data);
             }
         })
         .error(function(data, status, headers, config) {
@@ -96,7 +101,32 @@ module.exports = function($scope, $http, $state) {
             return 'under ' + event.ageLimitUpper + ' Years';
         }
     };
+
     $scope.submitShedule = function(event) {
-        console.log(event);
+        var candidatesGotBy = [];
+        if (event.candidatesGotBy &&
+            event.candidatesGotBy.length !== 0 &&
+            event.candidatesGotBy.length <= event.maximumByCount) {
+            event.candidatesGotBy.forEach(function(candidate) {
+                var participantId = candidate.text.split('ID:')[1];
+                candidatesGotBy.push({
+                    participantId: participantId
+                });
+            })
+        }
+        $http({
+                url: api.sheduleEvent,
+                method: 'PUT',
+                data: {
+                    eventId: event.eventId,
+                    candidateGiveBy: candidatesGotBy
+                }
+            })
+            .success(function(data) {
+
+            })
+            .error(function(err) {
+
+            })
     }
 }

@@ -28,7 +28,7 @@
                             <div class="status-indicator" ng-class="{'background-green':!event.pending,'background-red':event.pending}" ng-attr-title="{{event.pending?'pending':'Sheduled'}}"></div>
                         </div>
                         <div class="panel-body background-ash">
-                            <tags-input ng-model="event.candidatesGotBy" placeholder="Add candidates in list to give them by" add-on-blur="false" add-from-autocomplete-only="true" max-tags="{{event.maximumByCount}}">
+                            <tags-input ng-model="event.candidatesGotBy" placeholder="Add candidates in list to give them by" add-on-blur="false" add-from-autocomplete-only="true" max-tags="{{event.maximumByCount}}" replace-spaces-with-dashes="false">
                                 <auto-complete source="searchCandidates($query,event.eventId)" min-length="2"></auto-complete>
                             </tags-input>
                             <p>

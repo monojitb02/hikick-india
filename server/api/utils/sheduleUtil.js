@@ -241,7 +241,6 @@ module.exports = {
                         } else {
                             queryObject.participantId = Number(query);
                         }
-                        console.log(queryObject);
                         participantUtil
                             .findParticipant(queryObject)
                             .then(function(searchResult) {
@@ -306,7 +305,20 @@ module.exports = {
                             var reorderedParticipants = getFixtures(participants, candidateGiveBy);
                             saveShedule(reorderedParticipants)
                                 .then(function() {
-                                    deferred.resolve();
+                                    eventModel
+                                        .update({
+                                            eventId: eventId
+                                        }, {
+                                            $set: {
+                                                pending: false
+                                            }
+                                        })
+                                        .exec(function(err, data) {
+                                            if (err) {
+                                                console.log('Error setting pending false in shedule', err);
+                                            }
+                                            deferred.resolve();
+                                        })
                                 }, function(err) {
                                     deferred.reject(err);
                                 });

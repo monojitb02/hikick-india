@@ -441,102 +441,304 @@ getPlayers = function(level, group, player) {
 
 
 
-var participantList = [{
-    "participantId": 13,
+// var participantList = [{
+//     "participantId": 13,
+//     "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+// }, {
+//     "participantId": 1,
+//     "clubName": "MARTIAL OF SPORTS KARATE ASSOCIATION"
+// }, {
+//     "participantId": 5,
+//     "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+// }]
+// var getMaxPlayerPossible = function(originalNumber) {
+//     if (originalNumber === 1) {
+//         return 1;
+//     }
+//     return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
+// };
+// var getFixtures = function(participants, participantsGotBy) {
+//     var maximumSerialNo = getMaxPlayerPossible(participants.length),
+//         secretSerialNo1,
+//         secretSerialNo2,
+//         player1,
+//         player2,
+//         possiblePlayer2array = [],
+//         resultArray = [],
+//         hasGotBy = function(participant) {
+//             return participantsGotBy.filter(function(playerGotby) {
+//                 return playerGotby.participantId === participant.participantId;
+//             }).length;
+//         };
+//     console.log('maximumSerialNo', maximumSerialNo);
+//     /* if (!participants.length) {
+//         return [];
+//     }
+// */
+//     for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
+//         secretSerialNo1 = groupId * 2 + 1;
+//         secretSerialNo2 = secretSerialNo1 + 1;
+
+//         player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
+//         console.log('groupId', groupId, 'player1', player1);
+//         if (hasGotBy(player1)) {
+//             console.log('player1 got by in grpid', groupId, 'player', player1);
+//             player1.byFlag = true;
+//             player1.secretSerialNo = secretSerialNo1;
+//             resultArray.push(player1);
+//         } else {
+//             possiblePlayer2array = participants.filter(function(player2) {
+//                 //return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
+//                 if (!hasGotBy(player2) && player2.clubName !== player1.clubName) {
+//                     return true;
+//                 }
+//             });
+//             console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
+//             // TO_DO : have to check player 2 is in by list or not 
+
+//             if (!possiblePlayer2array.length) {
+//                 possiblePlayer2array = participants.filter(function(player2) {
+//                     return !hasGotBy(player2)
+//                 });
+//             }
+//             player2 = possiblePlayer2array.splice(Math.floor(Math.random() * possiblePlayer2array.length), 1)[0];
+//             participants = participants.filter(function(participant) {
+//                 return participant.participantId !== player2.participantId;
+//             });
+//             console.log('player2', player2);
+//             player1.secretSerialNo = secretSerialNo1;
+//             resultArray.push(player1);
+//             player2.secretSerialNo = secretSerialNo2;
+//             resultArray.push(player2);
+//         }
+//     }
+//     return resultArray;
+// };
+// getFixtures(participantList, [{
+//     participantId: 13
+// }]);
+
+
+participants = [{
+    "participantId": 100,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 101,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 102,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 103,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 104,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 105,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 106,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 107,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 108,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 109,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 110,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 111,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 112,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 113,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 114,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 115,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 116,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 117,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 118,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 119,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 120,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 121,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 122,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 123,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 124,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 125,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 126,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 127,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 128,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 129,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 130,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 131,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 132,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 133,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 134,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 135,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 136,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 137,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 138,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 139,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 140,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 141,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 142,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 143,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 144,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 145,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 146,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 147,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 148,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 149,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 150,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 151,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 152,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 153,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 154,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 155,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 156,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 157,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 158,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 159,
+    "clubName": "S.K.A of Jalpaiguri."
+}, {
+    "participantId": 160,
     "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
 }, {
-    "participantId": 1,
-    "clubName": "MARTIAL OF SPORTS KARATE ASSOCIATION"
+    "participantId": 161,
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+}, {
+    "participantId": 162,
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+}, {
+    "participantId": 163,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 164,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 165,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 166,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 167,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 168,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 169,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 170,
+    "clubName": "SHOTOKAN KARATE DO ASSOCIATION"
+}, {
+    "participantId": 3,
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+}, {
+    "participantId": 4,
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
 }, {
     "participantId": 5,
     "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
 }]
-var getMaxPlayerPossible = function(originalNumber) {
-    if (originalNumber === 1) {
-        return 1;
-    }
-    return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
-};
-var getFixtures = function(participants, participantsGotBy) {
-    var maximumSerialNo = getMaxPlayerPossible(participants.length),
-        secretSerialNo1,
-        secretSerialNo2,
-        player1,
-        player2,
-        possiblePlayer2array = [],
-        resultArray = [],
-        hasGotBy = function(participant) {
-            return participantsGotBy.filter(function(playerGotby) {
-                return playerGotby.participantId === participant.participantId;
-            }).length;
-        };
-    console.log('maximumSerialNo', maximumSerialNo);
-    /* if (!participants.length) {
-        return [];
-    }
-*/
-    for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
-        secretSerialNo1 = groupId * 2 + 1;
-        secretSerialNo2 = secretSerialNo1 + 1;
-
-        player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
-        console.log('groupId', groupId, 'player1', player1);
-        if (hasGotBy(player1)) {
-            console.log('player1 got by in grpid', groupId, 'player', player1);
-            player1.byFlag = true;
-            player1.secretSerialNo = secretSerialNo1;
-            resultArray.push(player1);
-        } else {
-            possiblePlayer2array = participants.filter(function(player2) {
-                //return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
-                if (!hasGotBy(player2) && player2.clubName !== player1.clubName) {
-                    return true;
-                }
-            });
-            console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
-            // TO_DO : have to check player 2 is in by list or not 
-
-            if (!possiblePlayer2array.length) {
-                possiblePlayer2array = participants.filter(function(player2) {
-                    return !hasGotBy(player2)
-                });
-            }
-            player2 = possiblePlayer2array.splice(Math.floor(Math.random() * possiblePlayer2array.length), 1)[0];
-            participants = participants.filter(function(participant) {
-                return participant.participantId !== player2.participantId;
-            });
-            console.log('player2', player2);
-            player1.secretSerialNo = secretSerialNo1;
-            resultArray.push(player1);
-            player2.secretSerialNo = secretSerialNo2;
-            resultArray.push(player2);
-        }
-    }
-    return resultArray;
-};
-getFixtures(participantList, [{
-    participantId: 13
-}]);
-
-
-
-maximumSerialNo 4
-VM441: 45 groupId 0 player1 Object {
-    participantId: 1,
-    clubName: "MARTIAL OF SPORTS KARATE ASSOCIATION"
-}
-VM441: 58 groupId 0 possiblePlayer2array[]
-VM441: 68 player2 Object {
-    participantId: 13,
-    clubName: "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
-}
-VM441: 45 groupId 1 player1 Object {
-    participantId: 5,
-    clubName: "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
-}
-VM441: 58 groupId 1 possiblePlayer2array[]
-VM441: 68 player2 Object {
-        participantId: 5,
-        clubName: "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
-    }
-    [Object, Object, Object, Object]
