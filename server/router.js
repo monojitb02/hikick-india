@@ -46,6 +46,7 @@ module.exports = function(app) {
     //Shedule game Routs
     app.get('/api/shedule/status', sheduleController.getSheduleStatus);
     app.get('/api/shedule/search_participant', sheduleController.searchParticipantForBy);
+    app.get('/api/shedule/sheduleEvent', sheduleController.addShedule);
 
 
 

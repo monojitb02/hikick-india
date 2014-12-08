@@ -33,7 +33,7 @@
              return;
          }
          if (participantData._id) {
-             console.log(participantData);
+             // console.log(participantData);
              delete participantData._id;
              // console.log(participantData);
          }
@@ -125,7 +125,7 @@
          }
          participantUtil
              .findParticipant({
-                 _id: participantId
+                 participantId: participantId
              })
              .then(function(data) {
                  if (!data.length) {

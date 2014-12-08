@@ -441,40 +441,15 @@ getPlayers = function(level, group, player) {
 
 
 
-var participants = [{
+var participantList = [{
     "participantId": 13,
-    "name": "AKASH BOSE",
-    "instructor": "SENSCI DILIP JANA",
-    "country": "India",
-    "state": "WB",
-    "gender": "M",
-    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION",
-    "dob": "14/08/1997",
-    "weight": 95,
-    "kata": 1,
-    "kumite": 1,
-    "weapons": 0,
-    "email": "bishajit.lord@gmail.com",
-    "contactNumber": "9433969162",
-    "address": "NORTH 24 PARGANAS KOL 124 BARASAT DUCKBANGLOW MORE MOLINA APPERTMENT 4TH FLOOR",
-    "profilePictureFile": "24f55c5f445be8da110ad00a95.jpg"
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
 }, {
     "participantId": 1,
-    "name": "AKASH BOSE",
-    "instructor": "SENSCI DILIP JANA",
-    "country": "India",
-    "state": "WB",
-    "gender": "M",
-    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION",
-    "dob": "14/08/1997",
-    "weight": 95,
-    "kata": 1,
-    "kumite": 1,
-    "weapons": 0,
-    "email": "bishajit.lord@gmail.com",
-    "contactNumber": "9433969162",
-    "address": "NORTH 24 PARGANAS KOL 124 BARASAT DUCKBANGLOW MORE MOLINA APPERTMENT 4TH FLOOR",
-    "profilePictureFile": "24f55c5f445be8da110ad00a95.jpg"
+    "clubName": "MARTIAL OF SPORTS KARATE ASSOCIATION"
+}, {
+    "participantId": 5,
+    "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
 }]
 var getMaxPlayerPossible = function(originalNumber) {
     if (originalNumber === 1) {
@@ -489,40 +464,48 @@ var getFixtures = function(participants, participantsGotBy) {
         player1,
         player2,
         possiblePlayer2array = [],
-        resultArray = [];
+        resultArray = [],
+        hasGotBy = function(participant) {
+            return participantsGotBy.filter(function(playerGotby) {
+                return playerGotby.participantId === participant.participantId;
+            }).length;
+        };
     console.log('maximumSerialNo', maximumSerialNo);
-    if (!participants.length) {
+    /* if (!participants.length) {
         return [];
     }
-
+*/
     for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
-        console.log('groupId', groupId);
         secretSerialNo1 = groupId * 2 + 1;
         secretSerialNo2 = secretSerialNo1 + 1;
-        if (participants.length === 1) {
-            player1 = participants[0];
-        } else {
-            player1 = participants.splice(Math.round((Math.random() * participants.length)), 1)[0];
-        }
-        if (participantsGotBy.filter(function(participant) {
-                return participant.participantId === player1.participantId;
-            }).length) {
+
+        player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
+        console.log('groupId', groupId, 'player1', player1);
+        if (hasGotBy(player1)) {
+            console.log('player1 got by in grpid', groupId, 'player', player1);
             player1.byFlag = true;
             player1.secretSerialNo = secretSerialNo1;
             resultArray.push(player1);
         } else {
-            possiblePlayer2array = participants.filter(function(participant) {
-                return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
+            possiblePlayer2array = participants.filter(function(player2) {
+                //return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
+                if (!hasGotBy(player2) && player2.clubName !== player1.clubName) {
+                    return true;
+                }
             });
-            if (possiblePlayer2array.length) {
-                player2 = possiblePlayer2array.splice(Math.round(Math.random() * possiblePlayer2array.length), 1)[0];
-            } else {
-                player2 = participants.splice(Math.round(Math.random() * participants.length), 1)[0];
+            console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
+            // TO_DO : have to check player 2 is in by list or not 
+
+            if (!possiblePlayer2array.length) {
+                possiblePlayer2array = participants.filter(function(player2) {
+                    return !hasGotBy(player2)
+                });
             }
-            console.log('player2', player2);
+            player2 = possiblePlayer2array.splice(Math.floor(Math.random() * possiblePlayer2array.length), 1)[0];
             participants = participants.filter(function(participant) {
                 return participant.participantId !== player2.participantId;
             });
+            console.log('player2', player2);
             player1.secretSerialNo = secretSerialNo1;
             resultArray.push(player1);
             player2.secretSerialNo = secretSerialNo2;
@@ -531,4 +514,29 @@ var getFixtures = function(participants, participantsGotBy) {
     }
     return resultArray;
 };
-getFixtures(participants, []);
+getFixtures(participantList, [{
+    participantId: 13
+}]);
+
+
+
+maximumSerialNo 4
+VM441: 45 groupId 0 player1 Object {
+    participantId: 1,
+    clubName: "MARTIAL OF SPORTS KARATE ASSOCIATION"
+}
+VM441: 58 groupId 0 possiblePlayer2array[]
+VM441: 68 player2 Object {
+    participantId: 13,
+    clubName: "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+}
+VM441: 45 groupId 1 player1 Object {
+    participantId: 5,
+    clubName: "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+}
+VM441: 58 groupId 1 possiblePlayer2array[]
+VM441: 68 player2 Object {
+        participantId: 5,
+        clubName: "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
+    }
+    [Object, Object, Object, Object]
