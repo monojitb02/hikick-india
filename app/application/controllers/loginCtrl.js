@@ -5,6 +5,11 @@ var api = require('../../util/api')
 
 module.exports = function($scope, $rootScope, $state, $http, $timeout) {
 
+    //checking login status
+    var user = utility.getCookie('user');
+    if (user) {
+        $state.go('app.home');
+    }
     var loginForm;
 
     //dummy login

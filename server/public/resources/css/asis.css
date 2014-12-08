@@ -15,6 +15,14 @@
 .input-group-btn {
     vertical-align: top !important;
 }
+/**************** Generic ***************************/
+
+.m-r-3 {
+    margin-right: 3px;
+}
+.margin-reset {
+    margin: 0 !important;
+}
 /*************** registration page *********************/
 
 .header-searchbox {
@@ -72,4 +80,9 @@
     padding: 5px;
     border-bottom: 1px solid #ccc;
     text-align: left;
+}
+/************************* view list page*****************/
+
+.participant-info-modal {
+    overflow: auto;
 }

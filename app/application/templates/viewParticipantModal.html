@@ -1,0 +1,64 @@
+<div class="modal-header">
+  <h3 class="modal-title">Detail Information</h3>
+</div>
+<div class="modal-body participant-info-modal">
+  <p>
+    <span class="col-sm-4">Name : </span>
+    <span class="col-sm-8">{{participant.name}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">ParticipantId : </span>
+    <span class="col-sm-8">{{participant.participantId}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Instructor's Name : </span>
+    <span class="col-sm-8">{{participant.name}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Gender : </span>
+    <span class="col-sm-8">{{participant.gender}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Country : </span>
+    <span class="col-sm-8">{{participant.country}}</span>
+  </p>
+  <p ng-show="participant.state">
+    <span class="col-sm-4">State : </span>
+    <span class="col-sm-8">{{participant.state.name}}</span>
+  </p>
+  <p ng-show="participant.clubName">
+    <span class="col-sm-4">Club Name : </span>
+    <span class="col-sm-8">{{participant.clubName}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Choice of Event : </span>
+    <span class="col-sm-8">
+      <span class="col-sm-4" ng-show="participant.choiceOfEvents.kata">Kata</span>
+    <span class="col-sm-4" ng-show="participant.choiceOfEvents.kumite">Kumite</span>
+    <span class="col-sm-4" ng-show="participant.choiceOfEvents.weapons">Weapons</span>
+    </span>
+  </p>
+  <p>
+    <span class="col-sm-4">Date of Birth : </span>
+    <span class="col-sm-8">{{participant.dob | date}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Email : </span>
+    <span class="col-sm-8">{{participant.email}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Contact No : </span>
+    <span class="col-sm-8">{{participant.contactNumber}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Address : </span>
+    <span class="col-sm-8">{{participant.address}}</span>
+  </p>
+  <p>
+    <span class="col-sm-4">Weight : </span>
+    <span class="col-sm-8">{{participant.weight}}</span>
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" ng-click="close()">Close</button>
+</div>
