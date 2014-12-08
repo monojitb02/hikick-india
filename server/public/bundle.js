@@ -1,5 +1,1302 @@
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js":[function(require,module,exports){
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
 
-<<<<<<< HEAD
+var base64 = require('base64-js')
+var ieee754 = require('ieee754')
+var isArray = require('is-array')
+
+exports.Buffer = Buffer
+exports.SlowBuffer = Buffer
+exports.INSPECT_MAX_BYTES = 50
+Buffer.poolSize = 8192 // not used by this implementation
+
+var kMaxLength = 0x3fffffff
+
+/**
+ * If `Buffer.TYPED_ARRAY_SUPPORT`:
+ *   === true    Use Uint8Array implementation (fastest)
+ *   === false   Use Object implementation (most compatible, even IE6)
+ *
+ * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+ * Opera 11.6+, iOS 4.2+.
+ *
+ * Note:
+ *
+ * - Implementation must support adding new properties to `Uint8Array` instances.
+ *   Firefox 4-29 lacked support, fixed in Firefox 30+.
+ *   See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+ *
+ *  - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+ *
+ *  - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+ *    incorrect length in some situations.
+ *
+ * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they will
+ * get the Object implementation, which is slower but will work correctly.
+ */
+Buffer.TYPED_ARRAY_SUPPORT = (function () {
+  try {
+    var buf = new ArrayBuffer(0)
+    var arr = new Uint8Array(buf)
+    arr.foo = function () { return 42 }
+    return 42 === arr.foo() && // typed array instances can be augmented
+        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+        new Uint8Array(1).subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
+  } catch (e) {
+    return false
+  }
+})()
+
+/**
+ * Class: Buffer
+ * =============
+ *
+ * The Buffer constructor returns instances of `Uint8Array` that are augmented
+ * with function properties for all the node `Buffer` API functions. We use
+ * `Uint8Array` so that square bracket notation works as expected -- it returns
+ * a single octet.
+ *
+ * By augmenting the instances, we can avoid modifying the `Uint8Array`
+ * prototype.
+ */
+function Buffer (subject, encoding, noZero) {
+  if (!(this instanceof Buffer))
+    return new Buffer(subject, encoding, noZero)
+
+  var type = typeof subject
+
+  // Find the length
+  var length
+  if (type === 'number')
+    length = subject > 0 ? subject >>> 0 : 0
+  else if (type === 'string') {
+    if (encoding === 'base64')
+      subject = base64clean(subject)
+    length = Buffer.byteLength(subject, encoding)
+  } else if (type === 'object' && subject !== null) { // assume object is array-like
+    if (subject.type === 'Buffer' && isArray(subject.data))
+      subject = subject.data
+    length = +subject.length > 0 ? Math.floor(+subject.length) : 0
+  } else
+    throw new TypeError('must start with number, buffer, array or string')
+
+  if (this.length > kMaxLength)
+    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+      'size: 0x' + kMaxLength.toString(16) + ' bytes')
+
+  var buf
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Preferred: Return an augmented `Uint8Array` instance for best performance
+    buf = Buffer._augment(new Uint8Array(length))
+  } else {
+    // Fallback: Return THIS instance of Buffer (created by `new`)
+    buf = this
+    buf.length = length
+    buf._isBuffer = true
+  }
+
+  var i
+  if (Buffer.TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
+    // Speed optimization -- use set if we're copying from a typed array
+    buf._set(subject)
+  } else if (isArrayish(subject)) {
+    // Treat array-ish objects as a byte array
+    if (Buffer.isBuffer(subject)) {
+      for (i = 0; i < length; i++)
+        buf[i] = subject.readUInt8(i)
+    } else {
+      for (i = 0; i < length; i++)
+        buf[i] = ((subject[i] % 256) + 256) % 256
+    }
+  } else if (type === 'string') {
+    buf.write(subject, 0, encoding)
+  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT && !noZero) {
+    for (i = 0; i < length; i++) {
+      buf[i] = 0
+    }
+  }
+
+  return buf
+}
+
+Buffer.isBuffer = function (b) {
+  return !!(b != null && b._isBuffer)
+}
+
+Buffer.compare = function (a, b) {
+  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b))
+    throw new TypeError('Arguments must be Buffers')
+
+  var x = a.length
+  var y = b.length
+  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
+  if (i !== len) {
+    x = a[i]
+    y = b[i]
+  }
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
+}
+
+Buffer.isEncoding = function (encoding) {
+  switch (String(encoding).toLowerCase()) {
+    case 'hex':
+    case 'utf8':
+    case 'utf-8':
+    case 'ascii':
+    case 'binary':
+    case 'base64':
+    case 'raw':
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      return true
+    default:
+      return false
+  }
+}
+
+Buffer.concat = function (list, totalLength) {
+  if (!isArray(list)) throw new TypeError('Usage: Buffer.concat(list[, length])')
+
+  if (list.length === 0) {
+    return new Buffer(0)
+  } else if (list.length === 1) {
+    return list[0]
+  }
+
+  var i
+  if (totalLength === undefined) {
+    totalLength = 0
+    for (i = 0; i < list.length; i++) {
+      totalLength += list[i].length
+    }
+  }
+
+  var buf = new Buffer(totalLength)
+  var pos = 0
+  for (i = 0; i < list.length; i++) {
+    var item = list[i]
+    item.copy(buf, pos)
+    pos += item.length
+  }
+  return buf
+}
+
+Buffer.byteLength = function (str, encoding) {
+  var ret
+  str = str + ''
+  switch (encoding || 'utf8') {
+    case 'ascii':
+    case 'binary':
+    case 'raw':
+      ret = str.length
+      break
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      ret = str.length * 2
+      break
+    case 'hex':
+      ret = str.length >>> 1
+      break
+    case 'utf8':
+    case 'utf-8':
+      ret = utf8ToBytes(str).length
+      break
+    case 'base64':
+      ret = base64ToBytes(str).length
+      break
+    default:
+      ret = str.length
+  }
+  return ret
+}
+
+// pre-set for values that may exist in the future
+Buffer.prototype.length = undefined
+Buffer.prototype.parent = undefined
+
+// toString(encoding, start=0, end=buffer.length)
+Buffer.prototype.toString = function (encoding, start, end) {
+  var loweredCase = false
+
+  start = start >>> 0
+  end = end === undefined || end === Infinity ? this.length : end >>> 0
+
+  if (!encoding) encoding = 'utf8'
+  if (start < 0) start = 0
+  if (end > this.length) end = this.length
+  if (end <= start) return ''
+
+  while (true) {
+    switch (encoding) {
+      case 'hex':
+        return hexSlice(this, start, end)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Slice(this, start, end)
+
+      case 'ascii':
+        return asciiSlice(this, start, end)
+
+      case 'binary':
+        return binarySlice(this, start, end)
+
+      case 'base64':
+        return base64Slice(this, start, end)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return utf16leSlice(this, start, end)
+
+      default:
+        if (loweredCase)
+          throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = (encoding + '').toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+Buffer.prototype.equals = function (b) {
+  if(!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  return Buffer.compare(this, b) === 0
+}
+
+Buffer.prototype.inspect = function () {
+  var str = ''
+  var max = exports.INSPECT_MAX_BYTES
+  if (this.length > 0) {
+    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
+    if (this.length > max)
+      str += ' ... '
+  }
+  return '<Buffer ' + str + '>'
+}
+
+Buffer.prototype.compare = function (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  return Buffer.compare(this, b)
+}
+
+// `get` will be removed in Node 0.13+
+Buffer.prototype.get = function (offset) {
+  console.log('.get() is deprecated. Access using array indexes instead.')
+  return this.readUInt8(offset)
+}
+
+// `set` will be removed in Node 0.13+
+Buffer.prototype.set = function (v, offset) {
+  console.log('.set() is deprecated. Access using array indexes instead.')
+  return this.writeUInt8(v, offset)
+}
+
+function hexWrite (buf, string, offset, length) {
+  offset = Number(offset) || 0
+  var remaining = buf.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+
+  // must be an even number of digits
+  var strLen = string.length
+  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
+
+  if (length > strLen / 2) {
+    length = strLen / 2
+  }
+  for (var i = 0; i < length; i++) {
+    var byte = parseInt(string.substr(i * 2, 2), 16)
+    if (isNaN(byte)) throw new Error('Invalid hex string')
+    buf[offset + i] = byte
+  }
+  return i
+}
+
+function utf8Write (buf, string, offset, length) {
+  var charsWritten = blitBuffer(utf8ToBytes(string), buf, offset, length)
+  return charsWritten
+}
+
+function asciiWrite (buf, string, offset, length) {
+  var charsWritten = blitBuffer(asciiToBytes(string), buf, offset, length)
+  return charsWritten
+}
+
+function binaryWrite (buf, string, offset, length) {
+  return asciiWrite(buf, string, offset, length)
+}
+
+function base64Write (buf, string, offset, length) {
+  var charsWritten = blitBuffer(base64ToBytes(string), buf, offset, length)
+  return charsWritten
+}
+
+function utf16leWrite (buf, string, offset, length) {
+  var charsWritten = blitBuffer(utf16leToBytes(string), buf, offset, length)
+  return charsWritten
+}
+
+Buffer.prototype.write = function (string, offset, length, encoding) {
+  // Support both (string, offset, length, encoding)
+  // and the legacy (string, encoding, offset, length)
+  if (isFinite(offset)) {
+    if (!isFinite(length)) {
+      encoding = length
+      length = undefined
+    }
+  } else {  // legacy
+    var swap = encoding
+    encoding = offset
+    offset = length
+    length = swap
+  }
+
+  offset = Number(offset) || 0
+  var remaining = this.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+  encoding = String(encoding || 'utf8').toLowerCase()
+
+  var ret
+  switch (encoding) {
+    case 'hex':
+      ret = hexWrite(this, string, offset, length)
+      break
+    case 'utf8':
+    case 'utf-8':
+      ret = utf8Write(this, string, offset, length)
+      break
+    case 'ascii':
+      ret = asciiWrite(this, string, offset, length)
+      break
+    case 'binary':
+      ret = binaryWrite(this, string, offset, length)
+      break
+    case 'base64':
+      ret = base64Write(this, string, offset, length)
+      break
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      ret = utf16leWrite(this, string, offset, length)
+      break
+    default:
+      throw new TypeError('Unknown encoding: ' + encoding)
+  }
+  return ret
+}
+
+Buffer.prototype.toJSON = function () {
+  return {
+    type: 'Buffer',
+    data: Array.prototype.slice.call(this._arr || this, 0)
+  }
+}
+
+function base64Slice (buf, start, end) {
+  if (start === 0 && end === buf.length) {
+    return base64.fromByteArray(buf)
+  } else {
+    return base64.fromByteArray(buf.slice(start, end))
+  }
+}
+
+function utf8Slice (buf, start, end) {
+  var res = ''
+  var tmp = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    if (buf[i] <= 0x7F) {
+      res += decodeUtf8Char(tmp) + String.fromCharCode(buf[i])
+      tmp = ''
+    } else {
+      tmp += '%' + buf[i].toString(16)
+    }
+  }
+
+  return res + decodeUtf8Char(tmp)
+}
+
+function asciiSlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i])
+  }
+  return ret
+}
+
+function binarySlice (buf, start, end) {
+  return asciiSlice(buf, start, end)
+}
+
+function hexSlice (buf, start, end) {
+  var len = buf.length
+
+  if (!start || start < 0) start = 0
+  if (!end || end < 0 || end > len) end = len
+
+  var out = ''
+  for (var i = start; i < end; i++) {
+    out += toHex(buf[i])
+  }
+  return out
+}
+
+function utf16leSlice (buf, start, end) {
+  var bytes = buf.slice(start, end)
+  var res = ''
+  for (var i = 0; i < bytes.length; i += 2) {
+    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
+  }
+  return res
+}
+
+Buffer.prototype.slice = function (start, end) {
+  var len = this.length
+  start = ~~start
+  end = end === undefined ? len : ~~end
+
+  if (start < 0) {
+    start += len;
+    if (start < 0)
+      start = 0
+  } else if (start > len) {
+    start = len
+  }
+
+  if (end < 0) {
+    end += len
+    if (end < 0)
+      end = 0
+  } else if (end > len) {
+    end = len
+  }
+
+  if (end < start)
+    end = start
+
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    return Buffer._augment(this.subarray(start, end))
+  } else {
+    var sliceLen = end - start
+    var newBuf = new Buffer(sliceLen, undefined, true)
+    for (var i = 0; i < sliceLen; i++) {
+      newBuf[i] = this[i + start]
+    }
+    return newBuf
+  }
+}
+
+/*
+ * Need to make sure that buffer isn't trying to write out of bounds.
+ */
+function checkOffset (offset, ext, length) {
+  if ((offset % 1) !== 0 || offset < 0)
+    throw new RangeError('offset is not uint')
+  if (offset + ext > length)
+    throw new RangeError('Trying to access beyond buffer length')
+}
+
+Buffer.prototype.readUInt8 = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 1, this.length)
+  return this[offset]
+}
+
+Buffer.prototype.readUInt16LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  return this[offset] | (this[offset + 1] << 8)
+}
+
+Buffer.prototype.readUInt16BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  return (this[offset] << 8) | this[offset + 1]
+}
+
+Buffer.prototype.readUInt32LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return ((this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16)) +
+      (this[offset + 3] * 0x1000000)
+}
+
+Buffer.prototype.readUInt32BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return (this[offset] * 0x1000000) +
+      ((this[offset + 1] << 16) |
+      (this[offset + 2] << 8) |
+      this[offset + 3])
+}
+
+Buffer.prototype.readInt8 = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 1, this.length)
+  if (!(this[offset] & 0x80))
+    return (this[offset])
+  return ((0xff - this[offset] + 1) * -1)
+}
+
+Buffer.prototype.readInt16LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  var val = this[offset] | (this[offset + 1] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt16BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  var val = this[offset + 1] | (this[offset] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt32LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return (this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16) |
+      (this[offset + 3] << 24)
+}
+
+Buffer.prototype.readInt32BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return (this[offset] << 24) |
+      (this[offset + 1] << 16) |
+      (this[offset + 2] << 8) |
+      (this[offset + 3])
+}
+
+Buffer.prototype.readFloatLE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, true, 23, 4)
+}
+
+Buffer.prototype.readFloatBE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, false, 23, 4)
+}
+
+Buffer.prototype.readDoubleLE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, true, 52, 8)
+}
+
+Buffer.prototype.readDoubleBE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, false, 52, 8)
+}
+
+function checkInt (buf, value, offset, ext, max, min) {
+  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
+  if (value > max || value < min) throw new TypeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new TypeError('index out of range')
+}
+
+Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 1, 0xff, 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  this[offset] = value
+  return offset + 1
+}
+
+function objectWriteUInt16 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
+    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+      (littleEndian ? i : 1 - i) * 8
+  }
+}
+
+Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = value
+    this[offset + 1] = (value >>> 8)
+  } else objectWriteUInt16(this, value, offset, true)
+  return offset + 2
+}
+
+Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = value
+  } else objectWriteUInt16(this, value, offset, false)
+  return offset + 2
+}
+
+function objectWriteUInt32 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffffffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
+    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+  }
+}
+
+Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset + 3] = (value >>> 24)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 1] = (value >>> 8)
+    this[offset] = value
+  } else objectWriteUInt32(this, value, offset, true)
+  return offset + 4
+}
+
+Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = value
+  } else objectWriteUInt32(this, value, offset, false)
+  return offset + 4
+}
+
+Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 1, 0x7f, -0x80)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  if (value < 0) value = 0xff + value + 1
+  this[offset] = value
+  return offset + 1
+}
+
+Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = value
+    this[offset + 1] = (value >>> 8)
+  } else objectWriteUInt16(this, value, offset, true)
+  return offset + 2
+}
+
+Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = value
+  } else objectWriteUInt16(this, value, offset, false)
+  return offset + 2
+}
+
+Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = value
+    this[offset + 1] = (value >>> 8)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 3] = (value >>> 24)
+  } else objectWriteUInt32(this, value, offset, true)
+  return offset + 4
+}
+
+Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (value < 0) value = 0xffffffff + value + 1
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = value
+  } else objectWriteUInt32(this, value, offset, false)
+  return offset + 4
+}
+
+function checkIEEE754 (buf, value, offset, ext, max, min) {
+  if (value > max || value < min) throw new TypeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new TypeError('index out of range')
+}
+
+function writeFloat (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert)
+    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+  return offset + 4
+}
+
+Buffer.prototype.writeFloatLE = function (value, offset, noAssert) {
+  return writeFloat(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
+  return writeFloat(this, value, offset, false, noAssert)
+}
+
+function writeDouble (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert)
+    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+  return offset + 8
+}
+
+Buffer.prototype.writeDoubleLE = function (value, offset, noAssert) {
+  return writeDouble(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
+  return writeDouble(this, value, offset, false, noAssert)
+}
+
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+Buffer.prototype.copy = function (target, target_start, start, end) {
+  var source = this
+
+  if (!start) start = 0
+  if (!end && end !== 0) end = this.length
+  if (!target_start) target_start = 0
+
+  // Copy 0 bytes; we're done
+  if (end === start) return
+  if (target.length === 0 || source.length === 0) return
+
+  // Fatal error conditions
+  if (end < start) throw new TypeError('sourceEnd < sourceStart')
+  if (target_start < 0 || target_start >= target.length)
+    throw new TypeError('targetStart out of bounds')
+  if (start < 0 || start >= source.length) throw new TypeError('sourceStart out of bounds')
+  if (end < 0 || end > source.length) throw new TypeError('sourceEnd out of bounds')
+
+  // Are we oob?
+  if (end > this.length)
+    end = this.length
+  if (target.length - target_start < end - start)
+    end = target.length - target_start + start
+
+  var len = end - start
+
+  if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < len; i++) {
+      target[i + target_start] = this[i + start]
+    }
+  } else {
+    target._set(this.subarray(start, start + len), target_start)
+  }
+}
+
+// fill(value, start=0, end=buffer.length)
+Buffer.prototype.fill = function (value, start, end) {
+  if (!value) value = 0
+  if (!start) start = 0
+  if (!end) end = this.length
+
+  if (end < start) throw new TypeError('end < start')
+
+  // Fill 0 bytes; we're done
+  if (end === start) return
+  if (this.length === 0) return
+
+  if (start < 0 || start >= this.length) throw new TypeError('start out of bounds')
+  if (end < 0 || end > this.length) throw new TypeError('end out of bounds')
+
+  var i
+  if (typeof value === 'number') {
+    for (i = start; i < end; i++) {
+      this[i] = value
+    }
+  } else {
+    var bytes = utf8ToBytes(value.toString())
+    var len = bytes.length
+    for (i = start; i < end; i++) {
+      this[i] = bytes[i % len]
+    }
+  }
+
+  return this
+}
+
+/**
+ * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
+ * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
+ */
+Buffer.prototype.toArrayBuffer = function () {
+  if (typeof Uint8Array !== 'undefined') {
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      return (new Buffer(this)).buffer
+    } else {
+      var buf = new Uint8Array(this.length)
+      for (var i = 0, len = buf.length; i < len; i += 1) {
+        buf[i] = this[i]
+      }
+      return buf.buffer
+    }
+  } else {
+    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
+  }
+}
+
+// HELPER FUNCTIONS
+// ================
+
+var BP = Buffer.prototype
+
+/**
+ * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
+ */
+Buffer._augment = function (arr) {
+  arr.constructor = Buffer
+  arr._isBuffer = true
+
+  // save reference to original Uint8Array get/set methods before overwriting
+  arr._get = arr.get
+  arr._set = arr.set
+
+  // deprecated, will be removed in node 0.13+
+  arr.get = BP.get
+  arr.set = BP.set
+
+  arr.write = BP.write
+  arr.toString = BP.toString
+  arr.toLocaleString = BP.toString
+  arr.toJSON = BP.toJSON
+  arr.equals = BP.equals
+  arr.compare = BP.compare
+  arr.copy = BP.copy
+  arr.slice = BP.slice
+  arr.readUInt8 = BP.readUInt8
+  arr.readUInt16LE = BP.readUInt16LE
+  arr.readUInt16BE = BP.readUInt16BE
+  arr.readUInt32LE = BP.readUInt32LE
+  arr.readUInt32BE = BP.readUInt32BE
+  arr.readInt8 = BP.readInt8
+  arr.readInt16LE = BP.readInt16LE
+  arr.readInt16BE = BP.readInt16BE
+  arr.readInt32LE = BP.readInt32LE
+  arr.readInt32BE = BP.readInt32BE
+  arr.readFloatLE = BP.readFloatLE
+  arr.readFloatBE = BP.readFloatBE
+  arr.readDoubleLE = BP.readDoubleLE
+  arr.readDoubleBE = BP.readDoubleBE
+  arr.writeUInt8 = BP.writeUInt8
+  arr.writeUInt16LE = BP.writeUInt16LE
+  arr.writeUInt16BE = BP.writeUInt16BE
+  arr.writeUInt32LE = BP.writeUInt32LE
+  arr.writeUInt32BE = BP.writeUInt32BE
+  arr.writeInt8 = BP.writeInt8
+  arr.writeInt16LE = BP.writeInt16LE
+  arr.writeInt16BE = BP.writeInt16BE
+  arr.writeInt32LE = BP.writeInt32LE
+  arr.writeInt32BE = BP.writeInt32BE
+  arr.writeFloatLE = BP.writeFloatLE
+  arr.writeFloatBE = BP.writeFloatBE
+  arr.writeDoubleLE = BP.writeDoubleLE
+  arr.writeDoubleBE = BP.writeDoubleBE
+  arr.fill = BP.fill
+  arr.inspect = BP.inspect
+  arr.toArrayBuffer = BP.toArrayBuffer
+
+  return arr
+}
+
+var INVALID_BASE64_RE = /[^+\/0-9A-z]/g
+
+function base64clean (str) {
+  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+  while (str.length % 4 !== 0) {
+    str = str + '='
+  }
+  return str
+}
+
+function stringtrim (str) {
+  if (str.trim) return str.trim()
+  return str.replace(/^\s+|\s+$/g, '')
+}
+
+function isArrayish (subject) {
+  return isArray(subject) || Buffer.isBuffer(subject) ||
+      subject && typeof subject === 'object' &&
+      typeof subject.length === 'number'
+}
+
+function toHex (n) {
+  if (n < 16) return '0' + n.toString(16)
+  return n.toString(16)
+}
+
+function utf8ToBytes (str) {
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    var b = str.charCodeAt(i)
+    if (b <= 0x7F) {
+      byteArray.push(b)
+    } else {
+      var start = i
+      if (b >= 0xD800 && b <= 0xDFFF) i++
+      var h = encodeURIComponent(str.slice(start, i+1)).substr(1).split('%')
+      for (var j = 0; j < h.length; j++) {
+        byteArray.push(parseInt(h[j], 16))
+      }
+    }
+  }
+  return byteArray
+}
+
+function asciiToBytes (str) {
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    // Node's code seems to be doing this and not & 0x7F..
+    byteArray.push(str.charCodeAt(i) & 0xFF)
+  }
+  return byteArray
+}
+
+function utf16leToBytes (str) {
+  var c, hi, lo
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    c = str.charCodeAt(i)
+    hi = c >> 8
+    lo = c % 256
+    byteArray.push(lo)
+    byteArray.push(hi)
+  }
+
+  return byteArray
+}
+
+function base64ToBytes (str) {
+  return base64.toByteArray(str)
+}
+
+function blitBuffer (src, dst, offset, length) {
+  for (var i = 0; i < length; i++) {
+    if ((i + offset >= dst.length) || (i >= src.length))
+      break
+    dst[i + offset] = src[i]
+  }
+  return i
+}
+
+function decodeUtf8Char (str) {
+  try {
+    return decodeURIComponent(str)
+  } catch (err) {
+    return String.fromCharCode(0xFFFD) // UTF 8 invalid char
+  }
+}
+
+},{"base64-js":"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js","ieee754":"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js","is-array":"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js"}],"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js":[function(require,module,exports){
+var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+;(function (exports) {
+	'use strict';
+
+  var Arr = (typeof Uint8Array !== 'undefined')
+    ? Uint8Array
+    : Array
+
+	var PLUS   = '+'.charCodeAt(0)
+	var SLASH  = '/'.charCodeAt(0)
+	var NUMBER = '0'.charCodeAt(0)
+	var LOWER  = 'a'.charCodeAt(0)
+	var UPPER  = 'A'.charCodeAt(0)
+
+	function decode (elt) {
+		var code = elt.charCodeAt(0)
+		if (code === PLUS)
+			return 62 // '+'
+		if (code === SLASH)
+			return 63 // '/'
+		if (code < NUMBER)
+			return -1 //no match
+		if (code < NUMBER + 10)
+			return code - NUMBER + 26 + 26
+		if (code < UPPER + 26)
+			return code - UPPER
+		if (code < LOWER + 26)
+			return code - LOWER + 26
+	}
+
+	function b64ToByteArray (b64) {
+		var i, j, l, tmp, placeHolders, arr
+
+		if (b64.length % 4 > 0) {
+			throw new Error('Invalid string. Length must be a multiple of 4')
+		}
+
+		// the number of equal signs (place holders)
+		// if there are two placeholders, than the two characters before it
+		// represent one byte
+		// if there is only one, then the three characters before it represent 2 bytes
+		// this is just a cheap hack to not do indexOf twice
+		var len = b64.length
+		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
+
+		// base64 is 4/3 + up to two characters of the original data
+		arr = new Arr(b64.length * 3 / 4 - placeHolders)
+
+		// if there are placeholders, only get up to the last complete 4 chars
+		l = placeHolders > 0 ? b64.length - 4 : b64.length
+
+		var L = 0
+
+		function push (v) {
+			arr[L++] = v
+		}
+
+		for (i = 0, j = 0; i < l; i += 4, j += 3) {
+			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
+			push((tmp & 0xFF0000) >> 16)
+			push((tmp & 0xFF00) >> 8)
+			push(tmp & 0xFF)
+		}
+
+		if (placeHolders === 2) {
+			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
+			push(tmp & 0xFF)
+		} else if (placeHolders === 1) {
+			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
+			push((tmp >> 8) & 0xFF)
+			push(tmp & 0xFF)
+		}
+
+		return arr
+	}
+
+	function uint8ToBase64 (uint8) {
+		var i,
+			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
+			output = "",
+			temp, length
+
+		function encode (num) {
+			return lookup.charAt(num)
+		}
+
+		function tripletToBase64 (num) {
+			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+		}
+
+		// go through the array every three bytes, we'll deal with trailing stuff later
+		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+			output += tripletToBase64(temp)
+		}
+
+		// pad the end with zeros, but make sure to not forget the extra bytes
+		switch (extraBytes) {
+			case 1:
+				temp = uint8[uint8.length - 1]
+				output += encode(temp >> 2)
+				output += encode((temp << 4) & 0x3F)
+				output += '=='
+				break
+			case 2:
+				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+				output += encode(temp >> 10)
+				output += encode((temp >> 4) & 0x3F)
+				output += encode((temp << 2) & 0x3F)
+				output += '='
+				break
+		}
+
+		return output
+	}
+
+	exports.toByteArray = b64ToByteArray
+	exports.fromByteArray = uint8ToBase64
+}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
+
+},{}],"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js":[function(require,module,exports){
+exports.read = function(buffer, offset, isLE, mLen, nBytes) {
+  var e, m,
+      eLen = nBytes * 8 - mLen - 1,
+      eMax = (1 << eLen) - 1,
+      eBias = eMax >> 1,
+      nBits = -7,
+      i = isLE ? (nBytes - 1) : 0,
+      d = isLE ? -1 : 1,
+      s = buffer[offset + i];
+
+  i += d;
+
+  e = s & ((1 << (-nBits)) - 1);
+  s >>= (-nBits);
+  nBits += eLen;
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+  m = e & ((1 << (-nBits)) - 1);
+  e >>= (-nBits);
+  nBits += mLen;
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+  if (e === 0) {
+    e = 1 - eBias;
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity);
+  } else {
+    m = m + Math.pow(2, mLen);
+    e = e - eBias;
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
+};
+
+exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c,
+      eLen = nBytes * 8 - mLen - 1,
+      eMax = (1 << eLen) - 1,
+      eBias = eMax >> 1,
+      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
+      i = isLE ? 0 : (nBytes - 1),
+      d = isLE ? 1 : -1,
+      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+  value = Math.abs(value);
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0;
+    e = eMax;
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2);
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--;
+      c *= 2;
+    }
+    if (e + eBias >= 1) {
+      value += rt / c;
+    } else {
+      value += rt * Math.pow(2, 1 - eBias);
+    }
+    if (value * c >= 2) {
+      e++;
+      c /= 2;
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0;
+      e = eMax;
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen);
+      e = e + eBias;
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+      e = 0;
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
+
+  e = (e << mLen) | m;
+  eLen += mLen;
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
+
+  buffer[offset + i - d] |= s * 128;
+};
+
+},{}],"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js":[function(require,module,exports){
+
+/**
+ * isArray
+ */
+
+var isArray = Array.isArray;
+
+/**
+ * toString
+ */
+
+var str = Object.prototype.toString;
+
+/**
+ * Whether or not the given `val`
+ * is an array.
+ *
+ * example:
+ *
+ *        isArray([]);
+ *        // > true
+ *        isArray(arguments);
+ *        // > false
+ *        isArray('');
+ *        // > false
+ *
+ * @param {mixed} val
+ * @return {bool}
+ */
+
+module.exports = isArray || function (val) {
+  return !! val && '[object Array]' == str.call(val);
+};
+
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\app.module.js":[function(require,module,exports){
+'use strict';
+
 require('./directives');
 var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'app.directive'])
     .controller('mainFrameCtrl', require('./controllers/mainFrameCtrl'))
@@ -16,7 +1313,7 @@ var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'ap
 
 module.exports = App;
 
-},{"./controllers/candidateListCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js","./controllers/dojoMatCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\dojoMatCtrl.js","./controllers/gameHistoryCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\gameHistoryCtrl.js","./controllers/homeCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\homeCtrl.js","./controllers/loginCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\loginCtrl.js","./controllers/mainFrameCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\mainFrameCtrl.js","./controllers/prepareChartCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\prepareChartCtrl.js","./controllers/registerCandidateCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\registerCandidateCtrl.js","./controllers/registrationModalCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\registrationModalCtrl.js","./controllers/viewChartCtrl":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\viewChartCtrl.js","./directives":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\directives\\index.js","./router/router":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\router\\router.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js":[function(require,module,exports){
+},{"./controllers/candidateListCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js","./controllers/dojoMatCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\dojoMatCtrl.js","./controllers/gameHistoryCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\gameHistoryCtrl.js","./controllers/homeCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\homeCtrl.js","./controllers/loginCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\loginCtrl.js","./controllers/mainFrameCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\mainFrameCtrl.js","./controllers/prepareChartCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\prepareChartCtrl.js","./controllers/registerCandidateCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\registerCandidateCtrl.js","./controllers/registrationModalCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\registrationModalCtrl.js","./controllers/viewChartCtrl":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\viewChartCtrl.js","./directives":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\directives\\index.js","./router/router":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\router\\router.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js":[function(require,module,exports){
 'use strict';
 
 module.exports = function($scope, $http, $state) {
@@ -24,11 +1321,11 @@ module.exports = function($scope, $http, $state) {
 
 }
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\dojoMatCtrl.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\dojoMatCtrl.js":[function(require,module,exports){
 'use strict';
 var defaultTimerSeconds = 180,
     submitGracePeriod = 5000;
-module.exports = function($scope, $http, $state, $timeout) {
+module.exports = function($scope, $http, $state, $timeout, $interval) {
     var clock = jQuery('.clock').FlipClock({
             countdown: true,
             autoStart: false,
@@ -37,23 +1334,20 @@ module.exports = function($scope, $http, $state, $timeout) {
                 start: function() {
                     $scope.gameRunning = !$scope.gameRunning;
                     $scope.matchStarted = true;
-                    timeBreaks.push(new Date());
+                    $scope.timeBreaks.push(new Date());
                 },
                 stop: function() {
                     $scope.gameRunning = !$scope.gameRunning;
-                    timeBreaks.push(new Date());
+                    $scope.timeBreaks.push(new Date());
+                    if (clock.getTime().time === 0) {
+                        console.log('ended');
+                        freezeMatch();
+                    }
                 }
             }
         }),
-        timeBreaks = [],
         checkNumber = function(value) {
             if (isNaN(value)) {
-                return 0;
-            }
-            if (isNaN(value)) {
-                return 0;
-            }
-            if (Number(value) >= 60) {
                 return 0;
             }
             if (Number(value) >= 60) {
@@ -91,13 +1385,38 @@ module.exports = function($scope, $http, $state, $timeout) {
 
         },
         freezeMatch = function() {
+            blockFreeze = false;
+            $scope.showProgress = true;
+            $interval(function() {
+                $scope.pgrogressValue += (100 / 50);
+            }, 100, 50)
             $timeout(function() {
-                $scope.matchEnded = true;
-            }, submitGracePeriod)
-        };
+                $scope.showProgress = false;
+                $scope.pgrogressValue = 2;
+                if (blockFreeze) {
+                    blockFreeze = false;
+                } else {
+                    console.log('matchEnded');
+                    $scope.matchEnded = true;
+                }
+            }, submitGracePeriod);
+        },
+        blockFreeze = false;
 
 
     $scope.warningArray = ['C', 'K', 'CH', 'H'];
+    var array = [];
+    for (var i = 1; i <= 53; i++) {
+        array.push({
+            name: String(i)
+        });
+    }
+    $scope.eventIds = array;
+    $scope.getMatches = function() {
+        console.log('connecting to server');
+    };
+
+    $scope.selectedEvent = {};
     $scope.player1WarningArray1 = [];
     $scope.player1WarningArray2 = [];
     $scope.player2WarningArray1 = [];
@@ -105,15 +1424,22 @@ module.exports = function($scope, $http, $state, $timeout) {
     $scope.matchStarted = false;
     $scope.matchEnded = false;
 
-
+    $scope.pgrogressValue = 2;
     $scope.Player1Score = 0;
     $scope.Player2Score = 0;
+    $scope.Player1ScoreArray = [];
+    $scope.Player2ScoreArray = [];
+    $scope.timeBreaks = [];
+
     $scope.matId = window.location.hash.split('dojoMat/')[1];
     $scope.toggleTimer = function() {
         clock.running ? clock.stop() : clock.start();
     };
     $scope.setTimer = function() {
         clock.setTime($scope.timerMinute * 60 + $scope.timerSecond);
+        blockFreeze = true;
+        $scope.showProgress = false;
+        $scope.pgrogressValue = 2;
     };
     $scope.resetTimer = function() {
         jQuery("#second").val('0');
@@ -121,17 +1447,36 @@ module.exports = function($scope, $http, $state, $timeout) {
         $scope.timerMinute = 3;
         $scope.timerSecond = 0;
         $scope.setTimer();
+        $scope.showProgress = false;
+        $scope.pgrogressValue = 2;
     };
     $scope.gameRunning = clock.running;
     $scope.increasePoint = function(playerNumber, points) {
-        console.log('increase', playerNumber, points, $scope.timer, $scope.Player2Score);
         if ($scope.matchStarted && !$scope.matchEnded) {
             if (playerNumber === 1) {
-                console.log('increases', playerNumber, points, $scope.Player1Score);
                 $scope.Player1Score = $scope.Player1Score + points;
+                $scope.Player1ScoreArray.push({
+                    point: points,
+                    time: new Date()
+                });
             } else if (playerNumber === 2) {
-                console.log('increases', playerNumber, points, $scope.Player2Score);
                 $scope.Player2Score = $scope.Player2Score + points;
+                $scope.Player2ScoreArray.push({
+                    point: points,
+                    time: new Date()
+                });
+            }
+        }
+    };
+    $scope.undo = function(player) {
+        var popped;
+        if ($scope.matchStarted && !$scope.matchEnded) {
+            if (player === 1) {
+                popped = $scope.Player1ScoreArray.pop();
+                $scope.Player1Score = $scope.Player1Score - popped.point;
+            } else if (player === 2) {
+                popped = $scope.Player2ScoreArray.pop();
+                $scope.Player2Score = $scope.Player2Score - popped.point;
             }
         }
     };
@@ -168,26 +1513,29 @@ module.exports = function($scope, $http, $state, $timeout) {
                 $scope.player2WarningArray2.push(warning);
             }
         }
-        console.log(clock.getTime().time);
+
         // console.log('toggleWarning', $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player2WarningArray1, $scope.player2WarningArray2)
     };
     $scope.submit = function() {
-        freezeMatch();
+
+    };
+    $scope.updateMatchList = function() {
+
     }
 
     $scope.resetTimer();
 }
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\gameHistoryCtrl.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\gameHistoryCtrl.js":[function(require,module,exports){
 'use strict';
 
 module.exports = function($scope, $http, $state) {
 
 }
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\homeCtrl.js":[function(require,module,exports){
-module.exports=require("C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js")
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\loginCtrl.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\homeCtrl.js":[function(require,module,exports){
+module.exports=require("C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js")
+},{"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\candidateListCtrl.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\loginCtrl.js":[function(require,module,exports){
 'use strict';
 
 var utility = require('../../util');
@@ -258,7 +1606,7 @@ module.exports = function($scope, $rootScope, $state, $http, $timeout) {
     });
 };
 
-},{"../../util":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\index.js","../../util/api":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\mainFrameCtrl.js":[function(require,module,exports){
+},{"../../util":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\index.js","../../util/api":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\mainFrameCtrl.js":[function(require,module,exports){
 'use strict';
 var utility = require('../../util');
 var api = require('../../util/api');
@@ -391,9 +1739,9 @@ module.exports = function($scope, $state, $http) {
     });
 };
 
-},{"../../util":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\index.js","../../util/api":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\prepareChartCtrl.js":[function(require,module,exports){
+},{"../../util":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\index.js","../../util/api":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\prepareChartCtrl.js":[function(require,module,exports){
 'use strict';
-
+var api = require('../../util/api');
 module.exports = function($scope, $http, $state) {
     var sheduleStatus = [],
         result,
@@ -419,8 +1767,11 @@ module.exports = function($scope, $http, $state) {
         if (docHeight > jQuery('.mainpanel').height())
             jQuery('.mainpanel').height(docHeight);
     };
-    $http.get('/api/shedule/status')
-        .success(function(data, status, headers, config) {
+    $http({
+            url: api.sheduleGame,
+            method: 'GET'
+        })
+        .success(function(data) {
             var games = [],
                 hasOdds;
             if (data.success) {
@@ -492,7 +1843,7 @@ module.exports = function($scope, $http, $state) {
     }
 }
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\registerCandidateCtrl.js":[function(require,module,exports){
+},{"../../util/api":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\registerCandidateCtrl.js":[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -710,7 +2061,7 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../../config":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\config\\index.js","../../util/api":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\api.js","buffer":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\index.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\registrationModalCtrl.js":[function(require,module,exports){
+},{"../../config":"C:\\xampp\\htdocs\\hikick-india\\app\\config\\index.js","../../util/api":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js","buffer":"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\registrationModalCtrl.js":[function(require,module,exports){
 'use strict';
 
 module.exports = function($scope, $modalInstance) {
@@ -729,7 +2080,7 @@ module.exports = function($scope, $modalInstance) {
     });
 }
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\controllers\\viewChartCtrl.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\controllers\\viewChartCtrl.js":[function(require,module,exports){
 'use strict';
 var unitHeight = 25,
     /*
@@ -887,7 +2238,7 @@ module.exports = function($scope, $http, $state) {
 
 };
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\directives\\index.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\directives\\index.js":[function(require,module,exports){
 'use strict';
 
 var Directive = angular.module('app.directive', [])
@@ -912,7 +2263,7 @@ var Directive = angular.module('app.directive', [])
 
 module.exports = Directive;
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\router\\router.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\application\\router\\router.js":[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -928,7 +2279,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
             controller: 'loginCtrl'
         })
         .state('app', {
-            template: Buffer("PHNlY3Rpb24+DQoNCiAgPGRpdiBjbGFzcz0ibGVmdHBhbmVsIj4NCg0KICAgIDxkaXYgY2xhc3M9ImxvZ29wYW5lbCB0ZXh0LWNlbnRlciBncmFkaWVudC1iYWNrIj4NCiAgICAgIDxoMT4NCiAgICAgICAgICA8c3Bhbj5bIDwvc3Bhbj5IaWtpY2s8c3Bhbj4gXTwvc3Bhbj4NCiAgICAgICAgPC9oMT4NCiAgICA8L2Rpdj4NCiAgICA8IS0tIGxvZ29wYW5lbCAtLT4NCg0KICAgIDxkaXYgY2xhc3M9ImxlZnRwYW5lbGlubmVyIj4NCiAgICAgIDxoNSBjbGFzcz0ic2lkZWJhcnRpdGxlIj5OYXZpZ2F0aW9uPC9oNT4NCiAgICAgIDx1bCBjbGFzcz0ibmF2IG5hdi1waWxscyBuYXYtc3RhY2tlZCBuYXYtYnJhY2tldCI+DQogICAgICAgIDxsaSBjbGFzcz0iYWN0aXZlIj48YSBocmVmPSIjL2hvbWUiPjxpIGNsYXNzPSJmYSBmYS1ob21lIj48L2k+PHNwYW4+IEhvbWU8L3NwYW4+PC9hPg0KICAgICAgICA8L2xpPg0KICAgICAgICA8bGkgY2xhc3M9Im5hdi1wYXJlbnQiPjxhPjxpIGNsYXNzPSJmYSBmYS11c2VycyI+PC9pPiA8c3Bhbj5DYW5kaWRhdGVzPC9zcGFuPjwvYT4NCiAgICAgICAgICA8dWwgY2xhc3M9ImNoaWxkcmVuIj4NCiAgICAgICAgICAgIDxsaSBuZy1zaG93PSJyb2xlLnJlZ2lzdGVyQ2FuZGlkYXRlIj48YSBocmVmPSIjL3JlZ2lzdGVyQ2FuZGlkYXRlIj48aSBjbGFzcz0iZmEgZmEtY2FyZXQtcmlnaHQiPjwvaT4gUmVnaXN0ZXI8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgICAgPGxpPjxhIGhyZWY9IiMvY2FuZGlkYXRlTGlzdCI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IFZpZXcgTGlzdDwvYT4NCiAgICAgICAgICAgIDwvbGk+DQogICAgICAgICAgPC91bD4NCiAgICAgICAgPC9saT4NCiAgICAgICAgPGxpIGNsYXNzPSJuYXYtcGFyZW50Ij48YT48aSBjbGFzcz0iZmEgZmEtZmlsZS10ZXh0Ij48L2k+PHNwYW4+IEdhbWUgU2hlZXQ8L3NwYW4+PC9hPg0KICAgICAgICAgIDx1bCBjbGFzcz0iY2hpbGRyZW4iPg0KICAgICAgICAgICAgPGxpIG5nLXNob3c9InJvbGUuc2hlZHVsZUV2ZW50Ij48YSBocmVmPSIjL3ByZXBhcmVDaGFydCI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IENoYXJ0IFByZXBlcmF0aW9uPC9hPg0KICAgICAgICAgICAgPC9saT4NCiAgICAgICAgICAgIDxsaT48YSBocmVmPSIjL3ZpZXdDaGFydCI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IFZpZXcgQ2hhcnQ8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgIDwvdWw+DQogICAgICAgIDwvbGk+DQogICAgICAgIDxsaSBjbGFzcz0ibmF2LXBhcmVudCIgbmctc2hvdz0ic2hvd0Rvam8iPjxhPjxpIGNsYXNzPSJmYSBmYS10cm9waHkiPjwvaT4gPHNwYW4+RG9qbzwvc3Bhbj48L2E+DQogICAgICAgICAgPHVsIGNsYXNzPSJjaGlsZHJlbiI+DQogICAgICAgICAgICA8bGkgbmctc2hvdz0icm9sZS5kb2pvTWF0MSI+DQogICAgICAgICAgICAgIDxhIGhyZWY9IiMvZG9qb01hdC8xIj48aSBjbGFzcz0iZmEgZmEtY2FyZXQtcmlnaHQiPjwvaT4gRG9qbyBNYXQgMTwvYT4NCiAgICAgICAgICAgIDwvbGk+DQogICAgICAgICAgICA8bGkgbmctc2hvdz0icm9sZS5kb2pvTWF0MiI+DQogICAgICAgICAgICAgIDxhIGhyZWY9IiMvZG9qb01hdC8yIj48aSBjbGFzcz0iZmEgZmEtY2FyZXQtcmlnaHQiPjwvaT4gRG9qbyBNYXQgMjwvYT4NCiAgICAgICAgICAgIDwvbGk+DQogICAgICAgICAgICA8bGkgbmctc2hvdz0icm9sZS5kb2pvTWF0MyI+DQogICAgICAgICAgICAgIDxhIGhyZWY9IiMvZG9qb01hdC8zIj48aSBjbGFzcz0iZmEgZmEtY2FyZXQtcmlnaHQiPjwvaT4gRG9qbyBNYXQgMzwvYT4NCiAgICAgICAgICAgIDwvbGk+DQogICAgICAgICAgICA8bGkgbmctc2hvdz0icm9sZS5kb2pvTWF0NCI+DQogICAgICAgICAgICAgIDxhIGhyZWY9IiMvZG9qb01hdC80Ij48aSBjbGFzcz0iZmEgZmEtY2FyZXQtcmlnaHQiPjwvaT4gRG9qbyBNYXQgNDwvYT4NCiAgICAgICAgICAgIDwvbGk+DQogICAgICAgICAgPC91bD4NCiAgICAgICAgPC9saT4NCiAgICAgICAgPGxpIG5nLXNob3c9InJvbGUuZ2FtZUhpc3RvcnkiPg0KICAgICAgICAgIDxhIGhyZWY9IiMvZ2FtZUhpc3RvcnkiPjxpIGNsYXNzPSJmYSBmYS1oaXN0b3J5Ij48L2k+PHNwYW4+IEdhbWUgSGlzdG9yeTwvc3Bhbj48L2E+DQogICAgICAgIDwvbGk+DQogICAgICA8L3VsPg0KICAgIDwvZGl2Pg0KICAgIDwhLS0gbGVmdHBhbmVsaW5uZXIgLS0+DQogIDwvZGl2Pg0KICA8IS0tIGxlZnRwYW5lbCAtLT4NCg0KICA8ZGl2IGNsYXNzPSJtYWlucGFuZWwiPg0KDQogICAgPGRpdiBjbGFzcz0iaGVhZGVyYmFyIj4NCg0KICAgICAgPGEgY2xhc3M9Im1lbnV0b2dnbGUiPjxpIGNsYXNzPSJmYSBmYS1iYXJzIj48L2k+PC9hPg0KICAgICAgPGRpdiBjbGFzcz0idGV4dC1jZW50ZXIgZ3JhZGllbnQtYmFjayI+DQogICAgICAgIDxzcGFuIGNsYXNzPSJzaXRlLWhlYWRlciI+SGlraWNrPC9zcGFuPjxzcGFuIGNsYXNzPSJoaWRkZW4teHMgc2l0ZS1oZWFkZXIiPiBJbmRpYTwvc3Bhbj4NCiAgICAgICAgPGRpdiBjbGFzcz0iaGVhZGVyLXJpZ2h0Ij4NCiAgICAgICAgICA8dWwgY2xhc3M9ImhlYWRlcm1lbnUiPg0KICAgICAgICAgICAgPGxpPg0KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJidG4tZ3JvdXAiPg0KICAgICAgICAgICAgICAgIDxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0iYnRuIGJ0bi1kZWZhdWx0IGRyb3Bkb3duLXRvZ2dsZSB0cmFuc3BhcmVudC1iYWNrIiBkYXRhLXRvZ2dsZT0iZHJvcGRvd24iPg0KICAgICAgICAgICAgICAgICAgPGltZyBzcmM9InJlc291cmNlcy9pbWFnZXMvdXNlci5wbmciIGFsdD0iIiAvPnt7bmFtZX19DQogICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzcz0iY2FyZXQiPjwvc3Bhbj4NCiAgICAgICAgICAgICAgICA8L2J1dHRvbj4NCiAgICAgICAgICAgICAgICA8dWwgY2xhc3M9ImRyb3Bkb3duLW1lbnUgZHJvcGRvd24tbWVudS11c2VybWVudSBkcm9wZG93bi1tZW51LWxlZnQgcHVsbC1yaWdodCI+DQogICAgICAgICAgICAgICAgICA8bGk+PGEgaHJlZj0iIiBuZy1jbGljaz0ibG9nb3V0KCkiPjxpIGNsYXNzPSJmYSBmYS1zaWduLW91dCI+PC9pPiA8c3Bhbj4gTG9nIE91dDwvc3Bhbj48L2E+DQogICAgICAgICAgICAgICAgICA8L2xpPg0KICAgICAgICAgICAgICAgIDwvdWw+DQogICAgICAgICAgICAgIDwvZGl2Pg0KICAgICAgICAgICAgPC9saT4NCiAgICAgICAgICA8L3VsPg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KICAgICAgPCEtLSBoZWFkZXItcmlnaHQgLS0+DQoNCiAgICA8L2Rpdj4NCiAgICA8IS0tIGhlYWRlcmJhciAtLT4NCiAgICA8ZGl2IHVpLXZpZXc9InBhZ2VzIj48L2Rpdj4NCiAgICA8IS0tIGNvbnRlbnRwYW5lbCAtLT4NCg0KICA8L2Rpdj4NCiAgPCEtLSBtYWlucGFuZWwgLS0+DQoNCjwvc2VjdGlvbj4NCg==","base64"),
+            template: Buffer("PHNlY3Rpb24+DQoNCiAgPGRpdiBjbGFzcz0ibGVmdHBhbmVsIj4NCiAgICA8ZGl2IGNsYXNzPSJsb2dvcGFuZWwgdGV4dC1jZW50ZXIgZ3JhZGllbnQtYmFjayI+DQogICAgICA8aDE+DQogICAgICAgICAgPHNwYW4+WyA8L3NwYW4+SGlraWNrPHNwYW4+IF08L3NwYW4+DQogICAgICAgIDwvaDE+DQogICAgPC9kaXY+DQogICAgPCEtLSBsb2dvcGFuZWwgLS0+DQoNCiAgICA8ZGl2IGNsYXNzPSJsZWZ0cGFuZWxpbm5lciI+DQogICAgICA8aDUgY2xhc3M9InNpZGViYXJ0aXRsZSI+TmF2aWdhdGlvbjwvaDU+DQogICAgICA8dWwgY2xhc3M9Im5hdiBuYXYtcGlsbHMgbmF2LXN0YWNrZWQgbmF2LWJyYWNrZXQiPg0KICAgICAgICA8bGkgY2xhc3M9ImFjdGl2ZSI+PGEgaHJlZj0iIy9ob21lIj48aSBjbGFzcz0iZmEgZmEtaG9tZSI+PC9pPjxzcGFuPiBIb21lPC9zcGFuPjwvYT4NCiAgICAgICAgPC9saT4NCiAgICAgICAgPGxpIGNsYXNzPSJuYXYtcGFyZW50Ij48YT48aSBjbGFzcz0iZmEgZmEtdXNlcnMiPjwvaT4gPHNwYW4+Q2FuZGlkYXRlczwvc3Bhbj48L2E+DQogICAgICAgICAgPHVsIGNsYXNzPSJjaGlsZHJlbiI+DQogICAgICAgICAgICA8bGkgbmctc2hvdz0icm9sZS5yZWdpc3RlckNhbmRpZGF0ZSI+PGEgaHJlZj0iIy9yZWdpc3RlckNhbmRpZGF0ZSI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IFJlZ2lzdGVyPC9hPg0KICAgICAgICAgICAgPC9saT4NCiAgICAgICAgICAgIDxsaT48YSBocmVmPSIjL2NhbmRpZGF0ZUxpc3QiPjxpIGNsYXNzPSJmYSBmYS1jYXJldC1yaWdodCI+PC9pPiBWaWV3IExpc3Q8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgIDwvdWw+DQogICAgICAgIDwvbGk+DQogICAgICAgIDxsaSBjbGFzcz0ibmF2LXBhcmVudCI+PGE+PGkgY2xhc3M9ImZhIGZhLWZpbGUtdGV4dCI+PC9pPjxzcGFuPiBHYW1lIFNoZWV0PC9zcGFuPjwvYT4NCiAgICAgICAgICA8dWwgY2xhc3M9ImNoaWxkcmVuIj4NCiAgICAgICAgICAgIDxsaSBuZy1zaG93PSJyb2xlLnNoZWR1bGVFdmVudCI+PGEgaHJlZj0iIy9wcmVwYXJlQ2hhcnQiPjxpIGNsYXNzPSJmYSBmYS1jYXJldC1yaWdodCI+PC9pPiBDaGFydCBQcmVwZXJhdGlvbjwvYT4NCiAgICAgICAgICAgIDwvbGk+DQogICAgICAgICAgICA8bGk+PGEgaHJlZj0iIy92aWV3Q2hhcnQiPjxpIGNsYXNzPSJmYSBmYS1jYXJldC1yaWdodCI+PC9pPiBWaWV3IENoYXJ0PC9hPg0KICAgICAgICAgICAgPC9saT4NCiAgICAgICAgICA8L3VsPg0KICAgICAgICA8L2xpPg0KICAgICAgICA8bGkgY2xhc3M9Im5hdi1wYXJlbnQiIG5nLXNob3c9InNob3dEb2pvIj48YT48aSBjbGFzcz0iZmEgZmEtdHJvcGh5Ij48L2k+IDxzcGFuPkRvam88L3NwYW4+PC9hPg0KICAgICAgICAgIDx1bCBjbGFzcz0iY2hpbGRyZW4iPg0KICAgICAgICAgICAgPGxpIG5nLXNob3c9InJvbGUuZG9qb01hdDEiPg0KICAgICAgICAgICAgICA8YSBocmVmPSIjL2Rvam9NYXQvMSI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IERvam8gTWF0IDE8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgICAgPGxpIG5nLXNob3c9InJvbGUuZG9qb01hdDIiPg0KICAgICAgICAgICAgICA8YSBocmVmPSIjL2Rvam9NYXQvMiI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IERvam8gTWF0IDI8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgICAgPGxpIG5nLXNob3c9InJvbGUuZG9qb01hdDMiPg0KICAgICAgICAgICAgICA8YSBocmVmPSIjL2Rvam9NYXQvMyI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IERvam8gTWF0IDM8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgICAgPGxpIG5nLXNob3c9InJvbGUuZG9qb01hdDQiPg0KICAgICAgICAgICAgICA8YSBocmVmPSIjL2Rvam9NYXQvNCI+PGkgY2xhc3M9ImZhIGZhLWNhcmV0LXJpZ2h0Ij48L2k+IERvam8gTWF0IDQ8L2E+DQogICAgICAgICAgICA8L2xpPg0KICAgICAgICAgIDwvdWw+DQogICAgICAgIDwvbGk+DQogICAgICAgIDxsaSBuZy1zaG93PSJyb2xlLmdhbWVIaXN0b3J5Ij4NCiAgICAgICAgICA8YSBocmVmPSIjL2dhbWVIaXN0b3J5Ij48aSBjbGFzcz0iZmEgZmEtaGlzdG9yeSI+PC9pPjxzcGFuPiBHYW1lIEhpc3Rvcnk8L3NwYW4+PC9hPg0KICAgICAgICA8L2xpPg0KICAgICAgPC91bD4NCiAgICA8L2Rpdj4NCiAgICA8IS0tIGxlZnRwYW5lbGlubmVyIC0tPg0KICA8L2Rpdj4NCiAgPCEtLSBsZWZ0cGFuZWwgLS0+DQoNCiAgPGRpdiBjbGFzcz0ibWFpbnBhbmVsIj4NCiAgICA8ZGl2IGNsYXNzPSJoZWFkZXJiYXIiPg0KICAgICAgPGEgY2xhc3M9Im1lbnV0b2dnbGUiPjxpIGNsYXNzPSJmYSBmYS1iYXJzIj48L2k+PC9hPg0KICAgICAgPGRpdiBjbGFzcz0idGV4dC1jZW50ZXIgZ3JhZGllbnQtYmFjayI+DQogICAgICAgIDxzcGFuIGNsYXNzPSJzaXRlLWhlYWRlciI+SGlraWNrPC9zcGFuPjxzcGFuIGNsYXNzPSJoaWRkZW4teHMgc2l0ZS1oZWFkZXIiPiBJbmRpYTwvc3Bhbj4NCiAgICAgICAgPGRpdiBjbGFzcz0iaGVhZGVyLXJpZ2h0Ij4NCiAgICAgICAgICA8dWwgY2xhc3M9ImhlYWRlcm1lbnUiPg0KICAgICAgICAgICAgPGxpPg0KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJidG4tZ3JvdXAiPg0KICAgICAgICAgICAgICAgIDxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0iYnRuIGJ0bi1kZWZhdWx0IGRyb3Bkb3duLXRvZ2dsZSB0cmFuc3BhcmVudC1iYWNrIiBkYXRhLXRvZ2dsZT0iZHJvcGRvd24iPg0KICAgICAgICAgICAgICAgICAgPGltZyBzcmM9InJlc291cmNlcy9pbWFnZXMvdXNlci5wbmciIGFsdD0iIiAvPnt7bmFtZX19DQogICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzcz0iY2FyZXQiPjwvc3Bhbj4NCiAgICAgICAgICAgICAgICA8L2J1dHRvbj4NCiAgICAgICAgICAgICAgICA8dWwgY2xhc3M9ImRyb3Bkb3duLW1lbnUgZHJvcGRvd24tbWVudS11c2VybWVudSBkcm9wZG93bi1tZW51LWxlZnQgcHVsbC1yaWdodCI+DQogICAgICAgICAgICAgICAgICA8bGk+PGEgaHJlZj0iIiBuZy1jbGljaz0ibG9nb3V0KCkiPjxpIGNsYXNzPSJmYSBmYS1zaWduLW91dCI+PC9pPiA8c3Bhbj4gTG9nIE91dDwvc3Bhbj48L2E+DQogICAgICAgICAgICAgICAgICA8L2xpPg0KICAgICAgICAgICAgICAgIDwvdWw+DQogICAgICAgICAgICAgIDwvZGl2Pg0KICAgICAgICAgICAgPC9saT4NCiAgICAgICAgICA8L3VsPg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KICAgICAgPCEtLSBoZWFkZXItcmlnaHQgLS0+DQoNCiAgICA8L2Rpdj4NCiAgICA8IS0tIGhlYWRlcmJhciAtLT4NCiAgICA8ZGl2IHVpLXZpZXc9InBhZ2VzIj48L2Rpdj4NCiAgICA8IS0tIGNvbnRlbnRwYW5lbCAtLT4NCg0KICA8L2Rpdj4NCiAgPCEtLSBtYWlucGFuZWwgLS0+DQoNCjwvc2VjdGlvbj4NCg==","base64"),
             controller: 'mainFrameCtrl'
         })
         .state('app.home', {
@@ -980,7 +2331,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
             url: '/dojoMat/:matId',
             views: {
                 'pages': {
-                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciBkb2pvLXBhZ2UtaGVhZGVyIj4NCiAgPGgyIGNsYXNzPSJwdWxsLWxlZnQiPjxpIGNsYXNzPSJmYSBmYS10cm9waHkiPjwvaT4gRG9qbyBNYXQte3ttYXRJZH19DQogIDwvaDI+DQoNCiAgPCEtLSA8ZGl2IGNsYXNzPSJjbG9jayBjb2wtc20tNCBjb2wtc20tb2Zmc2V0LTQiPjwvZGl2PiAtLT4NCg0KICA8ZGl2IGNsYXNzPSJwdWxsLXJpZ2h0Ij4NCiAgICBTZXRUaW1lcjoNCiAgICA8c3BhbiBjbGFzcz0idWktc3Bpbm5lciB1aS13aWRnZXQgdWktd2lkZ2V0LWNvbnRlbnQgdWktY29ybmVyLWFsbCI+DQogICAgICA8aW5wdXQgdHlwZT0idGV4dCIgaWQ9Im1pbnV0ZSIgY2xhc3M9InVpLXNwaW5uZXItaW5wdXQgdGltZS1pbnB1dCIgbmctbW9kZWw9InRpbWVyTWludXRlIiBhdXRvY29tcGxldGU9Im9mZiIgcm9sZT0ic3BpbmJ1dHRvbiIgYXJpYS12YWx1ZW5vdz0iMSI+DQogICAgPC9zcGFuPg0KICAgIDxzcGFuIGNsYXNzPSJ0aW1lLWRldmlkZXIiPjo8L3NwYW4+DQogICAgPHNwYW4gY2xhc3M9InVpLXNwaW5uZXIgdWktd2lkZ2V0IHVpLXdpZGdldC1jb250ZW50IHVpLWNvcm5lci1hbGwiPg0KICAgICAgPGlucHV0IHR5cGU9InRleHQiIGlkPSJzZWNvbmQiIGNsYXNzPSJ1aS1zcGlubmVyLWlucHV0IHRpbWUtaW5wdXQiIG5nLW1vZGVsPSJ0aW1lclNlY29uZCIgYXV0b2NvbXBsZXRlPSJvZmYiIHJvbGU9InNwaW5idXR0b24iIGFyaWEtdmFsdWVub3c9IjEiPg0KICAgIDwvc3Bhbj4NCiAgICA8c3Bhbj4NCiAgICAgIDxidXR0b24gY2xhc3M9ImJ0biBidG4tcHJpbWFyeSIgbmctY2xpY2s9InNldFRpbWVyKCkiPlNldDwvYnV0dG9uPg0KICAgIDwvc3Bhbj4NCiAgICA8c3Bhbj4NCiAgICAgIDxidXR0b24gY2xhc3M9ImJ0biBidG4td2FybmluZyIgbmctY2xpY2s9InJlc2V0VGltZXIoKSI+UmVzZXQ8L2J1dHRvbj4NCiAgICA8L3NwYW4+DQogIDwvZGl2Pg0KPC9kaXY+DQoNCjxkaXYgY2xhc3M9ImNvbnRlbnRwYW5lbCI+DQogIDxkaXYgY2xhc3M9InJvdyI+DQogICAgPCEtLSByZWQgY29ybmVyIC0tPg0KICAgIDxkaXYgY2xhc3M9ImNvbC1zbS00IHJlZC1jb3JuZXIgY29ybmVyIj4NCiAgICAgIDxoMSBjbGFzcz0iY29ybmVyLW5hbWUiPkFvPC9oMT4NCg0KICAgICAgPGRpdiBjbGFzcz0iaW5wdXQtZ3JvdXAiPg0KICAgICAgICA8c3BhbiBjbGFzcz0iaW5wdXQtZ3JvdXAtYWRkb24iPg0KICAgICAgICAgIDxzcGFuIGNsYXNzPSJnbHlwaGljb24gZ2x5cGhpY29uLXVzZXIiPjwvc3Bhbj4NCiAgICAgICAgPC9zcGFuPg0KICAgICAgICA8aW5wdXQgdHlwZT0idGV4dCIgY2xhc3M9ImZvcm0tY29udHJvbCIgcGxhY2Vob2xkZXI9IlNlbGVjdCBQbGF5ZXIxIiBuZy1kaXNhYmxlZD0ibWF0Y2hTdGFydGVkIj4NCiAgICAgIDwvZGl2Pg0KDQogICAgICA8ZGl2IGNsYXNzPSJnYW1lLWJ1dHRvbnMiPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXByaW1hcnkiIG5nLWNsaWNrPSJpbmNyZWFzZVBvaW50KDEsMSkiPg0KICAgICAgICAgIFl1a28gPHNwYW4gY2xhc3M9ImJhZGdlIj4xPC9zcGFuPg0KICAgICAgICA8L2J1dHRvbj4NCiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1wcmltYXJ5IiBuZy1jbGljaz0iaW5jcmVhc2VQb2ludCgxLDIpIj4NCiAgICAgICAgICBXYXphLWFyaSA8c3BhbiBjbGFzcz0iYmFkZ2UiPjI8L3NwYW4+DQogICAgICAgIDwvYnV0dG9uPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXByaW1hcnkiIG5nLWNsaWNrPSJpbmNyZWFzZVBvaW50KDEsMykiPg0KICAgICAgICAgIElwcG9uIDxzcGFuIGNsYXNzPSJiYWRnZSI+Mzwvc3Bhbj4NCiAgICAgICAgPC9idXR0b24+DQogICAgICA8L2Rpdj4NCg0KICAgICAgPGRpdiBjbGFzcz0id2FybmluZy1ob2xkZXIiPg0KICAgICAgICA8ZGl2IGNsYXNzPSJ3YXJuaW5nLWNvbnRyb2xzIGNvbC1zbS0xMiI+DQogICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXNtLTMgY2tib3ggY2tib3gtd2FybmluZyIgbmctcmVwZWF0PSJ3YXJuaW5nIGluIHdhcm5pbmdBcnJheSI+DQogICAgICAgICAgICA8aW5wdXQgdHlwZT0iY2hlY2tib3giIGlkPSJ7eydmaXJzdF93YXJuaW5nX3JfJyt3YXJuaW5nfX0iIG5nLWNoZWNrZWQ9InBsYXllcjFXYXJuaW5nQXJyYXkxLmluZGV4T2Yod2FybmluZykgPiAtMSIgbmctY2xpY2s9InRvZ2dsZVdhcm5pbmcod2FybmluZywxLDEpIj4NCiAgICAgICAgICAgIDxsYWJlbCBmb3I9Int7J2ZpcnN0X3dhcm5pbmdfcl8nK3dhcm5pbmd9fSIgY2xhc3M9Indhcm5pbmctbGFibGUiPnt7d2FybmluZ319PC9sYWJlbD4NCiAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgPC9kaXY+DQoNCiAgICAgICAgPGRpdiBjbGFzcz0id2FybmluZy1jb250cm9scyBjb2wtc20tMTIiPg0KICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0zIGNrYm94IGNrYm94LXdhcm5pbmciIG5nLXJlcGVhdD0id2FybmluZyBpbiB3YXJuaW5nQXJyYXkiPg0KICAgICAgICAgICAgPGlucHV0IHR5cGU9ImNoZWNrYm94IiBpZD0ie3snZmlyc3Rfd2FybmluZ19yXzJfJyt3YXJuaW5nfX0iIG5nLWNoZWNrZWQ9InBsYXllcjFXYXJuaW5nQXJyYXkyLmluZGV4T2Yod2FybmluZykgPiAtMSIgbmctY2xpY2s9InRvZ2dsZVdhcm5pbmcod2FybmluZywxLDIpIj4NCiAgICAgICAgICAgIDxsYWJlbCBmb3I9Int7J2ZpcnN0X3dhcm5pbmdfcl8yXycrd2FybmluZ319IiBjbGFzcz0id2FybmluZy1sYWJsZSI+e3t3YXJuaW5nfX08L2xhYmVsPg0KICAgICAgICAgIDwvZGl2Pg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KDQogICAgPC9kaXY+DQogICAgPCEtLSBtaWQgcGFydCB3aXRoIHRpbXJlcyBhbmQgbWFya3MgLS0+DQogICAgPGRpdiBjbGFzcz0iY29sLXNtLTQiPg0KICAgICAgPGRpdiBjbGFzcz0icm93Ij4NCiAgICAgICAgPGRpdiBjbGFzcz0iY2xvY2siPjwvZGl2Pg0KICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtc20tMTIgY29ybmVyLWJvdGgiPg0KICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0xMiI+DQogICAgICAgICAgICA8aDEgY2xhc3M9InB1bGwtbGVmdCBnYW1lLXBvaW50Ij57e1BsYXllcjFTY29yZX19PC9oMT4NCiAgICAgICAgICAgIDxoMSBjbGFzcz0icHVsbC1yaWdodCBnYW1lLXBvaW50Ij57e1BsYXllcjJTY29yZX19PC9oMT4NCiAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWJsb2NrIHN0YXJ0LWJ1dHRvbiIgbmctY2xhc3M9InsnYnRuLXN1Y2Nlc3MnOiFnYW1lUnVubmluZywnYnRuLWRhbmdlcic6Z2FtZVJ1bm5pbmd9IiBuZy1jbGljaz0idG9nZ2xlVGltZXIoKSI+e3tnYW1lUnVubmluZz8nU3RvcCc6J1N0YXJ0J319PC9idXR0b24+DQogICAgICAgICAgPGRpdiBjbGFzcz0iY2F0ZWdvcnktaGVhZGluZy1jb250YWluZXIgcm93Ij4NCiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0xMiB0ZXh0LWNlbnRlciBjYXRlZ29yeS1oZWFkaW5nIj5XYXJuaW5nIENhdGVnb3J5IDE8L2Rpdj4NCiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0xMiB0ZXh0LWNlbnRlciBjYXRlZ29yeS1oZWFkaW5nIj5XYXJuaW5nIENhdGVnb3J5IDI8L2Rpdj4NCiAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWJsb2NrIHN1Ym1pdC1idXR0b24iIG5nLWNsaWNrPSJzdWJtaXQoKSI+U3VibWl0PC9idXR0b24+DQogICAgICAgIDwvZGl2Pg0KICAgICAgPC9kaXY+DQogICAgPC9kaXY+DQogICAgPCEtLSBibHVlIGNvcm5lciAtLT4NCiAgICA8ZGl2IGNsYXNzPSJjb2wtc20tNCBibHVlLWNvcm5lciBjb3JuZXIiPg0KICAgICAgPGgxIGNsYXNzPSJjb3JuZXItbmFtZSB0ZXh0LXJpZ2h0Ij5Ba2E8L2gxPg0KICAgICAgPGRpdiBjbGFzcz0iaW5wdXQtZ3JvdXAiPg0KICAgICAgICA8aW5wdXQgdHlwZT0idGV4dCIgY2xhc3M9ImZvcm0tY29udHJvbCIgcGxhY2Vob2xkZXI9IlNlbGVjdCBQbGF5ZXIyIiBuZy1kaXNhYmxlZD0ibWF0Y2hTdGFydGVkIj4NCiAgICAgICAgPHNwYW4gY2xhc3M9ImlucHV0LWdyb3VwLWFkZG9uIj4NCiAgICAgICAgICA8c3BhbiBjbGFzcz0iZ2x5cGhpY29uIGdseXBoaWNvbi11c2VyIj48L3NwYW4+DQogICAgICAgIDwvc3Bhbj4NCiAgICAgIDwvZGl2Pg0KICAgICAgPGRpdiBjbGFzcz0idGV4dC1yaWdodCBnYW1lLWJ1dHRvbnMiPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWRhbmdlciIgbmctY2xpY2s9ImluY3JlYXNlUG9pbnQoMiwxKSI+DQogICAgICAgICAgWXVrbyA8c3BhbiBjbGFzcz0iYmFkZ2UiPjE8L3NwYW4+DQogICAgICAgIDwvYnV0dG9uPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWRhbmdlciIgbmctY2xpY2s9ImluY3JlYXNlUG9pbnQoMiwyKSI+DQogICAgICAgICAgV2F6YS1hcmkgPHNwYW4gY2xhc3M9ImJhZGdlIj4yPC9zcGFuPg0KICAgICAgICA8L2J1dHRvbj4NCiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1kYW5nZXIiIG5nLWNsaWNrPSJpbmNyZWFzZVBvaW50KDIsMykiPg0KICAgICAgICAgIElwcG9uIDxzcGFuIGNsYXNzPSJiYWRnZSI+Mzwvc3Bhbj4NCiAgICAgICAgPC9idXR0b24+DQogICAgICA8L2Rpdj4NCiAgICAgIDxkaXYgY2xhc3M9Indhcm5pbmctaG9sZGVyIj4NCiAgICAgICAgPGRpdiBjbGFzcz0id2FybmluZy1jb250cm9scyBjb2wtc20tMTIiPg0KICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0zIGNrYm94IGNrYm94LXdhcm5pbmciIG5nLXJlcGVhdD0id2FybmluZyBpbiB3YXJuaW5nQXJyYXkiPg0KICAgICAgICAgICAgPGlucHV0IHR5cGU9ImNoZWNrYm94IiBpZD0ie3snZmlyc3Rfd2FybmluZ19iXycrd2FybmluZ319IiBuZy1jaGVja2VkPSJwbGF5ZXIyV2FybmluZ0FycmF5MS5pbmRleE9mKHdhcm5pbmcpID4gLTEiIG5nLWNsaWNrPSJ0b2dnbGVXYXJuaW5nKHdhcm5pbmcsMiwxKSI+DQogICAgICAgICAgICA8bGFiZWwgZm9yPSJ7eydmaXJzdF93YXJuaW5nX2JfJyt3YXJuaW5nfX0iIGNsYXNzPSJ3YXJuaW5nLWxhYmxlIj57e3dhcm5pbmd9fTwvbGFiZWw+DQogICAgICAgICAgPC9kaXY+DQogICAgICAgIDwvZGl2Pg0KDQogICAgICAgIDxkaXYgY2xhc3M9Indhcm5pbmctY29udHJvbHMgY29sLXNtLTEyIj4NCiAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtc20tMyBja2JveCBja2JveC13YXJuaW5nIiBuZy1yZXBlYXQ9Indhcm5pbmcgaW4gd2FybmluZ0FycmF5Ij4NCiAgICAgICAgICAgIDxpbnB1dCB0eXBlPSJjaGVja2JveCIgaWQ9Int7J2ZpcnN0X3dhcm5pbmdfYl8yXycrd2FybmluZ319IiBuZy1jaGVja2VkPSJwbGF5ZXIyV2FybmluZ0FycmF5Mi5pbmRleE9mKHdhcm5pbmcpID4gLTEiIG5nLWNsaWNrPSJ0b2dnbGVXYXJuaW5nKHdhcm5pbmcsMiwyKSI+DQogICAgICAgICAgICA8bGFiZWwgZm9yPSJ7eydmaXJzdF93YXJuaW5nX2JfMl8nK3dhcm5pbmd9fSIgY2xhc3M9Indhcm5pbmctbGFibGUiPnt7d2FybmluZ319PC9sYWJlbD4NCiAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgPC9kaXY+DQogICAgICA8L2Rpdj4NCg0KICAgIDwvZGl2Pg0KICA8L2Rpdj4NCiAgPCEtLXJvdyAtLT4NCjwvZGl2Pg0KPCEtLSBjb250ZW50cGFuZWwgLS0+DQo=","base64"),
+                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciBkb2pvLXBhZ2UtaGVhZGVyIj4NCiAgPGgyIGNsYXNzPSJwdWxsLWxlZnQiPjxpIGNsYXNzPSJmYSBmYS10cm9waHkiPjwvaT4gRG9qbyBNYXQte3ttYXRJZH19DQogIDwvaDI+DQoNCiAgPCEtLSA8ZGl2IGNsYXNzPSJjbG9jayBjb2wtc20tNCBjb2wtc20tb2Zmc2V0LTQiPjwvZGl2PiAtLT4NCg0KICA8ZGl2IGNsYXNzPSJwdWxsLXJpZ2h0Ij4NCiAgICBTZXQgRXZlbnQ6DQogICAgPHNlbGVjdCBjbGFzcz0iZm9ybS1jb250cm9sIGlubGluZS1ib3giIG5nLW1vZGVsPSJzZWxlY3RlZEV2ZW50IiBuZy1vcHRpb25zPSJldmVudElkLm5hbWUgZm9yIGV2ZW50SWQgaW4gZXZlbnRJZHMiIG5nLWRpc2FibGVkPSJtYXRjaFN0YXJ0ZWQiPg0KICAgICAgPCEtLSBuZy1jaGFuZ2U9ImdldE1hdGNoZXMoKSINCiAgICAgIDxvcHRpb24gdmFsdWU9Int7ZXZlbnRJZH19IiBuZy1yZXBlYXQ9ImV2ZW5JZCBpbiBnZXRFdmVudElkcyI+e3tldmVudElkfX08L29wdGlvbj4gLS0+DQogICAgPC9zZWxlY3Q+IFNlbGVjdCBNYXRjaDoNCiAgICA8ZGl2IGNsYXNzPSJtYXRjaC1saXN0Ij4NCiAgICAgIDxpbnB1dCB0eXBlPSJ0ZXh0IiBjbGFzcz0iZm9ybS1jb250cm9sIGlubGluZS1ib3ggc2VsZWN0LW1hdGNoLWJveCIgcGxhY2Vob2xkZXI9IlBsYXllcjEgVlMgUGxheWVyMiIgbmctZGlzYWJsZWQ9Im1hdGNoU3RhcnRlZCIgbmctZm9jdXM9InNob3dNYXRjaExpc3Q9dHJ1ZSI+DQogICAgICA8IS0tIG5nLWJsdXI9InNob3dNYXRjaExpc3Q9ZmFsc2UiIC0tPg0KDQogICAgICA8ZGl2IG5nLXNob3c9InNob3dNYXRjaExpc3QiIGNsYXNzPSJ0YWctc3VnZ2VzdGlvbiBzZWFyY2gtcmVzdWx0LWJveCI+DQogICAgICAgIDxkaXYgY2xhc3M9InNlYXJjaC1yZXN1bHQtY2xvc2UtYmxvY2siPg0KICAgICAgICAgIDxzcGFuIGNsYXNzPSJzZWFyY2gtcmVzdWx0LWNsb3NlLXRleHQiPkZpeHR1cmVzIGZvdW5kIDoge3tmaXh0dXJlTGlzdC5sZW5ndGh9fTwvc3Bhbj4NCiAgICAgICAgICA8c3BhbiBjbGFzcz0iY2xvc2UiIHRpdGxlPSJDbG9zZSBzZWFyY2ggcmVzdWx0IiBuZy1jbGljaz0ic2hvd01hdGNoTGlzdD1mYWxzZSI+w5c8L3NwYW4+DQogICAgICAgIDwvZGl2Pg0KICAgICAgICA8dWwgbmctc2hvdz0iZml4dHVyZUxpc3QubGVuZ3RoIiBjbGFzcz0iY2hvc2VuLXJlc3VsdHMgbm8tc3R5bGUiIHJvbGU9Im1lbnUiPg0KICAgICAgICAgIDxsaSBuZy1yZXBlYXQ9ImZpeHR1cmUgaW4gZml4dHVyZUxpc3QiIG5nLWNsaWNrPSJnZXRQbGF5ZXJzKGZpeHR1cmUpIj4NCiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNsZWFyLWJvdGgiPg0KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtc20tOCBuby1wYWRkaW5nLWxlZnQgY2xlYXJmaXgiPg0KICAgICAgICAgICAgICAgIDxzcGFuPnt7Zml4dHVyZS5wbGF5ZXIxfX08L3NwYW4+DQogICAgICAgICAgICAgICAgPHNwYW4gY2xhc3M9InZzIj5Wczwvc3Bhbj4NCiAgICAgICAgICAgICAgICA8c3Bhbj4se3tmaXh0dXJlLnBsYXllcjJ9fTwvc3Bhbj4NCiAgICAgICAgICAgICAgPC9kaXY+DQogICAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgICA8L2xpPg0KICAgICAgICA8L3VsPg0KICAgICAgICA8ZGl2IG5nLWhpZGU9ImZpeHR1cmVMaXN0IiBjbGFzcz0idGV4dC1jZW50ZXIiPg0KICAgICAgICAgIDxzcGFuIGNsYXNzPSJmYSBmYS1zcGluIGZhLXNwaW5uZXIgbm8tc3BlY2lhbC1zdHlsaW5nIj48L3NwYW4+DQogICAgICAgIDwvZGl2Pg0KICAgICAgPC9kaXY+DQoNCiAgICA8L2Rpdj4gU2V0IFRpbWVyOg0KICAgIDxzcGFuIGNsYXNzPSJ1aS1zcGlubmVyIHVpLXdpZGdldCB1aS13aWRnZXQtY29udGVudCB1aS1jb3JuZXItYWxsIj4NCiAgICAgIDxpbnB1dCB0eXBlPSJ0ZXh0IiBpZD0ibWludXRlIiBjbGFzcz0idWktc3Bpbm5lci1pbnB1dCB0aW1lLWlucHV0IiBuZy1tb2RlbD0idGltZXJNaW51dGUiIGF1dG9jb21wbGV0ZT0ib2ZmIiByb2xlPSJzcGluYnV0dG9uIiBhcmlhLXZhbHVlbm93PSIxIj4NCiAgICA8L3NwYW4+DQogICAgPHNwYW4gY2xhc3M9InRpbWUtZGV2aWRlciI+Ojwvc3Bhbj4NCiAgICA8c3BhbiBjbGFzcz0idWktc3Bpbm5lciB1aS13aWRnZXQgdWktd2lkZ2V0LWNvbnRlbnQgdWktY29ybmVyLWFsbCI+DQogICAgICA8aW5wdXQgdHlwZT0idGV4dCIgaWQ9InNlY29uZCIgY2xhc3M9InVpLXNwaW5uZXItaW5wdXQgdGltZS1pbnB1dCIgbmctbW9kZWw9InRpbWVyU2Vjb25kIiBhdXRvY29tcGxldGU9Im9mZiIgcm9sZT0ic3BpbmJ1dHRvbiIgYXJpYS12YWx1ZW5vdz0iMSI+DQogICAgPC9zcGFuPg0KICAgIDxzcGFuPg0KICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1wcmltYXJ5IiBuZy1jbGljaz0ic2V0VGltZXIoKSI+U2V0PC9idXR0b24+DQogICAgPC9zcGFuPg0KICAgIDxzcGFuPg0KICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi13YXJuaW5nIiBuZy1jbGljaz0icmVzZXRUaW1lcigpIj5SZXNldDwvYnV0dG9uPg0KICAgIDwvc3Bhbj4NCiAgPC9kaXY+DQo8L2Rpdj4NCg0KPGRpdiBjbGFzcz0iY29udGVudHBhbmVsIj4NCiAgPGRpdiBjbGFzcz0icm93Ij4NCiAgICA8IS0tIHJlZCBjb3JuZXIgLS0+DQogICAgPGRpdiBjbGFzcz0iY29sLXNtLTQgcmVkLWNvcm5lciBjb3JuZXIiPg0KICAgICAgPGgxIGNsYXNzPSJjb3JuZXItbmFtZSI+QW88L2gxPg0KDQogICAgICA8ZGl2IGNsYXNzPSJpbnB1dC1ncm91cCI+DQogICAgICAgIDxzcGFuIGNsYXNzPSJpbnB1dC1ncm91cC1hZGRvbiI+DQogICAgICAgICAgPHNwYW4gY2xhc3M9ImdseXBoaWNvbiBnbHlwaGljb24tdXNlciI+PC9zcGFuPg0KICAgICAgICA8L3NwYW4+DQogICAgICAgIDxpbnB1dCB0eXBlPSJ0ZXh0IiBjbGFzcz0iZm9ybS1jb250cm9sIiBwbGFjZWhvbGRlcj0iU2VsZWN0IFBsYXllcjEiIG5nLWRpc2FibGVkPSJ0cnVlIj4NCiAgICAgIDwvZGl2Pg0KDQogICAgICA8ZGl2IGNsYXNzPSJnYW1lLWJ1dHRvbnMiPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXByaW1hcnkiIG5nLWNsaWNrPSJpbmNyZWFzZVBvaW50KDEsMSkiPg0KICAgICAgICAgIFl1a28gPHNwYW4gY2xhc3M9ImJhZGdlIj4xPC9zcGFuPg0KICAgICAgICA8L2J1dHRvbj4NCiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1wcmltYXJ5IiBuZy1jbGljaz0iaW5jcmVhc2VQb2ludCgxLDIpIj4NCiAgICAgICAgICBXYXphLWFyaSA8c3BhbiBjbGFzcz0iYmFkZ2UiPjI8L3NwYW4+DQogICAgICAgIDwvYnV0dG9uPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXByaW1hcnkiIG5nLWNsaWNrPSJpbmNyZWFzZVBvaW50KDEsMykiPg0KICAgICAgICAgIElwcG9uIDxzcGFuIGNsYXNzPSJiYWRnZSI+Mzwvc3Bhbj4NCiAgICAgICAgPC9idXR0b24+DQogICAgICA8L2Rpdj4NCg0KICAgICAgPGRpdiBjbGFzcz0idGV4dC1jZW50ZXIgdW5kby1idXR0b24iPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXByaW1hcnkiIG5nLWNsaWNrPSJ1bmRvKDEpIiB0aXRsZT0iVW5kbyBsYXN0IiBuZy1kaXNhYmxlZD0iUGxheWVyMVNjb3JlQXJyYXkubGVuZ3RoID09PSAwIj4NCiAgICAgICAgICA8aSBjbGFzcz0iZmEgZmEtdW5kbyI+PC9pPg0KICAgICAgICAgIDwhLS0gPHNwYW4gY2xhc3M9ImJhZGdlIj4xPC9zcGFuPiAtLT4NCiAgICAgICAgPC9idXR0b24+DQogICAgICA8L2Rpdj4NCg0KDQogICAgICA8ZGl2IGNsYXNzPSJ3YXJuaW5nLWhvbGRlciI+DQogICAgICAgIDxkaXYgY2xhc3M9Indhcm5pbmctY29udHJvbHMgY29sLXNtLTEyIj4NCiAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtc20tMyBja2JveCBja2JveC13YXJuaW5nIiBuZy1yZXBlYXQ9Indhcm5pbmcgaW4gd2FybmluZ0FycmF5Ij4NCiAgICAgICAgICAgIDxpbnB1dCB0eXBlPSJjaGVja2JveCIgaWQ9Int7J2ZpcnN0X3dhcm5pbmdfcl8nK3dhcm5pbmd9fSIgbmctY2hlY2tlZD0icGxheWVyMVdhcm5pbmdBcnJheTEuaW5kZXhPZih3YXJuaW5nKSA+IC0xIiBuZy1jbGljaz0idG9nZ2xlV2FybmluZyh3YXJuaW5nLDEsMSkiPg0KICAgICAgICAgICAgPGxhYmVsIGZvcj0ie3snZmlyc3Rfd2FybmluZ19yXycrd2FybmluZ319IiBjbGFzcz0id2FybmluZy1sYWJsZSI+e3t3YXJuaW5nfX08L2xhYmVsPg0KICAgICAgICAgIDwvZGl2Pg0KICAgICAgICA8L2Rpdj4NCg0KICAgICAgICA8ZGl2IGNsYXNzPSJ3YXJuaW5nLWNvbnRyb2xzIGNvbC1zbS0xMiI+DQogICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXNtLTMgY2tib3ggY2tib3gtd2FybmluZyIgbmctcmVwZWF0PSJ3YXJuaW5nIGluIHdhcm5pbmdBcnJheSI+DQogICAgICAgICAgICA8aW5wdXQgdHlwZT0iY2hlY2tib3giIGlkPSJ7eydmaXJzdF93YXJuaW5nX3JfMl8nK3dhcm5pbmd9fSIgbmctY2hlY2tlZD0icGxheWVyMVdhcm5pbmdBcnJheTIuaW5kZXhPZih3YXJuaW5nKSA+IC0xIiBuZy1jbGljaz0idG9nZ2xlV2FybmluZyh3YXJuaW5nLDEsMikiPg0KICAgICAgICAgICAgPGxhYmVsIGZvcj0ie3snZmlyc3Rfd2FybmluZ19yXzJfJyt3YXJuaW5nfX0iIGNsYXNzPSJ3YXJuaW5nLWxhYmxlIj57e3dhcm5pbmd9fTwvbGFiZWw+DQogICAgICAgICAgPC9kaXY+DQogICAgICAgIDwvZGl2Pg0KICAgICAgPC9kaXY+DQoNCiAgICA8L2Rpdj4NCiAgICA8IS0tIG1pZCBwYXJ0IHdpdGggdGltcmVzIGFuZCBtYXJrcyAtLT4NCiAgICA8ZGl2IGNsYXNzPSJjb2wtc20tNCI+DQogICAgICA8ZGl2IGNsYXNzPSJyb3ciPg0KICAgICAgICA8ZGl2IGNsYXNzPSJjbG9jayI+PC9kaXY+DQogICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0xMiBjb3JuZXItYm90aCI+DQogICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXNtLTEyIj4NCiAgICAgICAgICAgIDxoMSBjbGFzcz0icHVsbC1sZWZ0IGdhbWUtcG9pbnQiPnt7UGxheWVyMVNjb3JlfX08L2gxPg0KICAgICAgICAgICAgPGgxIGNsYXNzPSJwdWxsLXJpZ2h0IGdhbWUtcG9pbnQiPnt7UGxheWVyMlNjb3JlfX08L2gxPg0KICAgICAgICAgIDwvZGl2Pg0KICAgICAgICAgIDxidXR0b24gY2xhc3M9ImJ0biBidG4tYmxvY2sgc3RhcnQtYnV0dG9uIiBuZy1jbGFzcz0ieydidG4tc3VjY2Vzcyc6IWdhbWVSdW5uaW5nLCdidG4tZGFuZ2VyJzpnYW1lUnVubmluZ30iIG5nLWNsaWNrPSJ0b2dnbGVUaW1lcigpIj57e2dhbWVSdW5uaW5nPydTdG9wJzonU3RhcnQnfX08L2J1dHRvbj4NCiAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXRlZ29yeS1oZWFkaW5nLWNvbnRhaW5lciByb3ciPg0KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXNtLTEyIHRleHQtY2VudGVyIGNhdGVnb3J5LWhlYWRpbmciPldhcm5pbmcgQ2F0ZWdvcnkgMTwvZGl2Pg0KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXNtLTEyIHRleHQtY2VudGVyIGNhdGVnb3J5LWhlYWRpbmciPldhcm5pbmcgQ2F0ZWdvcnkgMjwvZGl2Pg0KICAgICAgICAgIDwvZGl2Pg0KICAgICAgICAgIDxwcm9ncmVzc2JhciBjbGFzcz0icHJvZ3Jlc3Mtc3RyaXBlZCBhY3RpdmUgdGltZW91dC1iYXIiIG1heD0iMTAwIiB2YWx1ZT0icGdyb2dyZXNzVmFsdWUiIHR5cGU9ImRhbmdlciIgbmctc2hvdz0ic2hvd1Byb2dyZXNzIj4NCiAgICAgICAgICAgIDxpPnt7cGdyb2dyZXNzVmFsdWV9fSAlPC9pPg0KICAgICAgICAgIDwvcHJvZ3Jlc3NiYXI+DQogICAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1ibG9jayBzdWJtaXQtYnV0dG9uIiBuZy1jbGljaz0ic3VibWl0KCkiPlN1Ym1pdDwvYnV0dG9uPg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KICAgIDwhLS0gYmx1ZSBjb3JuZXIgLS0+DQogICAgPGRpdiBjbGFzcz0iY29sLXNtLTQgYmx1ZS1jb3JuZXIgY29ybmVyIj4NCiAgICAgIDxoMSBjbGFzcz0iY29ybmVyLW5hbWUgdGV4dC1yaWdodCI+QWthPC9oMT4NCg0KICAgICAgPGRpdiBjbGFzcz0iaW5wdXQtZ3JvdXAiPg0KICAgICAgICA8aW5wdXQgdHlwZT0idGV4dCIgY2xhc3M9ImZvcm0tY29udHJvbCIgcGxhY2Vob2xkZXI9IlNlbGVjdCBQbGF5ZXIyIiBuZy1kaXNhYmxlZD0idHJ1ZSI+DQogICAgICAgIDxzcGFuIGNsYXNzPSJpbnB1dC1ncm91cC1hZGRvbiI+DQogICAgICAgICAgPHNwYW4gY2xhc3M9ImdseXBoaWNvbiBnbHlwaGljb24tdXNlciI+PC9zcGFuPg0KICAgICAgICA8L3NwYW4+DQogICAgICA8L2Rpdj4NCg0KICAgICAgPGRpdiBjbGFzcz0idGV4dC1yaWdodCBnYW1lLWJ1dHRvbnMiPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWRhbmdlciIgbmctY2xpY2s9ImluY3JlYXNlUG9pbnQoMiwxKSI+DQogICAgICAgICAgWXVrbyA8c3BhbiBjbGFzcz0iYmFkZ2UiPjE8L3NwYW4+DQogICAgICAgIDwvYnV0dG9uPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWRhbmdlciIgbmctY2xpY2s9ImluY3JlYXNlUG9pbnQoMiwyKSI+DQogICAgICAgICAgV2F6YS1hcmkgPHNwYW4gY2xhc3M9ImJhZGdlIj4yPC9zcGFuPg0KICAgICAgICA8L2J1dHRvbj4NCiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1kYW5nZXIiIG5nLWNsaWNrPSJpbmNyZWFzZVBvaW50KDIsMykiPg0KICAgICAgICAgIElwcG9uIDxzcGFuIGNsYXNzPSJiYWRnZSI+Mzwvc3Bhbj4NCiAgICAgICAgPC9idXR0b24+DQogICAgICA8L2Rpdj4NCg0KICAgICAgPGRpdiBjbGFzcz0idGV4dC1jZW50ZXIgdW5kby1idXR0b24iPg0KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWRhbmdlciIgbmctY2xpY2s9InVuZG8oMikiIHRpdGxlPSJVbmRvIGxhc3QiIG5nLWRpc2FibGVkPSJQbGF5ZXIyU2NvcmVBcnJheS5sZW5ndGggPT09IDAiPg0KICAgICAgICAgIDxpIGNsYXNzPSJmYSBmYS11bmRvIj48L2k+DQogICAgICAgICAgPCEtLSAgPHNwYW4gY2xhc3M9ImJhZGdlIj4xPC9zcGFuPiAtLT4NCiAgICAgICAgPC9idXR0b24+DQogICAgICA8L2Rpdj4NCg0KICAgICAgPGRpdiBjbGFzcz0id2FybmluZy1ob2xkZXIiPg0KICAgICAgICA8ZGl2IGNsYXNzPSJ3YXJuaW5nLWNvbnRyb2xzIGNvbC1zbS0xMiI+DQogICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXNtLTMgY2tib3ggY2tib3gtd2FybmluZyIgbmctcmVwZWF0PSJ3YXJuaW5nIGluIHdhcm5pbmdBcnJheSI+DQogICAgICAgICAgICA8aW5wdXQgdHlwZT0iY2hlY2tib3giIGlkPSJ7eydmaXJzdF93YXJuaW5nX2JfJyt3YXJuaW5nfX0iIG5nLWNoZWNrZWQ9InBsYXllcjJXYXJuaW5nQXJyYXkxLmluZGV4T2Yod2FybmluZykgPiAtMSIgbmctY2xpY2s9InRvZ2dsZVdhcm5pbmcod2FybmluZywyLDEpIj4NCiAgICAgICAgICAgIDxsYWJlbCBmb3I9Int7J2ZpcnN0X3dhcm5pbmdfYl8nK3dhcm5pbmd9fSIgY2xhc3M9Indhcm5pbmctbGFibGUiPnt7d2FybmluZ319PC9sYWJlbD4NCiAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgPC9kaXY+DQoNCiAgICAgICAgPGRpdiBjbGFzcz0id2FybmluZy1jb250cm9scyBjb2wtc20tMTIiPg0KICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1zbS0zIGNrYm94IGNrYm94LXdhcm5pbmciIG5nLXJlcGVhdD0id2FybmluZyBpbiB3YXJuaW5nQXJyYXkiPg0KICAgICAgICAgICAgPGlucHV0IHR5cGU9ImNoZWNrYm94IiBpZD0ie3snZmlyc3Rfd2FybmluZ19iXzJfJyt3YXJuaW5nfX0iIG5nLWNoZWNrZWQ9InBsYXllcjJXYXJuaW5nQXJyYXkyLmluZGV4T2Yod2FybmluZykgPiAtMSIgbmctY2xpY2s9InRvZ2dsZVdhcm5pbmcod2FybmluZywyLDIpIj4NCiAgICAgICAgICAgIDxsYWJlbCBmb3I9Int7J2ZpcnN0X3dhcm5pbmdfYl8yXycrd2FybmluZ319IiBjbGFzcz0id2FybmluZy1sYWJsZSI+e3t3YXJuaW5nfX08L2xhYmVsPg0KICAgICAgICAgIDwvZGl2Pg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KDQogICAgPC9kaXY+DQogIDwvZGl2Pg0KICA8IS0tcm93IC0tPg0KPC9kaXY+DQo8IS0tIGNvbnRlbnRwYW5lbCAtLT4NCg==","base64"),
                     controller: 'dojoMatCtrl'
                 }
             }
@@ -1007,7 +2358,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../../util":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\index.js","buffer":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\index.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\config\\index.js":[function(require,module,exports){
+},{"../../util":"C:\\xampp\\htdocs\\hikick-india\\app\\util\\index.js","buffer":"C:\\Users\\arup\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\buffer\\index.js"}],"C:\\xampp\\htdocs\\hikick-india\\app\\config\\index.js":[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -1122,7 +2473,7 @@ module.exports = {
     }]
 };
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\lang\\index.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\lang\\index.js":[function(require,module,exports){
 'use strict';
 var lang = {
     validationMessages: {
@@ -1188,7 +2539,7 @@ var lang = {
 };
 module.exports = lang;
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\api.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\util\\api.js":[function(require,module,exports){
 'use strict';
 
 var baseUrl = '/api';
@@ -1203,9 +2554,12 @@ module.exports = {
     //participant
     add: baseUrl + '/participant/add',
     clubs: baseUrl + '/participant/clubs',
+
+    //shedules
+    sheduleGame: baseUrl + '/shedule/status'
 };
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\util\\index.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\app\\util\\index.js":[function(require,module,exports){
 'use strict';
 
 module.exports={
@@ -1229,7 +2583,7 @@ module.exports={
 	}
 			
 };
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\index.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\index.js":[function(require,module,exports){
 window.name = "NG_DEFER_BOOTSTRAP!";
 
 //window._ = require('underscore');
@@ -1265,7 +2619,7 @@ angular.element().ready(function() {
     angular.resumeBootstrap([App['name']]);
 });
 
-},{"./app/application/app.module":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\application\\app.module.js","./app/lang":"C:\\xampp\\htdocs\\angular\\hikick-india\\app\\lang\\index.js","angular":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\angular\\angular.js","angular-bootstrap":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\angular-bootstrap\\ui-bootstrap.js","angular-ui-router":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\angular-ui-router\\release\\angular-ui-router.js","bootstrap":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js","custom":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\custom.js","flipclock":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\flipclock\\flipclock.min.js","jquery":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js","jqueryCookies":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js","jqueryMigrate":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","jquerySparkline":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js","jqueryUi":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","jqueryValidate":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.validate.min.js","modernizr":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js","mouseWheel":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.mousewheel.js","ng-tags-input":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\ng-tags-input\\build\\ng-tags-input.min.js","retina":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js","toggles":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\angular-bootstrap\\ui-bootstrap.js":[function(require,module,exports){
+},{"./app/application/app.module":"C:\\xampp\\htdocs\\hikick-india\\app\\application\\app.module.js","./app/lang":"C:\\xampp\\htdocs\\hikick-india\\app\\lang\\index.js","angular":"C:\\xampp\\htdocs\\hikick-india\\node_modules\\angular\\angular.js","angular-bootstrap":"C:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-bootstrap\\ui-bootstrap.js","angular-ui-router":"C:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-ui-router\\release\\angular-ui-router.js","bootstrap":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js","custom":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\custom.js","flipclock":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\flipclock\\flipclock.min.js","jquery":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js","jqueryCookies":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js","jqueryMigrate":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","jquerySparkline":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js","jqueryUi":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","jqueryValidate":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.validate.min.js","modernizr":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js","mouseWheel":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.mousewheel.js","ng-tags-input":"C:\\xampp\\htdocs\\hikick-india\\node_modules\\ng-tags-input\\build\\ng-tags-input.min.js","retina":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js","toggles":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-bootstrap\\ui-bootstrap.js":[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -5383,7 +6737,7 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "</ul>");
 }]);
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\angular-ui-router\\release\\angular-ui-router.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\node_modules\\angular-ui-router\\release\\angular-ui-router.js":[function(require,module,exports){
 /**
  * State-based routing for AngularJS
  * @version v0.2.11
@@ -9043,7 +10397,7 @@ angular.module('ui.router.state')
   .filter('includedByState', $IncludedByStateFilter);
 })(window, window.angular);
 
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\angular\\angular.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\node_modules\\angular\\angular.js":[function(require,module,exports){
 /**
  * @license AngularJS v1.3.4
  * (c) 2010-2014 Google, Inc. http://angularjs.org
@@ -34959,1308 +36313,12 @@ var styleDirective = valueFn({
 })(window, document);
 
 !window.angular.$$csp() && window.angular.element(document).find('head').prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}</style>');
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\index.js":[function(require,module,exports){
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-
-var base64 = require('base64-js')
-var ieee754 = require('ieee754')
-var isArray = require('is-array')
-
-exports.Buffer = Buffer
-exports.SlowBuffer = Buffer
-exports.INSPECT_MAX_BYTES = 50
-Buffer.poolSize = 8192 // not used by this implementation
-
-var kMaxLength = 0x3fffffff
-
-/**
- * If `Buffer.TYPED_ARRAY_SUPPORT`:
- *   === true    Use Uint8Array implementation (fastest)
- *   === false   Use Object implementation (most compatible, even IE6)
- *
- * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
- * Opera 11.6+, iOS 4.2+.
- *
- * Note:
- *
- * - Implementation must support adding new properties to `Uint8Array` instances.
- *   Firefox 4-29 lacked support, fixed in Firefox 30+.
- *   See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
- *
- *  - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
- *
- *  - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
- *    incorrect length in some situations.
- *
- * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they will
- * get the Object implementation, which is slower but will work correctly.
- */
-Buffer.TYPED_ARRAY_SUPPORT = (function () {
-  try {
-    var buf = new ArrayBuffer(0)
-    var arr = new Uint8Array(buf)
-    arr.foo = function () { return 42 }
-    return 42 === arr.foo() && // typed array instances can be augmented
-        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
-        new Uint8Array(1).subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
-  } catch (e) {
-    return false
-  }
-})()
-
-/**
- * Class: Buffer
- * =============
- *
- * The Buffer constructor returns instances of `Uint8Array` that are augmented
- * with function properties for all the node `Buffer` API functions. We use
- * `Uint8Array` so that square bracket notation works as expected -- it returns
- * a single octet.
- *
- * By augmenting the instances, we can avoid modifying the `Uint8Array`
- * prototype.
- */
-function Buffer (subject, encoding, noZero) {
-  if (!(this instanceof Buffer))
-    return new Buffer(subject, encoding, noZero)
-
-  var type = typeof subject
-
-  // Find the length
-  var length
-  if (type === 'number')
-    length = subject > 0 ? subject >>> 0 : 0
-  else if (type === 'string') {
-    if (encoding === 'base64')
-      subject = base64clean(subject)
-    length = Buffer.byteLength(subject, encoding)
-  } else if (type === 'object' && subject !== null) { // assume object is array-like
-    if (subject.type === 'Buffer' && isArray(subject.data))
-      subject = subject.data
-    length = +subject.length > 0 ? Math.floor(+subject.length) : 0
-  } else
-    throw new TypeError('must start with number, buffer, array or string')
-
-  if (this.length > kMaxLength)
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-      'size: 0x' + kMaxLength.toString(16) + ' bytes')
-
-  var buf
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    // Preferred: Return an augmented `Uint8Array` instance for best performance
-    buf = Buffer._augment(new Uint8Array(length))
-  } else {
-    // Fallback: Return THIS instance of Buffer (created by `new`)
-    buf = this
-    buf.length = length
-    buf._isBuffer = true
-  }
-
-  var i
-  if (Buffer.TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
-    // Speed optimization -- use set if we're copying from a typed array
-    buf._set(subject)
-  } else if (isArrayish(subject)) {
-    // Treat array-ish objects as a byte array
-    if (Buffer.isBuffer(subject)) {
-      for (i = 0; i < length; i++)
-        buf[i] = subject.readUInt8(i)
-    } else {
-      for (i = 0; i < length; i++)
-        buf[i] = ((subject[i] % 256) + 256) % 256
-    }
-  } else if (type === 'string') {
-    buf.write(subject, 0, encoding)
-  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT && !noZero) {
-    for (i = 0; i < length; i++) {
-      buf[i] = 0
-    }
-  }
-
-  return buf
-}
-
-Buffer.isBuffer = function (b) {
-  return !!(b != null && b._isBuffer)
-}
-
-Buffer.compare = function (a, b) {
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b))
-    throw new TypeError('Arguments must be Buffers')
-
-  var x = a.length
-  var y = b.length
-  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
-  if (i !== len) {
-    x = a[i]
-    y = b[i]
-  }
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
-
-Buffer.isEncoding = function (encoding) {
-  switch (String(encoding).toLowerCase()) {
-    case 'hex':
-    case 'utf8':
-    case 'utf-8':
-    case 'ascii':
-    case 'binary':
-    case 'base64':
-    case 'raw':
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      return true
-    default:
-      return false
-  }
-}
-
-Buffer.concat = function (list, totalLength) {
-  if (!isArray(list)) throw new TypeError('Usage: Buffer.concat(list[, length])')
-
-  if (list.length === 0) {
-    return new Buffer(0)
-  } else if (list.length === 1) {
-    return list[0]
-  }
-
-  var i
-  if (totalLength === undefined) {
-    totalLength = 0
-    for (i = 0; i < list.length; i++) {
-      totalLength += list[i].length
-    }
-  }
-
-  var buf = new Buffer(totalLength)
-  var pos = 0
-  for (i = 0; i < list.length; i++) {
-    var item = list[i]
-    item.copy(buf, pos)
-    pos += item.length
-  }
-  return buf
-}
-
-Buffer.byteLength = function (str, encoding) {
-  var ret
-  str = str + ''
-  switch (encoding || 'utf8') {
-    case 'ascii':
-    case 'binary':
-    case 'raw':
-      ret = str.length
-      break
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      ret = str.length * 2
-      break
-    case 'hex':
-      ret = str.length >>> 1
-      break
-    case 'utf8':
-    case 'utf-8':
-      ret = utf8ToBytes(str).length
-      break
-    case 'base64':
-      ret = base64ToBytes(str).length
-      break
-    default:
-      ret = str.length
-  }
-  return ret
-}
-
-// pre-set for values that may exist in the future
-Buffer.prototype.length = undefined
-Buffer.prototype.parent = undefined
-
-// toString(encoding, start=0, end=buffer.length)
-Buffer.prototype.toString = function (encoding, start, end) {
-  var loweredCase = false
-
-  start = start >>> 0
-  end = end === undefined || end === Infinity ? this.length : end >>> 0
-
-  if (!encoding) encoding = 'utf8'
-  if (start < 0) start = 0
-  if (end > this.length) end = this.length
-  if (end <= start) return ''
-
-  while (true) {
-    switch (encoding) {
-      case 'hex':
-        return hexSlice(this, start, end)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Slice(this, start, end)
-
-      case 'ascii':
-        return asciiSlice(this, start, end)
-
-      case 'binary':
-        return binarySlice(this, start, end)
-
-      case 'base64':
-        return base64Slice(this, start, end)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return utf16leSlice(this, start, end)
-
-      default:
-        if (loweredCase)
-          throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = (encoding + '').toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-
-Buffer.prototype.equals = function (b) {
-  if(!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b) === 0
-}
-
-Buffer.prototype.inspect = function () {
-  var str = ''
-  var max = exports.INSPECT_MAX_BYTES
-  if (this.length > 0) {
-    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
-    if (this.length > max)
-      str += ' ... '
-  }
-  return '<Buffer ' + str + '>'
-}
-
-Buffer.prototype.compare = function (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b)
-}
-
-// `get` will be removed in Node 0.13+
-Buffer.prototype.get = function (offset) {
-  console.log('.get() is deprecated. Access using array indexes instead.')
-  return this.readUInt8(offset)
-}
-
-// `set` will be removed in Node 0.13+
-Buffer.prototype.set = function (v, offset) {
-  console.log('.set() is deprecated. Access using array indexes instead.')
-  return this.writeUInt8(v, offset)
-}
-
-function hexWrite (buf, string, offset, length) {
-  offset = Number(offset) || 0
-  var remaining = buf.length - offset
-  if (!length) {
-    length = remaining
-  } else {
-    length = Number(length)
-    if (length > remaining) {
-      length = remaining
-    }
-  }
-
-  // must be an even number of digits
-  var strLen = string.length
-  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
-
-  if (length > strLen / 2) {
-    length = strLen / 2
-  }
-  for (var i = 0; i < length; i++) {
-    var byte = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(byte)) throw new Error('Invalid hex string')
-    buf[offset + i] = byte
-  }
-  return i
-}
-
-function utf8Write (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf8ToBytes(string), buf, offset, length)
-  return charsWritten
-}
-
-function asciiWrite (buf, string, offset, length) {
-  var charsWritten = blitBuffer(asciiToBytes(string), buf, offset, length)
-  return charsWritten
-}
-
-function binaryWrite (buf, string, offset, length) {
-  return asciiWrite(buf, string, offset, length)
-}
-
-function base64Write (buf, string, offset, length) {
-  var charsWritten = blitBuffer(base64ToBytes(string), buf, offset, length)
-  return charsWritten
-}
-
-function utf16leWrite (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf16leToBytes(string), buf, offset, length)
-  return charsWritten
-}
-
-Buffer.prototype.write = function (string, offset, length, encoding) {
-  // Support both (string, offset, length, encoding)
-  // and the legacy (string, encoding, offset, length)
-  if (isFinite(offset)) {
-    if (!isFinite(length)) {
-      encoding = length
-      length = undefined
-    }
-  } else {  // legacy
-    var swap = encoding
-    encoding = offset
-    offset = length
-    length = swap
-  }
-
-  offset = Number(offset) || 0
-  var remaining = this.length - offset
-  if (!length) {
-    length = remaining
-  } else {
-    length = Number(length)
-    if (length > remaining) {
-      length = remaining
-    }
-  }
-  encoding = String(encoding || 'utf8').toLowerCase()
-
-  var ret
-  switch (encoding) {
-    case 'hex':
-      ret = hexWrite(this, string, offset, length)
-      break
-    case 'utf8':
-    case 'utf-8':
-      ret = utf8Write(this, string, offset, length)
-      break
-    case 'ascii':
-      ret = asciiWrite(this, string, offset, length)
-      break
-    case 'binary':
-      ret = binaryWrite(this, string, offset, length)
-      break
-    case 'base64':
-      ret = base64Write(this, string, offset, length)
-      break
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      ret = utf16leWrite(this, string, offset, length)
-      break
-    default:
-      throw new TypeError('Unknown encoding: ' + encoding)
-  }
-  return ret
-}
-
-Buffer.prototype.toJSON = function () {
-  return {
-    type: 'Buffer',
-    data: Array.prototype.slice.call(this._arr || this, 0)
-  }
-}
-
-function base64Slice (buf, start, end) {
-  if (start === 0 && end === buf.length) {
-    return base64.fromByteArray(buf)
-  } else {
-    return base64.fromByteArray(buf.slice(start, end))
-  }
-}
-
-function utf8Slice (buf, start, end) {
-  var res = ''
-  var tmp = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; i++) {
-    if (buf[i] <= 0x7F) {
-      res += decodeUtf8Char(tmp) + String.fromCharCode(buf[i])
-      tmp = ''
-    } else {
-      tmp += '%' + buf[i].toString(16)
-    }
-  }
-
-  return res + decodeUtf8Char(tmp)
-}
-
-function asciiSlice (buf, start, end) {
-  var ret = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; i++) {
-    ret += String.fromCharCode(buf[i])
-  }
-  return ret
-}
-
-function binarySlice (buf, start, end) {
-  return asciiSlice(buf, start, end)
-}
-
-function hexSlice (buf, start, end) {
-  var len = buf.length
-
-  if (!start || start < 0) start = 0
-  if (!end || end < 0 || end > len) end = len
-
-  var out = ''
-  for (var i = start; i < end; i++) {
-    out += toHex(buf[i])
-  }
-  return out
-}
-
-function utf16leSlice (buf, start, end) {
-  var bytes = buf.slice(start, end)
-  var res = ''
-  for (var i = 0; i < bytes.length; i += 2) {
-    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
-  }
-  return res
-}
-
-Buffer.prototype.slice = function (start, end) {
-  var len = this.length
-  start = ~~start
-  end = end === undefined ? len : ~~end
-
-  if (start < 0) {
-    start += len;
-    if (start < 0)
-      start = 0
-  } else if (start > len) {
-    start = len
-  }
-
-  if (end < 0) {
-    end += len
-    if (end < 0)
-      end = 0
-  } else if (end > len) {
-    end = len
-  }
-
-  if (end < start)
-    end = start
-
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    return Buffer._augment(this.subarray(start, end))
-  } else {
-    var sliceLen = end - start
-    var newBuf = new Buffer(sliceLen, undefined, true)
-    for (var i = 0; i < sliceLen; i++) {
-      newBuf[i] = this[i + start]
-    }
-    return newBuf
-  }
-}
-
-/*
- * Need to make sure that buffer isn't trying to write out of bounds.
- */
-function checkOffset (offset, ext, length) {
-  if ((offset % 1) !== 0 || offset < 0)
-    throw new RangeError('offset is not uint')
-  if (offset + ext > length)
-    throw new RangeError('Trying to access beyond buffer length')
-}
-
-Buffer.prototype.readUInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
-  return this[offset]
-}
-
-Buffer.prototype.readUInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  return this[offset] | (this[offset + 1] << 8)
-}
-
-Buffer.prototype.readUInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  return (this[offset] << 8) | this[offset + 1]
-}
-
-Buffer.prototype.readUInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return ((this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16)) +
-      (this[offset + 3] * 0x1000000)
-}
-
-Buffer.prototype.readUInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset] * 0x1000000) +
-      ((this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      this[offset + 3])
-}
-
-Buffer.prototype.readInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
-  if (!(this[offset] & 0x80))
-    return (this[offset])
-  return ((0xff - this[offset] + 1) * -1)
-}
-
-Buffer.prototype.readInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  var val = this[offset] | (this[offset + 1] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  var val = this[offset + 1] | (this[offset] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16) |
-      (this[offset + 3] << 24)
-}
-
-Buffer.prototype.readInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset] << 24) |
-      (this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      (this[offset + 3])
-}
-
-Buffer.prototype.readFloatLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, true, 23, 4)
-}
-
-Buffer.prototype.readFloatBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, false, 23, 4)
-}
-
-Buffer.prototype.readDoubleLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, true, 52, 8)
-}
-
-Buffer.prototype.readDoubleBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, false, 52, 8)
-}
-
-function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new TypeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new TypeError('index out of range')
-}
-
-Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0xff, 0)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
-  this[offset] = value
-  return offset + 1
-}
-
-function objectWriteUInt16 (buf, value, offset, littleEndian) {
-  if (value < 0) value = 0xffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
-    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
-      (littleEndian ? i : 1 - i) * 8
-  }
-}
-
-Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
-  return offset + 2
-}
-
-Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 8)
-    this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
-  return offset + 2
-}
-
-function objectWriteUInt32 (buf, value, offset, littleEndian) {
-  if (value < 0) value = 0xffffffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
-    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
-  }
-}
-
-Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset + 3] = (value >>> 24)
-    this[offset + 2] = (value >>> 16)
-    this[offset + 1] = (value >>> 8)
-    this[offset] = value
-  } else objectWriteUInt32(this, value, offset, true)
-  return offset + 4
-}
-
-Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 24)
-    this[offset + 1] = (value >>> 16)
-    this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
-  return offset + 4
-}
-
-Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0x7f, -0x80)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
-  if (value < 0) value = 0xff + value + 1
-  this[offset] = value
-  return offset + 1
-}
-
-Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 8)
-    this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-    this[offset + 2] = (value >>> 16)
-    this[offset + 3] = (value >>> 24)
-  } else objectWriteUInt32(this, value, offset, true)
-  return offset + 4
-}
-
-Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (value < 0) value = 0xffffffff + value + 1
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 24)
-    this[offset + 1] = (value >>> 16)
-    this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
-  return offset + 4
-}
-
-function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (value > max || value < min) throw new TypeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new TypeError('index out of range')
-}
-
-function writeFloat (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
-    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
-  ieee754.write(buf, value, offset, littleEndian, 23, 4)
-  return offset + 4
-}
-
-Buffer.prototype.writeFloatLE = function (value, offset, noAssert) {
-  return writeFloat(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
-  return writeFloat(this, value, offset, false, noAssert)
-}
-
-function writeDouble (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
-    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
-  ieee754.write(buf, value, offset, littleEndian, 52, 8)
-  return offset + 8
-}
-
-Buffer.prototype.writeDoubleLE = function (value, offset, noAssert) {
-  return writeDouble(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
-  return writeDouble(this, value, offset, false, noAssert)
-}
-
-// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
-Buffer.prototype.copy = function (target, target_start, start, end) {
-  var source = this
-
-  if (!start) start = 0
-  if (!end && end !== 0) end = this.length
-  if (!target_start) target_start = 0
-
-  // Copy 0 bytes; we're done
-  if (end === start) return
-  if (target.length === 0 || source.length === 0) return
-
-  // Fatal error conditions
-  if (end < start) throw new TypeError('sourceEnd < sourceStart')
-  if (target_start < 0 || target_start >= target.length)
-    throw new TypeError('targetStart out of bounds')
-  if (start < 0 || start >= source.length) throw new TypeError('sourceStart out of bounds')
-  if (end < 0 || end > source.length) throw new TypeError('sourceEnd out of bounds')
-
-  // Are we oob?
-  if (end > this.length)
-    end = this.length
-  if (target.length - target_start < end - start)
-    end = target.length - target_start + start
-
-  var len = end - start
-
-  if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
-    for (var i = 0; i < len; i++) {
-      target[i + target_start] = this[i + start]
-    }
-  } else {
-    target._set(this.subarray(start, start + len), target_start)
-  }
-}
-
-// fill(value, start=0, end=buffer.length)
-Buffer.prototype.fill = function (value, start, end) {
-  if (!value) value = 0
-  if (!start) start = 0
-  if (!end) end = this.length
-
-  if (end < start) throw new TypeError('end < start')
-
-  // Fill 0 bytes; we're done
-  if (end === start) return
-  if (this.length === 0) return
-
-  if (start < 0 || start >= this.length) throw new TypeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new TypeError('end out of bounds')
-
-  var i
-  if (typeof value === 'number') {
-    for (i = start; i < end; i++) {
-      this[i] = value
-    }
-  } else {
-    var bytes = utf8ToBytes(value.toString())
-    var len = bytes.length
-    for (i = start; i < end; i++) {
-      this[i] = bytes[i % len]
-    }
-  }
-
-  return this
-}
-
-/**
- * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
- * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
- */
-Buffer.prototype.toArrayBuffer = function () {
-  if (typeof Uint8Array !== 'undefined') {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      return (new Buffer(this)).buffer
-    } else {
-      var buf = new Uint8Array(this.length)
-      for (var i = 0, len = buf.length; i < len; i += 1) {
-        buf[i] = this[i]
-      }
-      return buf.buffer
-    }
-  } else {
-    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
-  }
-}
-
-// HELPER FUNCTIONS
-// ================
-
-var BP = Buffer.prototype
-
-/**
- * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
- */
-Buffer._augment = function (arr) {
-  arr.constructor = Buffer
-  arr._isBuffer = true
-
-  // save reference to original Uint8Array get/set methods before overwriting
-  arr._get = arr.get
-  arr._set = arr.set
-
-  // deprecated, will be removed in node 0.13+
-  arr.get = BP.get
-  arr.set = BP.set
-
-  arr.write = BP.write
-  arr.toString = BP.toString
-  arr.toLocaleString = BP.toString
-  arr.toJSON = BP.toJSON
-  arr.equals = BP.equals
-  arr.compare = BP.compare
-  arr.copy = BP.copy
-  arr.slice = BP.slice
-  arr.readUInt8 = BP.readUInt8
-  arr.readUInt16LE = BP.readUInt16LE
-  arr.readUInt16BE = BP.readUInt16BE
-  arr.readUInt32LE = BP.readUInt32LE
-  arr.readUInt32BE = BP.readUInt32BE
-  arr.readInt8 = BP.readInt8
-  arr.readInt16LE = BP.readInt16LE
-  arr.readInt16BE = BP.readInt16BE
-  arr.readInt32LE = BP.readInt32LE
-  arr.readInt32BE = BP.readInt32BE
-  arr.readFloatLE = BP.readFloatLE
-  arr.readFloatBE = BP.readFloatBE
-  arr.readDoubleLE = BP.readDoubleLE
-  arr.readDoubleBE = BP.readDoubleBE
-  arr.writeUInt8 = BP.writeUInt8
-  arr.writeUInt16LE = BP.writeUInt16LE
-  arr.writeUInt16BE = BP.writeUInt16BE
-  arr.writeUInt32LE = BP.writeUInt32LE
-  arr.writeUInt32BE = BP.writeUInt32BE
-  arr.writeInt8 = BP.writeInt8
-  arr.writeInt16LE = BP.writeInt16LE
-  arr.writeInt16BE = BP.writeInt16BE
-  arr.writeInt32LE = BP.writeInt32LE
-  arr.writeInt32BE = BP.writeInt32BE
-  arr.writeFloatLE = BP.writeFloatLE
-  arr.writeFloatBE = BP.writeFloatBE
-  arr.writeDoubleLE = BP.writeDoubleLE
-  arr.writeDoubleBE = BP.writeDoubleBE
-  arr.fill = BP.fill
-  arr.inspect = BP.inspect
-  arr.toArrayBuffer = BP.toArrayBuffer
-
-  return arr
-}
-
-var INVALID_BASE64_RE = /[^+\/0-9A-z]/g
-
-function base64clean (str) {
-  // Node strips out invalid characters like \n and \t from the string, base64-js does not
-  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
-  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
-  while (str.length % 4 !== 0) {
-    str = str + '='
-  }
-  return str
-}
-
-function stringtrim (str) {
-  if (str.trim) return str.trim()
-  return str.replace(/^\s+|\s+$/g, '')
-}
-
-function isArrayish (subject) {
-  return isArray(subject) || Buffer.isBuffer(subject) ||
-      subject && typeof subject === 'object' &&
-      typeof subject.length === 'number'
-}
-
-function toHex (n) {
-  if (n < 16) return '0' + n.toString(16)
-  return n.toString(16)
-}
-
-function utf8ToBytes (str) {
-  var byteArray = []
-  for (var i = 0; i < str.length; i++) {
-    var b = str.charCodeAt(i)
-    if (b <= 0x7F) {
-      byteArray.push(b)
-    } else {
-      var start = i
-      if (b >= 0xD800 && b <= 0xDFFF) i++
-      var h = encodeURIComponent(str.slice(start, i+1)).substr(1).split('%')
-      for (var j = 0; j < h.length; j++) {
-        byteArray.push(parseInt(h[j], 16))
-      }
-    }
-  }
-  return byteArray
-}
-
-function asciiToBytes (str) {
-  var byteArray = []
-  for (var i = 0; i < str.length; i++) {
-    // Node's code seems to be doing this and not & 0x7F..
-    byteArray.push(str.charCodeAt(i) & 0xFF)
-  }
-  return byteArray
-}
-
-function utf16leToBytes (str) {
-  var c, hi, lo
-  var byteArray = []
-  for (var i = 0; i < str.length; i++) {
-    c = str.charCodeAt(i)
-    hi = c >> 8
-    lo = c % 256
-    byteArray.push(lo)
-    byteArray.push(hi)
-  }
-
-  return byteArray
-}
-
-function base64ToBytes (str) {
-  return base64.toByteArray(str)
-}
-
-function blitBuffer (src, dst, offset, length) {
-  for (var i = 0; i < length; i++) {
-    if ((i + offset >= dst.length) || (i >= src.length))
-      break
-    dst[i + offset] = src[i]
-  }
-  return i
-}
-
-function decodeUtf8Char (str) {
-  try {
-    return decodeURIComponent(str)
-  } catch (err) {
-    return String.fromCharCode(0xFFFD) // UTF 8 invalid char
-  }
-}
-
-},{"base64-js":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js","ieee754":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js","is-array":"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js":[function(require,module,exports){
-var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-;(function (exports) {
-	'use strict';
-
-  var Arr = (typeof Uint8Array !== 'undefined')
-    ? Uint8Array
-    : Array
-
-	var PLUS   = '+'.charCodeAt(0)
-	var SLASH  = '/'.charCodeAt(0)
-	var NUMBER = '0'.charCodeAt(0)
-	var LOWER  = 'a'.charCodeAt(0)
-	var UPPER  = 'A'.charCodeAt(0)
-
-	function decode (elt) {
-		var code = elt.charCodeAt(0)
-		if (code === PLUS)
-			return 62 // '+'
-		if (code === SLASH)
-			return 63 // '/'
-		if (code < NUMBER)
-			return -1 //no match
-		if (code < NUMBER + 10)
-			return code - NUMBER + 26 + 26
-		if (code < UPPER + 26)
-			return code - UPPER
-		if (code < LOWER + 26)
-			return code - LOWER + 26
-	}
-
-	function b64ToByteArray (b64) {
-		var i, j, l, tmp, placeHolders, arr
-
-		if (b64.length % 4 > 0) {
-			throw new Error('Invalid string. Length must be a multiple of 4')
-		}
-
-		// the number of equal signs (place holders)
-		// if there are two placeholders, than the two characters before it
-		// represent one byte
-		// if there is only one, then the three characters before it represent 2 bytes
-		// this is just a cheap hack to not do indexOf twice
-		var len = b64.length
-		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
-
-		// base64 is 4/3 + up to two characters of the original data
-		arr = new Arr(b64.length * 3 / 4 - placeHolders)
-
-		// if there are placeholders, only get up to the last complete 4 chars
-		l = placeHolders > 0 ? b64.length - 4 : b64.length
-
-		var L = 0
-
-		function push (v) {
-			arr[L++] = v
-		}
-
-		for (i = 0, j = 0; i < l; i += 4, j += 3) {
-			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
-			push((tmp & 0xFF0000) >> 16)
-			push((tmp & 0xFF00) >> 8)
-			push(tmp & 0xFF)
-		}
-
-		if (placeHolders === 2) {
-			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
-			push(tmp & 0xFF)
-		} else if (placeHolders === 1) {
-			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
-			push((tmp >> 8) & 0xFF)
-			push(tmp & 0xFF)
-		}
-
-		return arr
-	}
-
-	function uint8ToBase64 (uint8) {
-		var i,
-			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
-			output = "",
-			temp, length
-
-		function encode (num) {
-			return lookup.charAt(num)
-		}
-
-		function tripletToBase64 (num) {
-			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
-		}
-
-		// go through the array every three bytes, we'll deal with trailing stuff later
-		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-			output += tripletToBase64(temp)
-		}
-
-		// pad the end with zeros, but make sure to not forget the extra bytes
-		switch (extraBytes) {
-			case 1:
-				temp = uint8[uint8.length - 1]
-				output += encode(temp >> 2)
-				output += encode((temp << 4) & 0x3F)
-				output += '=='
-				break
-			case 2:
-				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
-				output += encode(temp >> 10)
-				output += encode((temp >> 4) & 0x3F)
-				output += encode((temp << 2) & 0x3F)
-				output += '='
-				break
-		}
-
-		return output
-	}
-
-	exports.toByteArray = b64ToByteArray
-	exports.fromByteArray = uint8ToBase64
-}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
-
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js":[function(require,module,exports){
-exports.read = function(buffer, offset, isLE, mLen, nBytes) {
-  var e, m,
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      nBits = -7,
-      i = isLE ? (nBytes - 1) : 0,
-      d = isLE ? -1 : 1,
-      s = buffer[offset + i];
-
-  i += d;
-
-  e = s & ((1 << (-nBits)) - 1);
-  s >>= (-nBits);
-  nBits += eLen;
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-  m = e & ((1 << (-nBits)) - 1);
-  e >>= (-nBits);
-  nBits += mLen;
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-  if (e === 0) {
-    e = 1 - eBias;
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity);
-  } else {
-    m = m + Math.pow(2, mLen);
-    e = e - eBias;
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-};
-
-exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c,
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
-      i = isLE ? 0 : (nBytes - 1),
-      d = isLE ? 1 : -1,
-      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
-
-  value = Math.abs(value);
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0;
-    e = eMax;
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2);
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--;
-      c *= 2;
-    }
-    if (e + eBias >= 1) {
-      value += rt / c;
-    } else {
-      value += rt * Math.pow(2, 1 - eBias);
-    }
-    if (value * c >= 2) {
-      e++;
-      c /= 2;
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0;
-      e = eMax;
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen);
-      e = e + eBias;
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-      e = 0;
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
-
-  e = (e << mLen) | m;
-  eLen += mLen;
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
-
-  buffer[offset + i - d] |= s * 128;
-};
-
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js":[function(require,module,exports){
-
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
-};
-
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\node_modules\\ng-tags-input\\build\\ng-tags-input.min.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\node_modules\\ng-tags-input\\build\\ng-tags-input.min.js":[function(require,module,exports){
 /*! ngTagsInput v2.1.1-1 License: MIT */!function(){"use strict";function a(){var a={};return{on:function(b,c){return b.split(" ").forEach(function(b){a[b]||(a[b]=[]),a[b].push(c)}),this},trigger:function(b,c){return angular.forEach(a[b],function(a){a.call(null,c)}),this}}}function b(a,b){return a=a||[],a.length>0&&!angular.isObject(a[0])&&a.forEach(function(c,d){a[d]={},a[d][b]=c}),a}function c(a,b,c){for(var d=null,f=0;f<a.length;f++)if(e(a[f][c]).toLowerCase()===e(b[c]).toLowerCase()){d=a[f];break}return d}function d(a,b,c){if(!b)return a;var d=b.replace(/([.?*+^$[\]\\(){}|-])/g,"\\$1");return a.replace(new RegExp(d,"gi"),c)}function e(a){return angular.isUndefined(a)||null==a?"":a.toString().trim()}function f(a){return a.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}var g={backspace:8,tab:9,enter:13,escape:27,space:32,up:38,down:40,comma:188},h=9007199254740991,i=["text","email","url"],j=angular.module("ngTagsInput",[]);j.directive("tagsInput",["$timeout","$document","tagsInputConfig",function(d,f,j){function k(a,b){var d,f,g,h={};return d=function(b){return e(b[a.displayProperty])},f=function(b,c){b[a.displayProperty]=c},g=function(b){var e=d(b);return e&&e.length>=a.minLength&&e.length<=a.maxLength&&a.allowedTagsPattern.test(e)&&!c(h.items,b,a.displayProperty)},h.items=[],h.addText=function(a){var b={};return f(b,a),h.add(b)},h.add=function(c){var e=d(c);return a.replaceSpacesWithDashes&&(e=e.replace(/\s/g,"-")),f(c,e),g(c)?(h.items.push(c),b.trigger("tag-added",{$tag:c})):e&&b.trigger("invalid-tag",{$tag:c}),c},h.remove=function(a){var c=h.items.splice(a,1)[0];return b.trigger("tag-removed",{$tag:c}),c},h.removeLast=function(){var b,c=h.items.length-1;return a.enableEditingLastTag||h.selected?(h.selected=null,b=h.remove(c)):h.selected||(h.selected=h.items[c]),b},h}function l(a){return-1!==i.indexOf(a)}return{restrict:"E",require:"ngModel",scope:{tags:"=ngModel",onTagAdded:"&",onTagRemoved:"&"},replace:!1,transclude:!0,templateUrl:"ngTagsInput/tags-input.html",controller:["$scope","$attrs","$element",function(b,c,d){b.events=new a,j.load("tagsInput",b,c,{type:[String,"text",l],placeholder:[String,"Add a tag"],tabindex:[Number,null],removeTagSymbol:[String,String.fromCharCode(215)],replaceSpacesWithDashes:[Boolean,!0],minLength:[Number,3],maxLength:[Number,h],addOnEnter:[Boolean,!0],addOnSpace:[Boolean,!1],addOnComma:[Boolean,!0],addOnBlur:[Boolean,!0],allowedTagsPattern:[RegExp,/.+/],enableEditingLastTag:[Boolean,!1],minTags:[Number,0],maxTags:[Number,h],displayProperty:[String,"text"],allowLeftoverText:[Boolean,!1],addFromAutocompleteOnly:[Boolean,!1]}),b.tagList=new k(b.options,b.events),this.registerAutocomplete=function(){var a=d.find("input");return a.on("keydown",function(a){b.events.trigger("input-keydown",a)}),{addTag:function(a){return b.tagList.add(a)},focusInput:function(){a[0].focus()},getTags:function(){return b.tags},getCurrentTagText:function(){return b.newTag.text},getOptions:function(){return b.options},on:function(a,c){return b.events.on(a,c),this}}}}],link:function(a,c,h,i){var j,k=[g.enter,g.comma,g.space,g.backspace],l=a.tagList,m=a.events,n=a.options,o=c.find("input"),p=["minTags","maxTags","allowLeftoverText"];j=function(){i.$setValidity("maxTags",a.tags.length<=n.maxTags),i.$setValidity("minTags",a.tags.length>=n.minTags),i.$setValidity("leftoverText",n.allowLeftoverText?!0:!a.newTag.text)},m.on("tag-added",a.onTagAdded).on("tag-removed",a.onTagRemoved).on("tag-added",function(){a.newTag.text=""}).on("tag-added tag-removed",function(){i.$setViewValue(a.tags)}).on("invalid-tag",function(){a.newTag.invalid=!0}).on("input-change",function(){l.selected=null,a.newTag.invalid=null}).on("input-focus",function(){i.$setValidity("leftoverText",!0)}).on("input-blur",function(){n.addFromAutocompleteOnly||(n.addOnBlur&&l.addText(a.newTag.text),j())}).on("option-change",function(a){-1!==p.indexOf(a.name)&&j()}),a.newTag={text:"",invalid:null},a.getDisplayText=function(a){return e(a[n.displayProperty])},a.track=function(a){return a[n.displayProperty]},a.newTagChange=function(){m.trigger("input-change",a.newTag.text)},a.$watch("tags",function(c){a.tags=b(c,n.displayProperty),l.items=a.tags}),a.$watch("tags.length",function(){j()}),o.on("keydown",function(b){if(!b.isImmediatePropagationStopped||!b.isImmediatePropagationStopped()){var c,d,e=b.keyCode,f=b.shiftKey||b.altKey||b.ctrlKey||b.metaKey,h={};if(!f&&-1!==k.indexOf(e))if(h[g.enter]=n.addOnEnter,h[g.comma]=n.addOnComma,h[g.space]=n.addOnSpace,c=!n.addFromAutocompleteOnly&&h[e],d=!c&&e===g.backspace&&0===a.newTag.text.length,c)l.addText(a.newTag.text),a.$apply(),b.preventDefault();else if(d){var i=l.removeLast();i&&n.enableEditingLastTag&&(a.newTag.text=i[n.displayProperty]),a.$apply(),b.preventDefault()}}}).on("focus",function(){a.hasFocus||(a.hasFocus=!0,m.trigger("input-focus"),a.$apply())}).on("blur",function(){d(function(){var b=f.prop("activeElement"),d=b===o[0],e=c[0].contains(b);(d||!e)&&(a.hasFocus=!1,m.trigger("input-blur"))})}),c.find("div").on("click",function(){o[0].focus()})}}}]),j.directive("autoComplete",["$document","$timeout","$sce","tagsInputConfig",function(a,h,i,j){function k(a,d){var e,f,g,i={};return f=function(a,b){return a.filter(function(a){return!c(b,a,d.tagsInput.displayProperty)})},i.reset=function(){g=null,i.items=[],i.visible=!1,i.index=-1,i.selected=null,i.query=null,h.cancel(e)},i.show=function(){i.selected=null,i.visible=!0},i.load=function(c,j){h.cancel(e),e=h(function(){i.query=c;var e=a({$query:c});g=e,e.then(function(a){e===g&&(a=b(a.data||a,d.tagsInput.displayProperty),a=f(a,j),i.items=a.slice(0,d.maxResultsToShow),i.items.length>0?i.show():i.reset())})},d.debounceDelay,!1)},i.selectNext=function(){i.select(++i.index)},i.selectPrior=function(){i.select(--i.index)},i.select=function(a){0>a?a=i.items.length-1:a>=i.items.length&&(a=0),i.index=a,i.selected=i.items[a]},i.reset(),i}return{restrict:"E",require:"^tagsInput",scope:{source:"&"},templateUrl:"ngTagsInput/auto-complete.html",link:function(a,b,c,h){var l,m,n,o,p,q,r=[g.enter,g.tab,g.escape,g.up,g.down];j.load("autoComplete",a,c,{debounceDelay:[Number,100],minLength:[Number,3],highlightMatchedText:[Boolean,!0],maxResultsToShow:[Number,10],loadOnDownArrow:[Boolean,!1],loadOnEmpty:[Boolean,!1],loadOnFocus:[Boolean,!1]}),n=a.options,m=h.registerAutocomplete(),n.tagsInput=m.getOptions(),l=new k(a.source,n),o=function(a){return a[n.tagsInput.displayProperty]},p=function(a){return e(o(a))},q=function(a){return a&&a.length>=n.minLength||!a&&n.loadOnEmpty},a.suggestionList=l,a.addSuggestionByIndex=function(b){l.select(b),a.addSuggestion()},a.addSuggestion=function(){var a=!1;return l.selected&&(m.addTag(l.selected),l.reset(),m.focusInput(),a=!0),a},a.highlight=function(a){var b=p(a);return b=f(b),n.highlightMatchedText&&(b=d(b,f(l.query),"<em>$&</em>")),i.trustAsHtml(b)},a.track=function(a){return o(a)},m.on("tag-added tag-removed invalid-tag input-blur",function(){l.reset()}).on("input-change",function(a){q(a)?l.load(a,m.getTags()):l.reset()}).on("input-focus",function(){var a=m.getCurrentTagText();n.loadOnFocus&&q(a)&&l.load(a,m.getTags())}).on("input-keydown",function(b){var c=!1;b.stopImmediatePropagation=function(){c=!0,b.stopPropagation()},b.isImmediatePropagationStopped=function(){return c};var d=b.keyCode,e=!1;-1!==r.indexOf(d)&&(l.visible?d===g.down?(l.selectNext(),e=!0):d===g.up?(l.selectPrior(),e=!0):d===g.escape?(l.reset(),e=!0):(d===g.enter||d===g.tab)&&(e=a.addSuggestion()):d===g.down&&a.options.loadOnDownArrow&&(l.load(m.getCurrentTagText(),m.getTags()),e=!0),e&&(b.preventDefault(),b.stopImmediatePropagation(),a.$apply()))})}}}]),j.directive("tiTranscludeAppend",function(){return function(a,b,c,d,e){e(function(a){b.append(a)})}}),j.directive("tiAutosize",["tagsInputConfig",function(a){return{restrict:"A",require:"ngModel",link:function(b,c,d,e){var f,g,h=a.getTextAutosizeThreshold();f=angular.element('<span class="input"></span>'),f.css("display","none").css("visibility","hidden").css("width","auto").css("white-space","pre"),c.parent().append(f),g=function(a){var b,e=a;return angular.isString(e)&&0===e.length&&(e=d.placeholder),e&&(f.text(e),f.css("display",""),b=f.prop("offsetWidth"),f.css("display","none")),c.css("width",b?b+h+"px":""),a},e.$parsers.unshift(g),e.$formatters.unshift(g),d.$observe("placeholder",function(a){e.$modelValue||g(a)})}}}]),j.directive("tiBindAttrs",function(){return function(a,b,c){a.$watch(c.tiBindAttrs,function(a){angular.forEach(a,function(a,b){c.$set(b,a)})},!0)}}),j.provider("tagsInputConfig",function(){var a={},b={},c=3;this.setDefaults=function(b,c){return a[b]=c,this},this.setActiveInterpolation=function(a,c){return b[a]=c,this},this.setTextAutosizeThreshold=function(a){return c=a,this},this.$get=["$interpolate",function(d){var e={};return e[String]=function(a){return a},e[Number]=function(a){return parseInt(a,10)},e[Boolean]=function(a){return"true"===a.toLowerCase()},e[RegExp]=function(a){return new RegExp(a)},{load:function(c,f,g,h){var i=function(){return!0};f.options={},angular.forEach(h,function(h,j){var k,l,m,n,o,p;k=h[0],l=h[1],m=h[2]||i,n=e[k],o=function(){var b=a[c]&&a[c][j];return angular.isDefined(b)?b:l},p=function(a){f.options[j]=a&&m(a)?n(a):o()},b[c]&&b[c][j]?g.$observe(j,function(a){p(a),f.events.trigger("option-change",{name:j,newValue:a})}):p(g[j]&&d(g[j])(f.$parent))})},getTextAutosizeThreshold:function(){return c}}}]}),j.run(["$templateCache",function(a){a.put("ngTagsInput/tags-input.html",'<div class="host" tabindex="-1" ti-transclude-append=""><div class="tags" ng-class="{focused: hasFocus}"><ul class="tag-list"><li class="tag-item" ng-repeat="tag in tagList.items track by track(tag)" ng-class="{ selected: tag == tagList.selected }"><span ng-bind="getDisplayText(tag)"></span> <a class="remove-button" ng-click="tagList.remove($index)" ng-bind="options.removeTagSymbol"></a></li></ul><input class="input" ng-model="newTag.text" ng-change="newTagChange()" ng-trim="false" ng-class="{\'invalid-tag\': newTag.invalid}" ti-bind-attrs="{type: options.type, placeholder: options.placeholder, tabindex: options.tabindex}" ti-autosize=""></div></div>'),a.put("ngTagsInput/auto-complete.html",'<div class="autocomplete" ng-show="suggestionList.visible"><ul class="suggestion-list"><li class="suggestion-item" ng-repeat="item in suggestionList.items track by track(item)" ng-class="{selected: item == suggestionList.selected}" ng-click="addSuggestionByIndex($index)" ng-mouseenter="suggestionList.select($index)" ng-bind-html="highlight(item)"></li></ul></div>')}])}();
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*!
  * Bootstrap v3.1.0 (http://getbootstrap.com)
@@ -36273,19 +36331,19 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap requires jQuery");+func
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\custom.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\custom.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js");
-require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js");
+require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 jQuery(window).load(function() {
     // console.log('custom.js loaded');
@@ -36563,7 +36621,7 @@ jQuery(document).ready(function() {
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js","C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\bootstrap.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js","C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":[function(require,module,exports){
 (function (global){
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery v1.10.2 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
@@ -36578,10 +36636,10 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":[function(require,module,exports){
+},{}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-migrate-1.2.1.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery Migrate v1.2.1 | (c) 2005, 2013 jQuery Foundation, Inc. and other contributors | jquery.org/license */
 jQuery.migrateMute===void 0&&(jQuery.migrateMute=!0),function(e,t,n){function r(n){var r=t.console;i[n]||(i[n]=!0,e.migrateWarnings.push(n),r&&r.warn&&!e.migrateMute&&(r.warn("JQMIGRATE: "+n),e.migrateTrace&&r.trace&&r.trace()))}function a(t,a,i,o){if(Object.defineProperty)try{return Object.defineProperty(t,a,{configurable:!0,enumerable:!0,get:function(){return r(o),i},set:function(e){r(o),i=e}}),n}catch(s){}e._definePropertyBroken=!0,t[a]=i}var i={};e.migrateWarnings=[],!e.migrateMute&&t.console&&t.console.log&&t.console.log("JQMIGRATE: Logging is active"),e.migrateTrace===n&&(e.migrateTrace=!0),e.migrateReset=function(){i={},e.migrateWarnings.length=0},"BackCompat"===document.compatMode&&r("jQuery is not compatible with Quirks Mode");var o=e("<input/>",{size:1}).attr("size")&&e.attrFn,s=e.attr,u=e.attrHooks.value&&e.attrHooks.value.get||function(){return null},c=e.attrHooks.value&&e.attrHooks.value.set||function(){return n},l=/^(?:input|button)$/i,d=/^[238]$/,p=/^(?:autofocus|autoplay|async|checked|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped|selected)$/i,f=/^(?:checked|selected)$/i;a(e,"attrFn",o||{},"jQuery.attrFn is deprecated"),e.attr=function(t,a,i,u){var c=a.toLowerCase(),g=t&&t.nodeType;return u&&(4>s.length&&r("jQuery.fn.attr( props, pass ) is deprecated"),t&&!d.test(g)&&(o?a in o:e.isFunction(e.fn[a])))?e(t)[a](i):("type"===a&&i!==n&&l.test(t.nodeName)&&t.parentNode&&r("Can't change the 'type' of an input or button in IE 6/7/8"),!e.attrHooks[c]&&p.test(c)&&(e.attrHooks[c]={get:function(t,r){var a,i=e.prop(t,r);return i===!0||"boolean"!=typeof i&&(a=t.getAttributeNode(r))&&a.nodeValue!==!1?r.toLowerCase():n},set:function(t,n,r){var a;return n===!1?e.removeAttr(t,r):(a=e.propFix[r]||r,a in t&&(t[a]=!0),t.setAttribute(r,r.toLowerCase())),r}},f.test(c)&&r("jQuery.fn.attr('"+c+"') may use property instead of attribute")),s.call(e,t,a,i))},e.attrHooks.value={get:function(e,t){var n=(e.nodeName||"").toLowerCase();return"button"===n?u.apply(this,arguments):("input"!==n&&"option"!==n&&r("jQuery.fn.attr('value') no longer gets properties"),t in e?e.value:null)},set:function(e,t){var a=(e.nodeName||"").toLowerCase();return"button"===a?c.apply(this,arguments):("input"!==a&&"option"!==a&&r("jQuery.fn.attr('value', val) no longer sets properties"),e.value=t,n)}};var g,h,v=e.fn.init,m=e.parseJSON,y=/^([^<]*)(<[\w\W]+>)([^>]*)$/;e.fn.init=function(t,n,a){var i;return t&&"string"==typeof t&&!e.isPlainObject(n)&&(i=y.exec(e.trim(t)))&&i[0]&&("<"!==t.charAt(0)&&r("$(html) HTML strings must start with '<' character"),i[3]&&r("$(html) HTML text after last tag is ignored"),"#"===i[0].charAt(0)&&(r("HTML string cannot start with a '#' character"),e.error("JQMIGRATE: Invalid selector string (XSS)")),n&&n.context&&(n=n.context),e.parseHTML)?v.call(this,e.parseHTML(i[2],n,!0),n,a):v.apply(this,arguments)},e.fn.init.prototype=e.fn,e.parseJSON=function(e){return e||null===e?m.apply(this,arguments):(r("jQuery.parseJSON requires a valid JSON string"),null)},e.uaMatch=function(e){e=e.toLowerCase();var t=/(chrome)[ \/]([\w.]+)/.exec(e)||/(webkit)[ \/]([\w.]+)/.exec(e)||/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(e)||/(msie) ([\w.]+)/.exec(e)||0>e.indexOf("compatible")&&/(mozilla)(?:.*? rv:([\w.]+)|)/.exec(e)||[];return{browser:t[1]||"",version:t[2]||"0"}},e.browser||(g=e.uaMatch(navigator.userAgent),h={},g.browser&&(h[g.browser]=!0,h.version=g.version),h.chrome?h.webkit=!0:h.webkit&&(h.safari=!0),e.browser=h),a(e,"browser",e.browser,"jQuery.browser is deprecated"),e.sub=function(){function t(e,n){return new t.fn.init(e,n)}e.extend(!0,t,this),t.superclass=this,t.fn=t.prototype=this(),t.fn.constructor=t,t.sub=this.sub,t.fn.init=function(r,a){return a&&a instanceof e&&!(a instanceof t)&&(a=t(a)),e.fn.init.call(this,r,a,n)},t.fn.init.prototype=t.fn;var n=t(document);return r("jQuery.sub() is deprecated"),t},e.ajaxSetup({converters:{"text json":e.parseJSON}});var b=e.fn.data;e.fn.data=function(t){var a,i,o=this[0];return!o||"events"!==t||1!==arguments.length||(a=e.data(o,t),i=e._data(o,t),a!==n&&a!==i||i===n)?b.apply(this,arguments):(r("Use of jQuery.fn.data('events') is deprecated"),i)};var j=/\/(java|ecma)script/i,w=e.fn.andSelf||e.fn.addBack;e.fn.andSelf=function(){return r("jQuery.fn.andSelf() replaced by jQuery.fn.addBack()"),w.apply(this,arguments)},e.clean||(e.clean=function(t,a,i,o){a=a||document,a=!a.nodeType&&a[0]||a,a=a.ownerDocument||a,r("jQuery.clean() is deprecated");var s,u,c,l,d=[];if(e.merge(d,e.buildFragment(t,a).childNodes),i)for(c=function(e){return!e.type||j.test(e.type)?o?o.push(e.parentNode?e.parentNode.removeChild(e):e):i.appendChild(e):n},s=0;null!=(u=d[s]);s++)e.nodeName(u,"script")&&c(u)||(i.appendChild(u),u.getElementsByTagName!==n&&(l=e.grep(e.merge([],u.getElementsByTagName("script")),c),d.splice.apply(d,[s+1,0].concat(l)),s+=l.length));return d});var Q=e.event.add,x=e.event.remove,k=e.event.trigger,N=e.fn.toggle,T=e.fn.live,M=e.fn.die,S="ajaxStart|ajaxStop|ajaxSend|ajaxComplete|ajaxError|ajaxSuccess",C=RegExp("\\b(?:"+S+")\\b"),H=/(?:^|\s)hover(\.\S+|)\b/,A=function(t){return"string"!=typeof t||e.event.special.hover?t:(H.test(t)&&r("'hover' pseudo-event is deprecated, use 'mouseenter mouseleave'"),t&&t.replace(H,"mouseenter$1 mouseleave$1"))};e.event.props&&"attrChange"!==e.event.props[0]&&e.event.props.unshift("attrChange","attrName","relatedNode","srcElement"),e.event.dispatch&&a(e.event,"handle",e.event.dispatch,"jQuery.event.handle is undocumented and deprecated"),e.event.add=function(e,t,n,a,i){e!==document&&C.test(t)&&r("AJAX events should be attached to document: "+t),Q.call(this,e,A(t||""),n,a,i)},e.event.remove=function(e,t,n,r,a){x.call(this,e,A(t)||"",n,r,a)},e.fn.error=function(){var e=Array.prototype.slice.call(arguments,0);return r("jQuery.fn.error() is deprecated"),e.splice(0,0,"error"),arguments.length?this.bind.apply(this,e):(this.triggerHandler.apply(this,e),this)},e.fn.toggle=function(t,n){if(!e.isFunction(t)||!e.isFunction(n))return N.apply(this,arguments);r("jQuery.fn.toggle(handler, handler...) is deprecated");var a=arguments,i=t.guid||e.guid++,o=0,s=function(n){var r=(e._data(this,"lastToggle"+t.guid)||0)%o;return e._data(this,"lastToggle"+t.guid,r+1),n.preventDefault(),a[r].apply(this,arguments)||!1};for(s.guid=i;a.length>o;)a[o++].guid=i;return this.click(s)},e.fn.live=function(t,n,a){return r("jQuery.fn.live() is deprecated"),T?T.apply(this,arguments):(e(this.context).on(t,this.selector,n,a),this)},e.fn.die=function(t,n){return r("jQuery.fn.die() is deprecated"),M?M.apply(this,arguments):(e(this.context).off(t,this.selector||"**",n),this)},e.event.trigger=function(e,t,n,a){return n||C.test(e)||r("Global events are undocumented and deprecated"),k.call(this,e,t,n||document,a)},e.each(S.split("|"),function(t,n){e.event.special[n]={setup:function(){var t=this;return t!==document&&(e.event.add(document,n+"."+e.guid,function(){e.event.trigger(n,null,t,!0)}),e._data(this,n,e.guid++)),!1},teardown:function(){return this!==document&&e.event.remove(document,n+"."+e._data(this,n)),!1}}})}(jQuery,window);
@@ -36590,10 +36648,10 @@ jQuery.migrateMute===void 0&&(jQuery.migrateMute=!0),function(e,t,n){function r(
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-ui-1.10.3.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery UI - v1.10.3 - 2013-10-20
 * http://jqueryui.com
@@ -36607,10 +36665,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.cookies.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*jshint eqnull:true */
 /*!
@@ -36688,10 +36746,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.mousewheel.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.mousewheel.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -36800,10 +36858,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.sparkline.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /* jquery.sparkline 2.1.2 - http://omnipotent.net/jquery.sparkline/ 
 ** Licensed under the New BSD License - see above site for details */
@@ -36815,10 +36873,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.tagsinput.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function(a){var b=new Array;var c=new Array;a.fn.doAutosize=function(b){var c=a(this).data("minwidth"),d=a(this).data("maxwidth"),e="",f=a(this),g=a("#"+a(this).data("tester_id"));if(e===(e=f.val())){return}var h=e.replace(/&/g,"&").replace(/\s/g," ").replace(/</g,"<").replace(/>/g,">");g.html(h);var i=g.width(),j=i+b.comfortZone>=c?i+b.comfortZone:c,k=f.width(),l=j<k&&j>=c||j>c&&j<d;if(l){f.width(j)}};a.fn.resetAutosize=function(b){var c=a(this).data("minwidth")||b.minInputWidth||a(this).width(),d=a(this).data("maxwidth")||b.maxInputWidth||a(this).closest(".tagsinput").width()-b.inputPadding,e="",f=a(this),g=a("<tester/>").css({position:"absolute",top:-9999,left:-9999,width:"auto",fontSize:f.css("fontSize"),fontFamily:f.css("fontFamily"),fontWeight:f.css("fontWeight"),letterSpacing:f.css("letterSpacing"),whiteSpace:"nowrap"}),h=a(this).attr("id")+"_autosize_tester";if(!a("#"+h).length>0){g.attr("id",h);g.appendTo("body")}f.data("minwidth",c);f.data("maxwidth",d);f.data("tester_id",h);f.css("width",c)};a.fn.addTag=function(d,e){e=jQuery.extend({focus:false,callback:true},e);this.each(function(){var f=a(this).attr("id");var g=a(this).val().split(b[f]);if(g[0]==""){g=new Array}d=jQuery.trim(d);if(e.unique){var h=a(g).tagExist(d);if(h==true){a("#"+f+"_tag").addClass("not_valid")}}else{var h=false}if(d!=""&&h!=true){a("<span>").addClass("tag").append(a("<span>").text(d).append("  "),a("<a>",{href:"#",title:"Removing tag",text:"x"}).click(function(){return a("#"+f).removeTag(escape(d))})).insertBefore("#"+f+"_addTag");g.push(d);a("#"+f+"_tag").val("");if(e.focus){a("#"+f+"_tag").focus()}else{a("#"+f+"_tag").blur()}a.fn.tagsInput.updateTagsField(this,g);if(e.callback&&c[f]&&c[f]["onAddTag"]){var i=c[f]["onAddTag"];i.call(this,d)}if(c[f]&&c[f]["onChange"]){var j=g.length;var i=c[f]["onChange"];i.call(this,a(this),g[j-1])}}});return false};a.fn.removeTag=function(d){d=unescape(d);this.each(function(){var e=a(this).attr("id");var f=a(this).val().split(b[e]);a("#"+e+"_tagsinput .tag").remove();str="";for(i=0;i<f.length;i++){if(f[i]!=d){str=str+b[e]+f[i]}}a.fn.tagsInput.importTags(this,str);if(c[e]&&c[e]["onRemoveTag"]){var g=c[e]["onRemoveTag"];g.call(this,d)}});return false};a.fn.tagExist=function(b){return jQuery.inArray(b,a(this))>=0};a.fn.importTags=function(b){id=a(this).attr("id");a("#"+id+"_tagsinput .tag").remove();a.fn.tagsInput.importTags(this,b)};a.fn.tagsInput=function(d){var e=jQuery.extend({interactive:true,defaultText:"add a tag",minChars:0,width:"300px",height:"100px",autocomplete:{selectFirst:false},hide:true,delimiter:",",unique:true,removeWithBackspace:true,placeholderColor:"#666666",autosize:true,comfortZone:20,inputPadding:6*2},d);this.each(function(){if(e.hide){a(this).hide()}var d=a(this).attr("id");if(!d||b[a(this).attr("id")]){d=a(this).attr("id","tags"+(new Date).getTime()).attr("id")}var f=jQuery.extend({pid:d,real_input:"#"+d,holder:"#"+d+"_tagsinput",input_wrapper:"#"+d+"_addTag",fake_input:"#"+d+"_tag"},e);b[d]=f.delimiter;if(e.onAddTag||e.onRemoveTag||e.onChange){c[d]=new Array;c[d]["onAddTag"]=e.onAddTag;c[d]["onRemoveTag"]=e.onRemoveTag;c[d]["onChange"]=e.onChange}var g='<div id="'+d+'_tagsinput" class="tagsinput"><div id="'+d+'_addTag">';if(e.interactive){g=g+'<input id="'+d+'_tag" value="" data-default="'+e.defaultText+'" />'}g=g+'</div><div class="tags_clear"></div></div>';a(g).insertAfter(this);a(f.holder).css("width",e.width);a(f.holder).css("height",e.height);if(a(f.real_input).val()!=""){a.fn.tagsInput.importTags(a(f.real_input),a(f.real_input).val())}if(e.interactive){a(f.fake_input).val(a(f.fake_input).attr("data-default"));a(f.fake_input).css("color",e.placeholderColor);a(f.fake_input).resetAutosize(e);a(f.holder).bind("click",f,function(b){a(b.data.fake_input).focus()});a(f.fake_input).bind("focus",f,function(b){if(a(b.data.fake_input).val()==a(b.data.fake_input).attr("data-default")){a(b.data.fake_input).val("")}a(b.data.fake_input).css("color","#000000")});if(e.autocomplete_url!=undefined){autocomplete_options={source:e.autocomplete_url};for(attrname in e.autocomplete){autocomplete_options[attrname]=e.autocomplete[attrname]}if(jQuery.Autocompleter!==undefined){a(f.fake_input).autocomplete(e.autocomplete_url,e.autocomplete);a(f.fake_input).bind("result",f,function(b,c,f){if(c){a("#"+d).addTag(c[0]+"",{focus:true,unique:e.unique})}})}else if(jQuery.ui.autocomplete!==undefined){a(f.fake_input).autocomplete(autocomplete_options);a(f.fake_input).bind("autocompleteselect",f,function(b,c){a(b.data.real_input).addTag(c.item.value,{focus:true,unique:e.unique});return false})}}else{a(f.fake_input).bind("blur",f,function(b){var c=a(this).attr("data-default");if(a(b.data.fake_input).val()!=""&&a(b.data.fake_input).val()!=c){if(b.data.minChars<=a(b.data.fake_input).val().length&&(!b.data.maxChars||b.data.maxChars>=a(b.data.fake_input).val().length))a(b.data.real_input).addTag(a(b.data.fake_input).val(),{focus:true,unique:e.unique})}else{a(b.data.fake_input).val(a(b.data.fake_input).attr("data-default"));a(b.data.fake_input).css("color",e.placeholderColor)}return false})}a(f.fake_input).bind("keypress",f,function(b){if(b.which==b.data.delimiter.charCodeAt(0)||b.which==13){b.preventDefault();if(b.data.minChars<=a(b.data.fake_input).val().length&&(!b.data.maxChars||b.data.maxChars>=a(b.data.fake_input).val().length))a(b.data.real_input).addTag(a(b.data.fake_input).val(),{focus:true,unique:e.unique});a(b.data.fake_input).resetAutosize(e);return false}else if(b.data.autosize){a(b.data.fake_input).doAutosize(e)}});f.removeWithBackspace&&a(f.fake_input).bind("keydown",function(b){if(b.keyCode==8&&a(this).val()==""){b.preventDefault();var c=a(this).closest(".tagsinput").find(".tag:last").text();var d=a(this).attr("id").replace(/_tag$/,"");c=c.replace(/[\s]+x$/,"");a("#"+d).removeTag(escape(c));a(this).trigger("focus")}});a(f.fake_input).blur();if(f.unique){a(f.fake_input).keydown(function(b){if(b.keyCode==8||String.fromCharCode(b.which).match(/\w+|[áéíóúÁÉÍÓÚñÑ,/]+/)){a(this).removeClass("not_valid")}})}}});return this};a.fn.tagsInput.updateTagsField=function(c,d){var e=a(c).attr("id");a(c).val(d.join(b[e]))};a.fn.tagsInput.importTags=function(d,e){a(d).val("");var f=a(d).attr("id");var g=e.split(b[f]);for(i=0;i<g.length;i++){a(d).addTag(g[i],{focus:false,callback:false})}if(c[f]&&c[f]["onChange"]){var h=c[f]["onChange"];h.call(d,d,g[i])}}})(jQuery);
 ; browserify_shim__define__module__export__(typeof tagsInput != "undefined" ? tagsInput : window.tagsInput);
@@ -36826,10 +36884,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.validate.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery.validate.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! jQuery Validation Plugin - v1.11.1 - 3/22/2013\n* https://github.com/jzaefferer/jquery-validation
 * Copyright (c) 2013 Jörn Zaefferer; Licensed MIT */(function(t){t.extend(t.fn,{validate:function(e){if(!this.length)return e&&e.debug&&window.console&&console.warn("Nothing selected, can't validate, returning nothing."),void 0;var i=t.data(this[0],"validator");return i?i:(this.attr("novalidate","novalidate"),i=new t.validator(e,this[0]),t.data(this[0],"validator",i),i.settings.onsubmit&&(this.validateDelegate(":submit","click",function(e){i.settings.submitHandler&&(i.submitButton=e.target),t(e.target).hasClass("cancel")&&(i.cancelSubmit=!0),void 0!==t(e.target).attr("formnovalidate")&&(i.cancelSubmit=!0)}),this.submit(function(e){function s(){var s;return i.settings.submitHandler?(i.submitButton&&(s=t("<input type='hidden'/>").attr("name",i.submitButton.name).val(t(i.submitButton).val()).appendTo(i.currentForm)),i.settings.submitHandler.call(i,i.currentForm,e),i.submitButton&&s.remove(),!1):!0}return i.settings.debug&&e.preventDefault(),i.cancelSubmit?(i.cancelSubmit=!1,s()):i.form()?i.pendingRequest?(i.formSubmitted=!0,!1):s():(i.focusInvalid(),!1)})),i)},valid:function(){if(t(this[0]).is("form"))return this.validate().form();var e=!0,i=t(this[0].form).validate();return this.each(function(){e=e&&i.element(this)}),e},removeAttrs:function(e){var i={},s=this;return t.each(e.split(/\s/),function(t,e){i[e]=s.attr(e),s.removeAttr(e)}),i},rules:function(e,i){var s=this[0];if(e){var r=t.data(s.form,"validator").settings,n=r.rules,a=t.validator.staticRules(s);switch(e){case"add":t.extend(a,t.validator.normalizeRule(i)),delete a.messages,n[s.name]=a,i.messages&&(r.messages[s.name]=t.extend(r.messages[s.name],i.messages));break;case"remove":if(!i)return delete n[s.name],a;var u={};return t.each(i.split(/\s/),function(t,e){u[e]=a[e],delete a[e]}),u}}var o=t.validator.normalizeRules(t.extend({},t.validator.classRules(s),t.validator.attributeRules(s),t.validator.dataRules(s),t.validator.staticRules(s)),s);if(o.required){var l=o.required;delete o.required,o=t.extend({required:l},o)}return o}}),t.extend(t.expr[":"],{blank:function(e){return!t.trim(""+t(e).val())},filled:function(e){return!!t.trim(""+t(e).val())},unchecked:function(e){return!t(e).prop("checked")}}),t.validator=function(e,i){this.settings=t.extend(!0,{},t.validator.defaults,e),this.currentForm=i,this.init()},t.validator.format=function(e,i){return 1===arguments.length?function(){var i=t.makeArray(arguments);return i.unshift(e),t.validator.format.apply(this,i)}:(arguments.length>2&&i.constructor!==Array&&(i=t.makeArray(arguments).slice(1)),i.constructor!==Array&&(i=[i]),t.each(i,function(t,i){e=e.replace(RegExp("\\{"+t+"\\}","g"),function(){return i})}),e)},t.extend(t.validator,{defaults:{messages:{},groups:{},rules:{},errorClass:"error",validClass:"valid",errorElement:"label",focusInvalid:!0,errorContainer:t([]),errorLabelContainer:t([]),onsubmit:!0,ignore:":hidden",ignoreTitle:!1,onfocusin:function(t){this.lastActive=t,this.settings.focusCleanup&&!this.blockFocusCleanup&&(this.settings.unhighlight&&this.settings.unhighlight.call(this,t,this.settings.errorClass,this.settings.validClass),this.addWrapper(this.errorsFor(t)).hide())},onfocusout:function(t){this.checkable(t)||!(t.name in this.submitted)&&this.optional(t)||this.element(t)},onkeyup:function(t,e){(9!==e.which||""!==this.elementValue(t))&&(t.name in this.submitted||t===this.lastElement)&&this.element(t)},onclick:function(t){t.name in this.submitted?this.element(t):t.parentNode.name in this.submitted&&this.element(t.parentNode)},highlight:function(e,i,s){"radio"===e.type?this.findByName(e.name).addClass(i).removeClass(s):t(e).addClass(i).removeClass(s)},unhighlight:function(e,i,s){"radio"===e.type?this.findByName(e.name).removeClass(i).addClass(s):t(e).removeClass(i).addClass(s)}},setDefaults:function(e){t.extend(t.validator.defaults,e)},messages:{required:"This field is required.",remote:"Please fix this field.",email:"Please enter a valid email address.",url:"Please enter a valid URL.",date:"Please enter a valid date.",dateISO:"Please enter a valid date (ISO).",number:"Please enter a valid number.",digits:"Please enter only digits.",creditcard:"Please enter a valid credit card number.",equalTo:"Please enter the same value again.",maxlength:t.validator.format("Please enter no more than {0} characters."),minlength:t.validator.format("Please enter at least {0} characters."),rangelength:t.validator.format("Please enter a value between {0} and {1} characters long."),range:t.validator.format("Please enter a value between {0} and {1}."),max:t.validator.format("Please enter a value less than or equal to {0}."),min:t.validator.format("Please enter a value greater than or equal to {0}.")},autoCreateRanges:!1,prototype:{init:function(){function e(e){var i=t.data(this[0].form,"validator"),s="on"+e.type.replace(/^validate/,"");i.settings[s]&&i.settings[s].call(i,this[0],e)}this.labelContainer=t(this.settings.errorLabelContainer),this.errorContext=this.labelContainer.length&&this.labelContainer||t(this.currentForm),this.containers=t(this.settings.errorContainer).add(this.settings.errorLabelContainer),this.submitted={},this.valueCache={},this.pendingRequest=0,this.pending={},this.invalid={},this.reset();var i=this.groups={};t.each(this.settings.groups,function(e,s){"string"==typeof s&&(s=s.split(/\s/)),t.each(s,function(t,s){i[s]=e})});var s=this.settings.rules;t.each(s,function(e,i){s[e]=t.validator.normalizeRule(i)}),t(this.currentForm).validateDelegate(":text, [type='password'], [type='file'], select, textarea, [type='number'], [type='search'] ,[type='tel'], [type='url'], [type='email'], [type='datetime'], [type='date'], [type='month'], [type='week'], [type='time'], [type='datetime-local'], [type='range'], [type='color'] ","focusin focusout keyup",e).validateDelegate("[type='radio'], [type='checkbox'], select, option","click",e),this.settings.invalidHandler&&t(this.currentForm).bind("invalid-form.validate",this.settings.invalidHandler)},form:function(){return this.checkForm(),t.extend(this.submitted,this.errorMap),this.invalid=t.extend({},this.errorMap),this.valid()||t(this.currentForm).triggerHandler("invalid-form",[this]),this.showErrors(),this.valid()},checkForm:function(){this.prepareForm();for(var t=0,e=this.currentElements=this.elements();e[t];t++)this.check(e[t]);return this.valid()},element:function(e){e=this.validationTargetFor(this.clean(e)),this.lastElement=e,this.prepareElement(e),this.currentElements=t(e);var i=this.check(e)!==!1;return i?delete this.invalid[e.name]:this.invalid[e.name]=!0,this.numberOfInvalids()||(this.toHide=this.toHide.add(this.containers)),this.showErrors(),i},showErrors:function(e){if(e){t.extend(this.errorMap,e),this.errorList=[];for(var i in e)this.errorList.push({message:e[i],element:this.findByName(i)[0]});this.successList=t.grep(this.successList,function(t){return!(t.name in e)})}this.settings.showErrors?this.settings.showErrors.call(this,this.errorMap,this.errorList):this.defaultShowErrors()},resetForm:function(){t.fn.resetForm&&t(this.currentForm).resetForm(),this.submitted={},this.lastElement=null,this.prepareForm(),this.hideErrors(),this.elements().removeClass(this.settings.errorClass).removeData("previousValue")},numberOfInvalids:function(){return this.objectLength(this.invalid)},objectLength:function(t){var e=0;for(var i in t)e++;return e},hideErrors:function(){this.addWrapper(this.toHide).hide()},valid:function(){return 0===this.size()},size:function(){return this.errorList.length},focusInvalid:function(){if(this.settings.focusInvalid)try{t(this.findLastActive()||this.errorList.length&&this.errorList[0].element||[]).filter(":visible").focus().trigger("focusin")}catch(e){}},findLastActive:function(){var e=this.lastActive;return e&&1===t.grep(this.errorList,function(t){return t.element.name===e.name}).length&&e},elements:function(){var e=this,i={};return t(this.currentForm).find("input, select, textarea").not(":submit, :reset, :image, [disabled]").not(this.settings.ignore).filter(function(){return!this.name&&e.settings.debug&&window.console&&console.error("%o has no name assigned",this),this.name in i||!e.objectLength(t(this).rules())?!1:(i[this.name]=!0,!0)})},clean:function(e){return t(e)[0]},errors:function(){var e=this.settings.errorClass.replace(" ",".");return t(this.settings.errorElement+"."+e,this.errorContext)},reset:function(){this.successList=[],this.errorList=[],this.errorMap={},this.toShow=t([]),this.toHide=t([]),this.currentElements=t([])},prepareForm:function(){this.reset(),this.toHide=this.errors().add(this.containers)},prepareElement:function(t){this.reset(),this.toHide=this.errorsFor(t)},elementValue:function(e){var i=t(e).attr("type"),s=t(e).val();return"radio"===i||"checkbox"===i?t("input[name='"+t(e).attr("name")+"']:checked").val():"string"==typeof s?s.replace(/\r/g,""):s},check:function(e){e=this.validationTargetFor(this.clean(e));var i,s=t(e).rules(),r=!1,n=this.elementValue(e);for(var a in s){var u={method:a,parameters:s[a]};try{if(i=t.validator.methods[a].call(this,n,e,u.parameters),"dependency-mismatch"===i){r=!0;continue}if(r=!1,"pending"===i)return this.toHide=this.toHide.not(this.errorsFor(e)),void 0;if(!i)return this.formatAndAdd(e,u),!1}catch(o){throw this.settings.debug&&window.console&&console.log("Exception occurred when checking element "+e.id+", check the '"+u.method+"' method.",o),o}}return r?void 0:(this.objectLength(s)&&this.successList.push(e),!0)},customDataMessage:function(e,i){return t(e).data("msg-"+i.toLowerCase())||e.attributes&&t(e).attr("data-msg-"+i.toLowerCase())},customMessage:function(t,e){var i=this.settings.messages[t];return i&&(i.constructor===String?i:i[e])},findDefined:function(){for(var t=0;arguments.length>t;t++)if(void 0!==arguments[t])return arguments[t];return void 0},defaultMessage:function(e,i){return this.findDefined(this.customMessage(e.name,i),this.customDataMessage(e,i),!this.settings.ignoreTitle&&e.title||void 0,t.validator.messages[i],"<strong>Warning: No message defined for "+e.name+"</strong>")},formatAndAdd:function(e,i){var s=this.defaultMessage(e,i.method),r=/\$?\{(\d+)\}/g;"function"==typeof s?s=s.call(this,i.parameters,e):r.test(s)&&(s=t.validator.format(s.replace(r,"{$1}"),i.parameters)),this.errorList.push({message:s,element:e}),this.errorMap[e.name]=s,this.submitted[e.name]=s},addWrapper:function(t){return this.settings.wrapper&&(t=t.add(t.parent(this.settings.wrapper))),t},defaultShowErrors:function(){var t,e;for(t=0;this.errorList[t];t++){var i=this.errorList[t];this.settings.highlight&&this.settings.highlight.call(this,i.element,this.settings.errorClass,this.settings.validClass),this.showLabel(i.element,i.message)}if(this.errorList.length&&(this.toShow=this.toShow.add(this.containers)),this.settings.success)for(t=0;this.successList[t];t++)this.showLabel(this.successList[t]);if(this.settings.unhighlight)for(t=0,e=this.validElements();e[t];t++)this.settings.unhighlight.call(this,e[t],this.settings.errorClass,this.settings.validClass);this.toHide=this.toHide.not(this.toShow),this.hideErrors(),this.addWrapper(this.toShow).show()},validElements:function(){return this.currentElements.not(this.invalidElements())},invalidElements:function(){return t(this.errorList).map(function(){return this.element})},showLabel:function(e,i){var s=this.errorsFor(e);s.length?(s.removeClass(this.settings.validClass).addClass(this.settings.errorClass),s.html(i)):(s=t("<"+this.settings.errorElement+">").attr("for",this.idOrName(e)).addClass(this.settings.errorClass).html(i||""),this.settings.wrapper&&(s=s.hide().show().wrap("<"+this.settings.wrapper+"/>").parent()),this.labelContainer.append(s).length||(this.settings.errorPlacement?this.settings.errorPlacement(s,t(e)):s.insertAfter(e))),!i&&this.settings.success&&(s.text(""),"string"==typeof this.settings.success?s.addClass(this.settings.success):this.settings.success(s,e)),this.toShow=this.toShow.add(s)},errorsFor:function(e){var i=this.idOrName(e);return this.errors().filter(function(){return t(this).attr("for")===i})},idOrName:function(t){return this.groups[t.name]||(this.checkable(t)?t.name:t.id||t.name)},validationTargetFor:function(t){return this.checkable(t)&&(t=this.findByName(t.name).not(this.settings.ignore)[0]),t},checkable:function(t){return/radio|checkbox/i.test(t.type)},findByName:function(e){return t(this.currentForm).find("[name='"+e+"']")},getLength:function(e,i){switch(i.nodeName.toLowerCase()){case"select":return t("option:selected",i).length;case"input":if(this.checkable(i))return this.findByName(i.name).filter(":checked").length}return e.length},depend:function(t,e){return this.dependTypes[typeof t]?this.dependTypes[typeof t](t,e):!0},dependTypes:{"boolean":function(t){return t},string:function(e,i){return!!t(e,i.form).length},"function":function(t,e){return t(e)}},optional:function(e){var i=this.elementValue(e);return!t.validator.methods.required.call(this,i,e)&&"dependency-mismatch"},startRequest:function(t){this.pending[t.name]||(this.pendingRequest++,this.pending[t.name]=!0)},stopRequest:function(e,i){this.pendingRequest--,0>this.pendingRequest&&(this.pendingRequest=0),delete this.pending[e.name],i&&0===this.pendingRequest&&this.formSubmitted&&this.form()?(t(this.currentForm).submit(),this.formSubmitted=!1):!i&&0===this.pendingRequest&&this.formSubmitted&&(t(this.currentForm).triggerHandler("invalid-form",[this]),this.formSubmitted=!1)},previousValue:function(e){return t.data(e,"previousValue")||t.data(e,"previousValue",{old:null,valid:!0,message:this.defaultMessage(e,"remote")})}},classRuleSettings:{required:{required:!0},email:{email:!0},url:{url:!0},date:{date:!0},dateISO:{dateISO:!0},number:{number:!0},digits:{digits:!0},creditcard:{creditcard:!0}},addClassRules:function(e,i){e.constructor===String?this.classRuleSettings[e]=i:t.extend(this.classRuleSettings,e)},classRules:function(e){var i={},s=t(e).attr("class");return s&&t.each(s.split(" "),function(){this in t.validator.classRuleSettings&&t.extend(i,t.validator.classRuleSettings[this])}),i},attributeRules:function(e){var i={},s=t(e),r=s[0].getAttribute("type");for(var n in t.validator.methods){var a;"required"===n?(a=s.get(0).getAttribute(n),""===a&&(a=!0),a=!!a):a=s.attr(n),/min|max/.test(n)&&(null===r||/number|range|text/.test(r))&&(a=Number(a)),a?i[n]=a:r===n&&"range"!==r&&(i[n]=!0)}return i.maxlength&&/-1|2147483647|524288/.test(i.maxlength)&&delete i.maxlength,i},dataRules:function(e){var i,s,r={},n=t(e);for(i in t.validator.methods)s=n.data("rule-"+i.toLowerCase()),void 0!==s&&(r[i]=s);return r},staticRules:function(e){var i={},s=t.data(e.form,"validator");return s.settings.rules&&(i=t.validator.normalizeRule(s.settings.rules[e.name])||{}),i},normalizeRules:function(e,i){return t.each(e,function(s,r){if(r===!1)return delete e[s],void 0;if(r.param||r.depends){var n=!0;switch(typeof r.depends){case"string":n=!!t(r.depends,i.form).length;break;case"function":n=r.depends.call(i,i)}n?e[s]=void 0!==r.param?r.param:!0:delete e[s]}}),t.each(e,function(s,r){e[s]=t.isFunction(r)?r(i):r}),t.each(["minlength","maxlength"],function(){e[this]&&(e[this]=Number(e[this]))}),t.each(["rangelength","range"],function(){var i;e[this]&&(t.isArray(e[this])?e[this]=[Number(e[this][0]),Number(e[this][1])]:"string"==typeof e[this]&&(i=e[this].split(/[\s,]+/),e[this]=[Number(i[0]),Number(i[1])]))}),t.validator.autoCreateRanges&&(e.min&&e.max&&(e.range=[e.min,e.max],delete e.min,delete e.max),e.minlength&&e.maxlength&&(e.rangelength=[e.minlength,e.maxlength],delete e.minlength,delete e.maxlength)),e},normalizeRule:function(e){if("string"==typeof e){var i={};t.each(e.split(/\s/),function(){i[this]=!0}),e=i}return e},addMethod:function(e,i,s){t.validator.methods[e]=i,t.validator.messages[e]=void 0!==s?s:t.validator.messages[e],3>i.length&&t.validator.addClassRules(e,t.validator.normalizeRule(e))},methods:{required:function(e,i,s){if(!this.depend(s,i))return"dependency-mismatch";if("select"===i.nodeName.toLowerCase()){var r=t(i).val();return r&&r.length>0}return this.checkable(i)?this.getLength(e,i)>0:t.trim(e).length>0},email:function(t,e){return this.optional(e)||/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i.test(t)},url:function(t,e){return this.optional(e)||/^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(t)},date:function(t,e){return this.optional(e)||!/Invalid|NaN/.test(""+new Date(t))},dateISO:function(t,e){return this.optional(e)||/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/.test(t)},number:function(t,e){return this.optional(e)||/^-?(?:\d+|\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(t)},digits:function(t,e){return this.optional(e)||/^\d+$/.test(t)},creditcard:function(t,e){if(this.optional(e))return"dependency-mismatch";if(/[^0-9 \-]+/.test(t))return!1;var i=0,s=0,r=!1;t=t.replace(/\D/g,"");for(var n=t.length-1;n>=0;n--){var a=t.charAt(n);s=parseInt(a,10),r&&(s*=2)>9&&(s-=9),i+=s,r=!r}return 0===i%10},minlength:function(e,i,s){var r=t.isArray(e)?e.length:this.getLength(t.trim(e),i);return this.optional(i)||r>=s},maxlength:function(e,i,s){var r=t.isArray(e)?e.length:this.getLength(t.trim(e),i);return this.optional(i)||s>=r},rangelength:function(e,i,s){var r=t.isArray(e)?e.length:this.getLength(t.trim(e),i);return this.optional(i)||r>=s[0]&&s[1]>=r},min:function(t,e,i){return this.optional(e)||t>=i},max:function(t,e,i){return this.optional(e)||i>=t},range:function(t,e,i){return this.optional(e)||t>=i[0]&&i[1]>=t},equalTo:function(e,i,s){var r=t(s);return this.settings.onfocusout&&r.unbind(".validate-equalTo").bind("blur.validate-equalTo",function(){t(i).valid()}),e===r.val()},remote:function(e,i,s){if(this.optional(i))return"dependency-mismatch";var r=this.previousValue(i);if(this.settings.messages[i.name]||(this.settings.messages[i.name]={}),r.originalMessage=this.settings.messages[i.name].remote,this.settings.messages[i.name].remote=r.message,s="string"==typeof s&&{url:s}||s,r.old===e)return r.valid;r.old=e;var n=this;this.startRequest(i);var a={};return a[i.name]=e,t.ajax(t.extend(!0,{url:s,mode:"abort",port:"validate"+i.name,dataType:"json",data:a,success:function(s){n.settings.messages[i.name].remote=r.originalMessage;var a=s===!0||"true"===s;if(a){var u=n.formSubmitted;n.prepareElement(i),n.formSubmitted=u,n.successList.push(i),delete n.invalid[i.name],n.showErrors()}else{var o={},l=s||n.defaultMessage(i,"remote");o[i.name]=r.message=t.isFunction(l)?l(e):l,n.invalid[i.name]=!0,n.showErrors(o)}r.valid=a,n.stopRequest(i,a)}},s)),"pending"}}}),t.format=t.validator.format})(jQuery),function(t){var e={};if(t.ajaxPrefilter)t.ajaxPrefilter(function(t,i,s){var r=t.port;"abort"===t.mode&&(e[r]&&e[r].abort(),e[r]=s)});else{var i=t.ajax;t.ajax=function(s){var r=("mode"in s?s:t.ajaxSettings).mode,n=("port"in s?s:t.ajaxSettings).port;return"abort"===r?(e[n]&&e[n].abort(),e[n]=i.apply(this,arguments),e[n]):i.apply(this,arguments)}}}(jQuery),function(t){t.extend(t.fn,{validateDelegate:function(e,i,s){return this.bind(i,function(i){var r=t(i.target);return r.is(e)?s.apply(r,arguments):void 0})}})}(jQuery);
@@ -36838,10 +36896,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\modernizr.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
  * Build: http://modernizr.com/download/#-fontface-backgroundsize-borderimage-borderradius-boxshadow-flexbox-flexboxlegacy-hsla-multiplebgs-opacity-rgba-textshadow-cssanimations-csscolumns-generatedcontent-cssgradients-cssreflections-csstransforms-csstransforms3d-csstransitions-applicationcache-canvas-canvastext-draganddrop-hashchange-history-audio-video-indexeddb-input-inputtypes-localstorage-postmessage-sessionstorage-websockets-websqldatabase-webworkers-geolocation-inlinesvg-smil-svg-svgclippaths-touch-webgl-shiv-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes-load
@@ -36852,10 +36910,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\retina.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function(){function n(){}function r(e,t){this.path=e;if(typeof t!=="undefined"&&t!==null){this.at_2x_path=t;this.perform_check=false}else{this.at_2x_path=e.replace(/\.\w+$/,function(e){return"@2x"+e});this.perform_check=true}}function i(e){this.el=e;this.path=new r(this.el.getAttribute("src"),this.el.getAttribute("data-at2x"));var t=this;this.path.check_2x_variant(function(e){if(e)t.swap()})}var e=typeof exports=="undefined"?window:exports;var t={check_mime_type:true};e.Retina=n;n.configure=function(e){if(e==null)e={};for(var n in e)t[n]=e[n]};n.init=function(t){if(t==null)t=e;var n=t.onload||new Function;t.onload=function(){var e=document.getElementsByTagName("img"),t=[],r,s;for(r=0;r<e.length;r++){s=e[r];t.push(new i(s))}n()}};n.isRetina=function(){var t="(-webkit-min-device-pixel-ratio: 1.5),                      (min--moz-device-pixel-ratio: 1.5),                      (-o-min-device-pixel-ratio: 3/2),                      (min-resolution: 1.5dppx)";if(e.devicePixelRatio>1)return true;if(e.matchMedia&&e.matchMedia(t).matches)return true;return false};e.RetinaImagePath=r;r.confirmed_paths=[];r.prototype.is_external=function(){return!!(this.path.match(/^https?\:/i)&&!this.path.match("//"+document.domain))};r.prototype.check_2x_variant=function(e){var n,i=this;if(this.is_external()){return e(false)}else if(!this.perform_check&&typeof this.at_2x_path!=="undefined"&&this.at_2x_path!==null){return e(true)}else if(this.at_2x_path in r.confirmed_paths){return e(true)}else{n=new XMLHttpRequest;n.open("HEAD",this.at_2x_path);n.onreadystatechange=function(){if(n.readyState!=4){return e(false)}if(n.status>=200&&n.status<=399){if(t.check_mime_type){var s=n.getResponseHeader("Content-Type");if(s==null||!s.match(/^image/i)){return e(false)}}r.confirmed_paths.push(i.at_2x_path);return e(true)}else{return e(false)}};n.send()}};e.RetinaImage=i;i.prototype.swap=function(e){function n(){if(!t.el.complete){setTimeout(n,5)}else{t.el.setAttribute("width",t.el.offsetWidth);t.el.setAttribute("height",t.el.offsetHeight);t.el.setAttribute("src",e)}}if(typeof e=="undefined")e=this.path.at_2x_path;var t=this;n()};if(n.isRetina()){n.init(e)}})()
 ; browserify_shim__define__module__export__(typeof retina != "undefined" ? retina : window.retina);
@@ -36863,10 +36921,10 @@ return isNaN(t)?c:t},m=p(d[0]),f=Math.max(m,p(d[1]||"")),m=a?Math.max(m,a.getFul
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\toggles.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function($){/*
  jQuery Toggles v2.0.4
@@ -36885,10 +36943,10 @@ v)})}})};})(jQuery);
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\flipclock\\flipclock.min.js":[function(require,module,exports){
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}],"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\flipclock\\flipclock.min.js":[function(require,module,exports){
 (function (global){
 
-; require("C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
+; require("C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js");
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*! flipclock 2014-10-21 */
 var Base = function() {};
@@ -37632,6 +37690,4 @@ function() {
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\angular\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}]},{},["C:\\xampp\\htdocs\\angular\\hikick-india\\index.js"]);
-=======
->>>>>>> 03b990b059d7fd372ee1c2cb411ae6ab821fc678
+},{"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js":"C:\\xampp\\htdocs\\hikick-india\\server\\public\\resources\\lib\\bracket\\jquery-1.10.2.min.js"}]},{},["C:\\xampp\\htdocs\\hikick-india\\index.js"]);

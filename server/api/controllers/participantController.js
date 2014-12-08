@@ -33,7 +33,7 @@
              return;
          }
          if (participantData._id) {
-             console.log(participantData);
+             // console.log(participantData);
              delete participantData._id;
              // console.log(participantData);
          }

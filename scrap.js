@@ -441,7 +441,7 @@ getPlayers = function(level, group, player) {
 
 
 
-var participants = [{
+var participantList = [{
     "participantId": 13,
     "clubName": "MARTIAL ARTS OF SPORTS KARATE ASSOCIATION"
 }, {
@@ -478,11 +478,8 @@ var getFixtures = function(participants, participantsGotBy) {
     for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
         secretSerialNo1 = groupId * 2 + 1;
         secretSerialNo2 = secretSerialNo1 + 1;
-        if (participants.length === 1) {
-            player1 = participants[0];
-        } else {
-            player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
-        }
+
+        player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
         console.log('groupId', groupId, 'player1', player1);
         if (hasGotBy(player1)) {
             console.log('player1 got by in grpid', groupId, 'player', player1);
@@ -493,19 +490,21 @@ var getFixtures = function(participants, participantsGotBy) {
             possiblePlayer2array = participants.filter(function(player2) {
                 //return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
                 if (!hasGotBy(player2) && player2.clubName !== player1.clubName) {
-                    return;
+                    return true;
                 }
             });
             console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
             // TO_DO : have to check player 2 is in by list or not 
-            if (possiblePlayer2array.length) {
-                player2 = possiblePlayer2array[Math.floor(Math.random() * possiblePlayer2array.length)];
-                participants = participants.filter(function(participant) {
-                    return participant.participantId !== player2.participantId;
+
+            if (!possiblePlayer2array.length) {
+                possiblePlayer2array = participants.filter(function(player2) {
+                    return !hasGotBy(player2)
                 });
-            } else {
-                player2 = participants.splice(Math.floor(Math.random() * participants.length), 1)[0];
             }
+            player2 = possiblePlayer2array.splice(Math.floor(Math.random() * possiblePlayer2array.length), 1)[0];
+            participants = participants.filter(function(participant) {
+                return participant.participantId !== player2.participantId;
+            });
             console.log('player2', player2);
             player1.secretSerialNo = secretSerialNo1;
             resultArray.push(player1);
@@ -515,10 +514,9 @@ var getFixtures = function(participants, participantsGotBy) {
     }
     return resultArray;
 };
-getFixtures(participants, [{
+getFixtures(participantList, [{
     participantId: 13
 }]);
-
 
 
 

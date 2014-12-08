@@ -117,39 +117,60 @@ var lib = require('../../lib'),
             player1,
             player2,
             possiblePlayer2array = [],
-            resultArray = [];
-        console.log('maximumSerialNo', maximumSerialNo);
-        if (!participants.length) {
-            return [];
-        }
+            resultArray = [],
+            hasGotBy = function(participant) {
+                return participantsGotBy.filter(function(playerGotby) {
+                    return playerGotby.participantId === participant.participantId;
+                }).length;
+            };
+        participantsGotBy = participantsGotBy || [];
+        if (participants.length !== maximumSerialNo) {
+            if ((maximumSerialNo - participants.length) > participantsGotBy.length) {
+                var extraAutoByCount = maximumSerialNo - participants.length - participantsGotBy.length,
+                    selectedCandidate;
+                for (var i = 0; i < extraAutoByCount; i++) {
+                    selectedCandidate = participants[Math.floor((Math.random() * participants.length))];
+                    while (hasGotBy(selectedCandidate)) {
+                        selectedCandidate = participants[Math.floor((Math.random() * participants.length))];
+                    }
+                    participantsGotBy.push(selectedCandidate);
+                }
 
+            }
+        } else {
+            participantsGotBy = [];
+        }
+        console.log('maximumSerialNo', maximumSerialNo);
         for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
-            console.log(groupId);
             secretSerialNo1 = groupId * 2 + 1;
             secretSerialNo2 = secretSerialNo1 + 1;
-            if (participants.length === 1) {
-                player1 = participants[0];
-            } else {
-                player1 = participants.splice(Math.round((Math.random() * participants.length)), 1)[0];
-            }
-            if (participantsGotBy.filter(function(participant) {
-                    return participant.participantId === player1.participantId;
-                }).length) {
+
+            player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
+            console.log('groupId', groupId, 'player1', player1);
+            if (hasGotBy(player1)) {
+                console.log('player1 got by in grpid', groupId, 'player', player1);
                 player1.byFlag = true;
                 player1.secretSerialNo = secretSerialNo1;
                 resultArray.push(player1);
             } else {
-                possiblePlayer2array = participants.filter(function(participant) {
-                    return participant.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase();
+                possiblePlayer2array = participants.filter(function(player2) {
+                    if (!hasGotBy(player2) && player2.clubName.trim().toUpperCase() !== player1.clubName.trim().toUpperCase()) {
+                        return true;
+                    }
                 });
-                if (possiblePlayer2array.length) {
-                    player2 = possiblePlayer2array.splice(Math.round(Math.random() * possiblePlayer2array.length), 1)[0];
-                } else {
-                    player2 = participants.splice(Math.round(Math.random() * participants.length), 1)[0];
+                console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
+                // TO_DO : have to check player 2 is in by list or not 
+
+                if (!possiblePlayer2array.length) {
+                    possiblePlayer2array = participants.filter(function(player2) {
+                        return !hasGotBy(player2)
+                    });
                 }
+                player2 = possiblePlayer2array.splice(Math.floor(Math.random() * possiblePlayer2array.length), 1)[0];
                 participants = participants.filter(function(participant) {
                     return participant.participantId !== player2.participantId;
                 });
+                console.log('player2', player2);
                 player1.secretSerialNo = secretSerialNo1;
                 resultArray.push(player1);
                 player2.secretSerialNo = secretSerialNo2;
@@ -157,8 +178,27 @@ var lib = require('../../lib'),
             }
         }
         return resultArray;
+    },
+    saveShedule = function(sheduledList) {
+        var deferred = Q.defer(),
+            count = sheduledList.length,
+            successCount = 0,
+            responseLock = false;
+        sheduledList.forEach(function(participant) {
+            new sheduleModel(participant)
+                .save(function(err, data) {
+                    if (err) {
+                        console.log('Error in save Shedules', err);
+                    }
+                    successCount++;
+                    if (successCount === sheduledList.length && !responseLock) {
+                        responseLock = true;
+                        deferred.resolve();
+                    }
+                })
+        })
+        return deferred.promise;
     };
-
 module.exports = {
 
     /**
@@ -263,8 +303,13 @@ module.exports = {
                 if (result) {
                     getParticipantForEvent(result)
                         .then(function(participants) {
-                            var reorderedParticipant = getFixtures(participants);
-                            deferred.resolve(result);
+                            var reorderedParticipants = getFixtures(participants, candidateGiveBy);
+                            saveShedule(reorderedParticipants)
+                                .then(function() {
+                                    deferred.resolve();
+                                }, function(err) {
+                                    deferred.reject(err);
+                                });
                         }, function(err) {
                             deferred.reject(err);
                         });
@@ -272,7 +317,6 @@ module.exports = {
                     eferred.reject();
                 }
             });
-
         return deferred.promise;
     }
 };
