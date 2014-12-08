@@ -51,7 +51,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" name="name" placeholder="Enter name.." class="form-control col-sm-11" ng-model="participant.name">
+            <input type="text" name="name" placeholder="Enter name.." class="form-control col-sm-11" ng-model="participant.name" capitalize>
           </div>
         </div>
         <div class="form-group">
@@ -60,7 +60,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <input type="text" name="instructorName" placeholder="Enter instructor's name.." class="form-control col-sm-11" ng-model="participant.instructor">
+            <input type="text" name="instructorName" placeholder="Enter instructor's name.." class="form-control col-sm-11" ng-model="participant.instructor" capitalize>
           </div>
         </div>
         <div class="form-group">
@@ -142,7 +142,7 @@
             </div>
           </div>
           <div class="col-sm-6" ng-show="club.name==='Others'">
-            <input type="text" name="club" placeholder="Enter club name.." class="form-control col-sm-6" ng-model="participant.clubName">
+            <input type="text" name="club" placeholder="Enter club name.." class="form-control col-sm-6" ng-model="participant.clubName" capitalize>
           </div>
         </div>
 
@@ -191,7 +191,7 @@
             <span class="asterisk">*</span>
           </label>
           <div class="col-sm-6">
-            <textarea name="address" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5" ng-model="participant.address"></textarea>
+            <textarea name="address" ckeditor="editorOptions" placeholder="Enter address.." class="form-control" rows="5" ng-model="participant.address" capitalize></textarea>
           </div>
         </div>
         <div class="form-group">

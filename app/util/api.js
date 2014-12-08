@@ -12,6 +12,7 @@ module.exports = {
     //participant
     add: baseUrl + '/participant/add',
     clubs: baseUrl + '/participant/clubs',
+    participantList: baseUrl + '/participant/list',
 
     //shedules
     sheduleSatus: baseUrl + '/shedule/status',
