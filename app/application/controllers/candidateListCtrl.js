@@ -30,6 +30,7 @@ module.exports = function($scope, $http, $modal) {
             hideMessage();
         });
 
+    //opens the modal window to view participant details
     $scope.viewDetails = function(participant) {
         $http({
                 url: api.findParticipant,
@@ -55,5 +56,19 @@ module.exports = function($scope, $http, $modal) {
                 hideMessage();
             });
     };
+    $scope.editDetails = function(participant) {
 
+    };
+
+    //opens the modal window to delete participant details
+    $scope.deleteDetails = function(participant) {
+        $scope.participant = participant;
+        var modalInstance = $modal.open({
+            template: require('fs').readFileSync(__dirname + '/../templates/deleteParticipantModal.html'),
+            controller: 'deleteParticipantModalCtrl',
+            size: 'sm',
+            backdrop: 'static',
+            scope: $scope
+        });
+    };
 }
