@@ -1,19 +1,18 @@
 'use strict';
 
 var Service = angular.module('app.service', [])
-    .factory('generateVideoId',
+    .factory('exchangeParticipant',
         function() {
-            var video,
-                generateVideoId = {
-                    setVideo: function(obj) {
-                        video = obj;
+            var participant,
+                exchangeParticipant = {
+                    setParticipant: function(obj) {
+                        participant = obj;
                     },
-                    getVideo: function() {
-                        return video;
+                    getParticipant: function() {
+                        return participant;
                     }
                 };
-            return generateVideoId;
-
+            return exchangeParticipant;
         }
     );
 

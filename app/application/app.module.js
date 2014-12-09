@@ -13,6 +13,7 @@ var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'ap
     .controller('gameHistoryCtrl', require('./controllers/gameHistoryCtrl'))
     .controller('registrationModalCtrl', require('./controllers/registrationModalCtrl'))
     .controller('viewParticipantModalCtrl', require('./controllers/viewParticipantModalCtrl'))
+    .controller('deleteParticipantModalCtrl', require('./controllers/deleteParticipantModalCtrl'))
     .config(require('./router/router'));
 
 module.exports = App;
