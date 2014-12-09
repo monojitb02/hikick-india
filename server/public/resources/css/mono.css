@@ -26,6 +26,9 @@
 .last-level {
     display: none;
 }
+.clickable {
+    cursor: pointer;
+}
 /******************** ForDojo Mat **************************/
 
 .no-special-styling {

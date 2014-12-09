@@ -47,6 +47,7 @@ module.exports = function(app) {
     app.get('/api/shedule/status', sheduleController.getSheduleStatus);
     app.get('/api/shedule/search_participant', sheduleController.searchParticipantForBy);
     app.put('/api/shedule/sheduleEvent', sheduleController.addShedule);
+    app.get('/api/shedule/get_all_shedules', sheduleController.getAllShedule);
 
 
 

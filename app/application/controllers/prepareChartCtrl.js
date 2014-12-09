@@ -62,7 +62,6 @@ module.exports = function($scope, $http, $state) {
         .success(function(data) {
             if (data.success) {
                 gameEvents = refreshSheduleStatus(data.data);
-                console.log(gameEvents[0].events[0]);
                 $scope.gameEvents = gameEvents;
             }
         })
@@ -113,7 +112,7 @@ module.exports = function($scope, $http, $state) {
             event.candidatesGotBy.forEach(function(candidate) {
                 var participantId = candidate.text.split('ID:')[1];
                 candidatesGotBy.push({
-                    participantId: participantId
+                    participantId: Number(participantId)
                 });
             })
         }
@@ -126,7 +125,8 @@ module.exports = function($scope, $http, $state) {
                 }
             })
             .success(function(data) {
-                console.log(data);
+                gameEvents = refreshSheduleStatus(data.data);
+                $scope.gameEvents = gameEvents;
             })
             .error(function(err) {
                 console.log(err);

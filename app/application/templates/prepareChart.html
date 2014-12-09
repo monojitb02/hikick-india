@@ -16,14 +16,14 @@
 <div class="contentpanel">
 
   <div class="panel panel-default" ng-repeat="game in gameEvents">
-    <div class="panel-heading background-aqua sliding-panel" ng-click="slidePanel($event)">
+    <div class="panel-heading background-aqua sliding-panel clickable" ng-click="slidePanel($event)">
       <h4 class="panel-title">{{game.eventName}}</h4>
     </div>
     <div class="panel-body">
       <div class="row" ng-repeat="eventGroup in game.events">
         <div class="col-md-6" ng-repeat="event in eventGroup">
           <div class="panel panel-default">
-            <div class="panel-heading background-aqua sliding-panel events-panel" ng-click="slidePanel($event)">
+            <div class="panel-heading background-aqua sliding-panel events-panel clickable maximize" ng-click="slidePanel($event)">
               <h4 class="panel-title">Event Id: {{event.eventId}} Weight: {{getWeightLimit(event)}} Age: {{getAgeLimit(event)}} Category: {{event.gender==='M'?'Male':'Female'}}</h4>
               <div class="status-indicator" ng-class="{'background-green':!event.pending,'background-red':event.pending}" ng-attr-title="{{event.pending?'pending':'Sheduled'}}"></div>
             </div>
@@ -33,7 +33,7 @@
               </tags-input>
               <p>
                 <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}" ng-click="submitShedule(event)">
-                  Shedule It<span class="badge pull-right">{{event.maximumByCount-event.candidatesGotBy.length}}</span>
+                  <span class="badge pull-left">{{event.participantCount}}</span>Shedule It<span class="badge pull-right">{{event.maximumByCount-event.candidatesGotBy.length}}</span>
                 </button>
               </p>
             </div>

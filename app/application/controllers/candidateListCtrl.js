@@ -61,7 +61,7 @@ module.exports = function($scope, $http, $modal) {
     };
 
     //opens the modal window to delete participant details
-    $scope.deleteDetails = function(participant) {
+    /*$scope.deleteDetails = function(participant) {
         $scope.participant = participant;
         var modalInstance = $modal.open({
             template: require('fs').readFileSync(__dirname + '/../templates/deleteParticipantModal.html'),
@@ -70,5 +70,5 @@ module.exports = function($scope, $http, $modal) {
             backdrop: 'static',
             scope: $scope
         });
-    };
+    };*/
 }

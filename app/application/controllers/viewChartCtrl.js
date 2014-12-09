@@ -1,92 +1,14 @@
 'use strict';
-var unitHeight = 25,
+
+var api = require('../../util/api'),
+    unitHeight = 25,
+    completeShedule = [],
     /*
         getMaxPlayerPossible = function(originalNumber) {
             return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
         },
     */
-    completeShedule = [{
-        event: 1,
-        participant: {
-            participantId: 1,
-            name: 'number1'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 1,
-        byFlag: false
-    }, {
-        event: 1,
-        participant: {
-            participantId: 9,
-            name: 'number8'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 8,
-        byFlag: true
-    }, {
-        event: 1,
-        participant: {
-            participantId: 2,
-            name: 'number3'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 3,
-        byFlag: false
-    }, {
-        event: 1,
-        participant: {
-            participantId: 3,
-            name: 'number4'
-        },
-        currentLevel: 2,
-        secretSerialNumber: 4,
-        byFlag: false
-    }, {
-        event: 1,
-        participant: {
-            participantId: 4,
-            name: 'number5'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 5,
-        byFlag: true
-    }, {
-        event: 1,
-        participant: {
-            participantId: 5,
-            name: 'number7'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 7,
-        byFlag: false
-    }, {
-        event: 2,
-        participant: {
-            participantId: 1,
-            name: 'number1'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 1,
-        byFlag: false
-    } {
-        event: 2,
-        participant: {
-            participantId: 2,
-            name: 'number3'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 3,
-        byFlag: false
-    }, {
-        event: 2,
-        participant: {
-            participantId: 3,
-            name: 'number4'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 4,
-        byFlag: false
-    }],
+
     getEvents = function(shedules) {
         var events = [];
         shedules.forEach(function(shedule) {
@@ -174,7 +96,6 @@ var unitHeight = 25,
         }
     };
 module.exports = function($scope, $http, $state) {
-    // $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
     $scope.isLastLevel = function(levelId) {
         return levelId === getMaxLevel($scope.shedules);
@@ -188,19 +109,33 @@ module.exports = function($scope, $http, $state) {
         }
         return ((Math.pow(2, levelId) - 1) * unitHeight) + 'px';
     };
-    //pagination control
     $scope.currentEvent = 1;
     $scope.itemsPerPage = 1;
-    $scope.events = getEvents(completeShedule);
-    //completeShedule comming from server
-    $scope.shedules = completeShedule.filter(function(shedule) {
-        return shedule.event === $scope.events[$scope.currentEvent - 1];
-    });
-    $scope.$watch('currentEvent', function() {
-        $scope.levels = getFormation(completeShedule.filter(function(shedule) {
-            console.log($scope.events, $scope.currentEvent);
-            return shedule.event === $scope.events[$scope.currentEvent - 1];
-        }));
-    });
-    // $scope.events = [1, 2, 3, 4];
+    $http({
+            url: api.getAllShedule,
+            method: 'GET'
+        })
+        .success(function(data) {
+            if (data.success) {
+                completeShedule = data.data;
+                $scope.events = getEvents(completeShedule);
+                $scope.$watch('currentEvent', function() {
+                    $scope.shedules = completeShedule.filter(function(shedule) {
+                        return shedule.event === $scope.events[$scope.currentEvent - 1];
+                    });
+                    $scope.levels = getFormation($scope.shedules);
+                });
+            }
+        })
+        .error(function() {
+            //TO_DO:show error message
+        });
+    /*
+        $scope.events = getEvents(completeShedule);
+        $scope.$watch('currentEvent', function() {
+            $scope.shedules = completeShedule.filter(function(shedule) {
+                return shedule.event === $scope.events[$scope.currentEvent - 1];
+            });
+            $scope.levels = getFormation($scope.shedules);
+        });*/
 };
