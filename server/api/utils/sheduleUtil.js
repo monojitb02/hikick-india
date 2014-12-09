@@ -94,7 +94,9 @@ var lib = require('../../lib'),
         var deferred = Q.defer(),
             result = {};
         sheduleModel
-            .find()
+            .find({
+                byFlag: true
+            })
             .populate('participant')
             .exec(function(err, shedules) {
                 if (err) {
@@ -140,7 +142,7 @@ var lib = require('../../lib'),
         } else {
             participantsGotBy = [];
         }
-        console.log('maximumSerialNo', maximumSerialNo);
+        console.log('maximumSerialNo', maximumSerialNo, participants, participantsGotBy);
         for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
             secretSerialNo1 = groupId * 2 + 1;
             secretSerialNo2 = secretSerialNo1 + 1;
@@ -150,6 +152,7 @@ var lib = require('../../lib'),
             if (hasGotBy(player1)) {
                 console.log('player1 got by in grpid', groupId, 'player', player1);
                 player1.byFlag = true;
+                player1.currentLevel = 2;
                 player1.secretSerialNo = secretSerialNo1;
                 resultArray.push(player1);
             } else {
@@ -159,8 +162,6 @@ var lib = require('../../lib'),
                     }
                 });
                 console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
-                // TO_DO : have to check player 2 is in by list or not 
-
                 if (!possiblePlayer2array.length) {
                     possiblePlayer2array = participants.filter(function(player2) {
                         return !hasGotBy(player2)
@@ -172,28 +173,43 @@ var lib = require('../../lib'),
                 });
                 console.log('player2', player2);
                 player1.secretSerialNo = secretSerialNo1;
+                player2.currentLevel = 1;
                 resultArray.push(player1);
                 player2.secretSerialNo = secretSerialNo2;
+                player1.currentLevel = 1;
                 resultArray.push(player2);
             }
         }
         return resultArray;
     },
-    saveShedule = function(sheduledList) {
+    saveShedule = function(sheduledList, event_id) {
         var deferred = Q.defer(),
             count = sheduledList.length,
             successCount = 0,
+            errorCount = 0,
             responseLock = false;
         sheduledList.forEach(function(participant) {
-            new sheduleModel(participant)
+            new sheduleModel({
+                    event: event_id,
+                    participant: participant._id,
+                    currentLevel: participant.currentLevel,
+                    secretSerialNumber: participant.secretSerialNumber,
+                    byFlag: participant.byFlag
+                })
                 .save(function(err, data) {
                     if (err) {
                         console.log('Error in save Shedules', err);
+                        errorCount++;
+                    } else {
+                        successCount++;
                     }
-                    successCount++;
-                    if (successCount === sheduledList.length && !responseLock) {
+                    if (successCount + errorCount === sheduledList.length && !responseLock) {
                         responseLock = true;
-                        deferred.resolve();
+                        if (errorCount) {
+                            deferred.reject();
+                        } else {
+                            deferred.resolve();
+                        }
                     }
                 })
         })
@@ -211,8 +227,11 @@ module.exports = {
         Q.all([getEvents(), getShedule()])
             .spread(function(events, shedules) {
                 events.forEach(function(event) {
-                    var resultTempStorage = event;
-                    resultTempStorage.candidatesGotBy = shedules[event._id] || [];
+                    var resultTempStorage = event,
+                        candidatesGotBy = shedules[event._id] || [];
+                    resultTempStorage.candidatesGotBy = candidatesGotBy.map(function(shedule) {
+                        return shedule.participant.name + ' ID: ' + shedule.participant.participantId;
+                    })
                     result.push(resultTempStorage);
                 });
                 deferred.resolve(result);
@@ -288,9 +307,8 @@ module.exports = {
     },
 
     sheduleEvent: function(eventId, candidateGiveBy) {
-        var deferred = Q.defer(),
-            sheduleData = lib.flat(sheduleObject);
-        delete sheduleData._id;
+
+        var deferred = Q.defer();
         eventModel
             .findOne({
                 eventId: eventId
@@ -302,8 +320,10 @@ module.exports = {
                 if (result) {
                     getParticipantForEvent(result)
                         .then(function(participants) {
+                            console.log('eventsParticipants:', participants);
                             var reorderedParticipants = getFixtures(participants, candidateGiveBy);
-                            saveShedule(reorderedParticipants)
+                            console.log('reorderedParticipants:', reorderedParticipants);
+                            saveShedule(reorderedParticipants, result._id)
                                 .then(function() {
                                     eventModel
                                         .update({

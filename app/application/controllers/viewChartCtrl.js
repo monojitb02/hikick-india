@@ -5,7 +5,7 @@ var unitHeight = 25,
             return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
         },
     */
-    shedules = [{
+    completeShedule = [{
         event: 1,
         participant: {
             participantId: 1,
@@ -59,7 +59,43 @@ var unitHeight = 25,
         currentLevel: 1,
         secretSerialNumber: 7,
         byFlag: false
+    }, {
+        event: 2,
+        participant: {
+            participantId: 1,
+            name: 'number1'
+        },
+        currentLevel: 1,
+        secretSerialNumber: 1,
+        byFlag: false
+    } {
+        event: 2,
+        participant: {
+            participantId: 2,
+            name: 'number3'
+        },
+        currentLevel: 1,
+        secretSerialNumber: 3,
+        byFlag: false
+    }, {
+        event: 2,
+        participant: {
+            participantId: 3,
+            name: 'number4'
+        },
+        currentLevel: 1,
+        secretSerialNumber: 4,
+        byFlag: false
     }],
+    getEvents = function(shedules) {
+        var events = [];
+        shedules.forEach(function(shedule) {
+            if (events.indexOf(shedule.event) < 0) {
+                events.push(shedule.event);
+            }
+        });
+        return events;
+    },
     getMaxLevel = function(players) { //returns top current lavel from all players
         return Math.ceil(Math.log(players.length) / Math.LN2) + 1;
     },
@@ -138,10 +174,10 @@ var unitHeight = 25,
         }
     };
 module.exports = function($scope, $http, $state) {
-    $scope.levels = getFormation(shedules);
+    // $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
     $scope.isLastLevel = function(levelId) {
-        return levelId === getMaxLevel(shedules);
+        return levelId === getMaxLevel($scope.shedules);
     };
     $scope.getHeight = function(levelId) {
         return (Math.pow(2, levelId) * unitHeight) + 'px';
@@ -152,5 +188,19 @@ module.exports = function($scope, $http, $state) {
         }
         return ((Math.pow(2, levelId) - 1) * unitHeight) + 'px';
     };
-
+    //pagination control
+    $scope.currentEvent = 1;
+    $scope.itemsPerPage = 1;
+    $scope.events = getEvents(completeShedule);
+    //completeShedule comming from server
+    $scope.shedules = completeShedule.filter(function(shedule) {
+        return shedule.event === $scope.events[$scope.currentEvent - 1];
+    });
+    $scope.$watch('currentEvent', function() {
+        $scope.levels = getFormation(completeShedule.filter(function(shedule) {
+            console.log($scope.events, $scope.currentEvent);
+            return shedule.event === $scope.events[$scope.currentEvent - 1];
+        }));
+    });
+    // $scope.events = [1, 2, 3, 4];
 };

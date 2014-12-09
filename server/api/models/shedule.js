@@ -17,8 +17,7 @@ var lib = require('../../lib'),
             required: true
         },
         currentLevel: {
-            type: Number,
-            default: 1
+            type: Number
         },
         secretSerialNumber: {
             type: Number

@@ -18,7 +18,7 @@
                      res.send(['No Data Found']);
                  } else {
                      result.forEach(function(participant) {
-                         participants.push(participant.name + ' ID: ' + participant.participantId + '  ')
+                         participants.push(participant.name + ' ID: ' + participant.participantId)
                      })
                      res.send(participants);
                  }
@@ -69,7 +69,7 @@
       */
      addShedule: function(req, res) {
          var workflow = lib.workflow(req, res);
-
+         console.log('adShedule Request received');
          if (req.body.eventId === undefined) {
              workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
              workflow.emit('response');
@@ -88,6 +88,7 @@
                              workflow.outcome.data = data.sort(function(first, second) {
                                  return first.eventId > second.eventId ? 1 : -1
                              });
+                             console.log('addShedule done');
                              workflow.emit('response');
                          }
                      }, function(err) {

@@ -575,15 +575,18 @@ module.exports = function($scope, $http, $state) {
         .success(function(data) {
             if (data.success) {
                 gameEvents = refreshSheduleStatus(data.data);
+                console.log(gameEvents[0].events[0]);
+                $scope.gameEvents = gameEvents;
             }
         })
         .error(function(data, status, headers, config) {
             //TO_DO:show error message
         });
 
-    $scope.getGames = function() {
+    /*$scope.getGames = function() {
+        console.log(gameEvents);
         return gameEvents;
-    };
+    };*/
     /* deprecated function
         $scope.getCandidatesGotBy = function(eventId) {
             var eventData = sheduleStatus.filter(function(element) {
@@ -636,10 +639,10 @@ module.exports = function($scope, $http, $state) {
                 }
             })
             .success(function(data) {
-
+                console.log(data);
             })
             .error(function(err) {
-
+                console.log(err);
             })
     }
 }
@@ -889,7 +892,7 @@ var unitHeight = 25,
             return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
         },
     */
-    shedules = [{
+    completeShedule = [{
         event: 1,
         participant: {
             participantId: 1,
@@ -943,7 +946,52 @@ var unitHeight = 25,
         currentLevel: 1,
         secretSerialNumber: 7,
         byFlag: false
+    }, {
+        event: 2,
+        participant: {
+            participantId: 1,
+            name: 'number1'
+        },
+        currentLevel: 1,
+        secretSerialNumber: 1,
+        byFlag: false
+    }, {
+        event: 2,
+        participant: {
+            participantId: 9,
+            name: 'number8'
+        },
+        currentLevel: 1,
+        secretSerialNumber: 8,
+        byFlag: true
+    }, {
+        event: 2,
+        participant: {
+            participantId: 2,
+            name: 'number3'
+        },
+        currentLevel: 1,
+        secretSerialNumber: 3,
+        byFlag: false
+    }, {
+        event: 2,
+        participant: {
+            participantId: 3,
+            name: 'number4'
+        },
+        currentLevel: 2,
+        secretSerialNumber: 4,
+        byFlag: false
     }],
+    getEvents = function(shedules) {
+        var events = [];
+        shedules.forEach(function(shedule) {
+            if (events.indexOf(shedule.event) < 0) {
+                events.push(shedule.event);
+            }
+        });
+        return events;
+    },
     getMaxLevel = function(players) { //returns top current lavel from all players
         return Math.ceil(Math.log(players.length) / Math.LN2) + 1;
     },
@@ -1022,10 +1070,10 @@ var unitHeight = 25,
         }
     };
 module.exports = function($scope, $http, $state) {
-    $scope.levels = getFormation(shedules);
+    // $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
     $scope.isLastLevel = function(levelId) {
-        return levelId === getMaxLevel(shedules);
+        return levelId === getMaxLevel($scope.shedules);
     };
     $scope.getHeight = function(levelId) {
         return (Math.pow(2, levelId) * unitHeight) + 'px';
@@ -1036,7 +1084,21 @@ module.exports = function($scope, $http, $state) {
         }
         return ((Math.pow(2, levelId) - 1) * unitHeight) + 'px';
     };
-
+    //pagination control
+    $scope.currentEvent = 1;
+    $scope.itemsPerPage = 1;
+    $scope.events = getEvents(completeShedule);
+    //completeShedule comming from server
+    $scope.shedules = completeShedule.filter(function(shedule) {
+        return shedule.event === $scope.events[$scope.currentEvent - 1];
+    });
+    $scope.$watch('currentEvent', function() {
+        $scope.levels = getFormation(completeShedule.filter(function(shedule) {
+            console.log($scope.events, $scope.currentEvent);
+            return shedule.event === $scope.events[$scope.currentEvent - 1];
+        }));
+    });
+    // $scope.events = [1, 2, 3, 4];
 };
 
 },{}],"/var/www/html/hikick-india/app/application/controllers/viewParticipantModalCtrl.js":[function(require,module,exports){
@@ -1124,7 +1186,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
             url: '/prepareChart',
             views: {
                 'pages': {
-                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+CiAgICA8aDI+PGkgY2xhc3M9ImZhIGZhLWhhbmQtby11cCI+PC9pPiBHYW1lIEV2ZW50IFNoZWR1bGluZyA8IS0tIDxzcGFuPlN1YnRpdGxlIGdvZXMgaGVyZS4uLjwvc3Bhbj4gLS0+CiAgPC9oMj4KICAgIDwhLS0gIDxkaXYgY2xhc3M9ImJyZWFkY3J1bWItd3JhcHBlciI+CiAgICAgICA8c3BhbiBjbGFzcz0ibGFiZWwiPllvdSBhcmUgaGVyZTo8L3NwYW4+CiAgICAgICA8b2wgY2xhc3M9ImJyZWFkY3J1bWIiPgogICAgICAgICAgIDxsaT48YSBocmVmPSJpbmRleC5odG1sIj5CcmFja2V0PC9hPgogICAgICAgICAgIDwvbGk+CiAgICAgICAgICAgPGxpPjxhIGhyZWY9ImJ1dHRvbnMuaHRtbCI+VUkgRWxlbWVudHM8L2E+CiAgICAgICAgICAgPC9saT4KICAgICAgICAgICA8bGkgY2xhc3M9ImFjdGl2ZSI+QnV0dG9uczwvbGk+CiAgICAgICA8L29sPgogICA8L2Rpdj4gLS0+CjwvZGl2PgoKPGRpdiBjbGFzcz0iY29udGVudHBhbmVsIj4KCiAgICA8ZGl2IGNsYXNzPSJwYW5lbCBwYW5lbC1kZWZhdWx0IiBuZy1yZXBlYXQ9ImdhbWUgaW4gZ2V0R2FtZXMoKSI+CiAgICAgICAgPGRpdiBjbGFzcz0icGFuZWwtaGVhZGluZyBiYWNrZ3JvdW5kLWFxdWEgc2xpZGluZy1wYW5lbCIgbmctY2xpY2s9InNsaWRlUGFuZWwoJGV2ZW50KSI+CiAgICAgICAgICAgIDxoNCBjbGFzcz0icGFuZWwtdGl0bGUiPnt7Z2FtZS5ldmVudE5hbWV9fTwvaDQ+CiAgICAgICAgPC9kaXY+CiAgICAgICAgPGRpdiBjbGFzcz0icGFuZWwtYm9keSI+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InJvdyIgbmctcmVwZWF0PSJldmVudEdyb3VwIGluIGdhbWUuZXZlbnRzIj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC02IiBuZy1yZXBlYXQ9ImV2ZW50IGluIGV2ZW50R3JvdXAiPgogICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InBhbmVsIHBhbmVsLWRlZmF1bHQiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJwYW5lbC1oZWFkaW5nIGJhY2tncm91bmQtYXF1YSBzbGlkaW5nLXBhbmVsIGV2ZW50cy1wYW5lbCIgbmctY2xpY2s9InNsaWRlUGFuZWwoJGV2ZW50KSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aDQgY2xhc3M9InBhbmVsLXRpdGxlIj5FdmVudCBJZDoge3tldmVudC5ldmVudElkfX0gV2VpZ2h0OiB7e2dldFdlaWdodExpbWl0KGV2ZW50KX19IEFnZToge3tnZXRBZ2VMaW1pdChldmVudCl9fSBDYXRlZ29yeToge3tldmVudC5nZW5kZXI9PT0nTSc/J01hbGUnOidGZW1hbGUnfX08L2g0PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0ic3RhdHVzLWluZGljYXRvciIgbmctY2xhc3M9InsnYmFja2dyb3VuZC1ncmVlbic6IWV2ZW50LnBlbmRpbmcsJ2JhY2tncm91bmQtcmVkJzpldmVudC5wZW5kaW5nfSIgbmctYXR0ci10aXRsZT0ie3tldmVudC5wZW5kaW5nPydwZW5kaW5nJzonU2hlZHVsZWQnfX0iPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icGFuZWwtYm9keSBiYWNrZ3JvdW5kLWFzaCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGFncy1pbnB1dCBuZy1tb2RlbD0iZXZlbnQuY2FuZGlkYXRlc0dvdEJ5IiBwbGFjZWhvbGRlcj0iQWRkIGNhbmRpZGF0ZXMgaW4gbGlzdCB0byBnaXZlIHRoZW0gYnkiIGFkZC1vbi1ibHVyPSJmYWxzZSIgYWRkLWZyb20tYXV0b2NvbXBsZXRlLW9ubHk9InRydWUiIG1heC10YWdzPSJ7e2V2ZW50Lm1heGltdW1CeUNvdW50fX0iIHJlcGxhY2Utc3BhY2VzLXdpdGgtZGFzaGVzPSJmYWxzZSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGF1dG8tY29tcGxldGUgc291cmNlPSJzZWFyY2hDYW5kaWRhdGVzKCRxdWVyeSxldmVudC5ldmVudElkKSIgbWluLWxlbmd0aD0iMiI+PC9hdXRvLWNvbXBsZXRlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90YWdzLWlucHV0PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1ibG9jayIgbmctY2xhc3M9InsnYnRuLXByaW1hcnknOmV2ZW50LnBlbmRpbmcsJ2J0bi1kYW5nZXInOiFldmVudC5wZW5kaW5nfSIgbmctY2xpY2s9InN1Ym1pdFNoZWR1bGUoZXZlbnQpIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU2hlZHVsZSBJdDxzcGFuIGNsYXNzPSJiYWRnZSBwdWxsLXJpZ2h0Ij57e2V2ZW50Lm1heGltdW1CeUNvdW50LWV2ZW50LmNhbmRpZGF0ZXNHb3RCeS5sZW5ndGh9fTwvc3Bhbj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2J1dHRvbj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvcD4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gcGFuZWwtYm9keSAtLT4KICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj4KICAgICAgICA8IS0tIHBhbmVsLWJvZHkgLS0+CiAgICA8L2Rpdj4KICAgIDwhLS0gcGFuZWwgLS0+CgoKPC9kaXY+CjwhLS0gY29udGVudHBhbmVsIC0tPgo=","base64"),
+                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+CiAgPGgyPjxpIGNsYXNzPSJmYSBmYS1oYW5kLW8tdXAiPjwvaT4gR2FtZSBFdmVudCBTaGVkdWxpbmcgPCEtLSA8c3Bhbj5TdWJ0aXRsZSBnb2VzIGhlcmUuLi48L3NwYW4+IC0tPgogIDwvaDI+CiAgPCEtLSAgPGRpdiBjbGFzcz0iYnJlYWRjcnVtYi13cmFwcGVyIj4KICAgICAgIDxzcGFuIGNsYXNzPSJsYWJlbCI+WW91IGFyZSBoZXJlOjwvc3Bhbj4KICAgICAgIDxvbCBjbGFzcz0iYnJlYWRjcnVtYiI+CiAgICAgICAgICAgPGxpPjxhIGhyZWY9ImluZGV4Lmh0bWwiPkJyYWNrZXQ8L2E+CiAgICAgICAgICAgPC9saT4KICAgICAgICAgICA8bGk+PGEgaHJlZj0iYnV0dG9ucy5odG1sIj5VSSBFbGVtZW50czwvYT4KICAgICAgICAgICA8L2xpPgogICAgICAgICAgIDxsaSBjbGFzcz0iYWN0aXZlIj5CdXR0b25zPC9saT4KICAgICAgIDwvb2w+CiAgIDwvZGl2PiAtLT4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJjb250ZW50cGFuZWwiPgoKICA8ZGl2IGNsYXNzPSJwYW5lbCBwYW5lbC1kZWZhdWx0IiBuZy1yZXBlYXQ9ImdhbWUgaW4gZ2FtZUV2ZW50cyI+CiAgICA8ZGl2IGNsYXNzPSJwYW5lbC1oZWFkaW5nIGJhY2tncm91bmQtYXF1YSBzbGlkaW5nLXBhbmVsIiBuZy1jbGljaz0ic2xpZGVQYW5lbCgkZXZlbnQpIj4KICAgICAgPGg0IGNsYXNzPSJwYW5lbC10aXRsZSI+e3tnYW1lLmV2ZW50TmFtZX19PC9oND4KICAgIDwvZGl2PgogICAgPGRpdiBjbGFzcz0icGFuZWwtYm9keSI+CiAgICAgIDxkaXYgY2xhc3M9InJvdyIgbmctcmVwZWF0PSJldmVudEdyb3VwIGluIGdhbWUuZXZlbnRzIj4KICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNiIgbmctcmVwZWF0PSJldmVudCBpbiBldmVudEdyb3VwIj4KICAgICAgICAgIDxkaXYgY2xhc3M9InBhbmVsIHBhbmVsLWRlZmF1bHQiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJwYW5lbC1oZWFkaW5nIGJhY2tncm91bmQtYXF1YSBzbGlkaW5nLXBhbmVsIGV2ZW50cy1wYW5lbCIgbmctY2xpY2s9InNsaWRlUGFuZWwoJGV2ZW50KSI+CiAgICAgICAgICAgICAgPGg0IGNsYXNzPSJwYW5lbC10aXRsZSI+RXZlbnQgSWQ6IHt7ZXZlbnQuZXZlbnRJZH19IFdlaWdodDoge3tnZXRXZWlnaHRMaW1pdChldmVudCl9fSBBZ2U6IHt7Z2V0QWdlTGltaXQoZXZlbnQpfX0gQ2F0ZWdvcnk6IHt7ZXZlbnQuZ2VuZGVyPT09J00nPydNYWxlJzonRmVtYWxlJ319PC9oND4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJzdGF0dXMtaW5kaWNhdG9yIiBuZy1jbGFzcz0ieydiYWNrZ3JvdW5kLWdyZWVuJzohZXZlbnQucGVuZGluZywnYmFja2dyb3VuZC1yZWQnOmV2ZW50LnBlbmRpbmd9IiBuZy1hdHRyLXRpdGxlPSJ7e2V2ZW50LnBlbmRpbmc/J3BlbmRpbmcnOidTaGVkdWxlZCd9fSI+PC9kaXY+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJwYW5lbC1ib2R5IGJhY2tncm91bmQtYXNoIj4KICAgICAgICAgICAgICA8dGFncy1pbnB1dCBuZy1tb2RlbD0iZXZlbnQuY2FuZGlkYXRlc0dvdEJ5IiBwbGFjZWhvbGRlcj0iQWRkIGNhbmRpZGF0ZXMgaW4gbGlzdCB0byBnaXZlIHRoZW0gYnkiIGFkZC1vbi1ibHVyPSJmYWxzZSIgYWRkLWZyb20tYXV0b2NvbXBsZXRlLW9ubHk9InRydWUiIG1heC10YWdzPSJ7e2V2ZW50Lm1heGltdW1CeUNvdW50fX0iIHJlcGxhY2Utc3BhY2VzLXdpdGgtZGFzaGVzPSJmYWxzZSI+CiAgICAgICAgICAgICAgICA8YXV0by1jb21wbGV0ZSBzb3VyY2U9InNlYXJjaENhbmRpZGF0ZXMoJHF1ZXJ5LGV2ZW50LmV2ZW50SWQpIiBtaW4tbGVuZ3RoPSIyIj48L2F1dG8tY29tcGxldGU+CiAgICAgICAgICAgICAgPC90YWdzLWlucHV0PgogICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1ibG9jayIgbmctY2xhc3M9InsnYnRuLXByaW1hcnknOmV2ZW50LnBlbmRpbmcsJ2J0bi1kYW5nZXInOiFldmVudC5wZW5kaW5nfSIgbmctY2xpY2s9InN1Ym1pdFNoZWR1bGUoZXZlbnQpIj4KICAgICAgICAgICAgICAgICAgU2hlZHVsZSBJdDxzcGFuIGNsYXNzPSJiYWRnZSBwdWxsLXJpZ2h0Ij57e2V2ZW50Lm1heGltdW1CeUNvdW50LWV2ZW50LmNhbmRpZGF0ZXNHb3RCeS5sZW5ndGh9fTwvc3Bhbj4KICAgICAgICAgICAgICAgIDwvYnV0dG9uPgogICAgICAgICAgICAgIDwvcD4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDwhLS0gcGFuZWwtYm9keSAtLT4KICAgICAgICAgIDwvZGl2PgogICAgICAgIDwvZGl2PgogICAgICA8L2Rpdj4KICAgIDwvZGl2PgogICAgPCEtLSBwYW5lbC1ib2R5IC0tPgogIDwvZGl2PgogIDwhLS0gcGFuZWwgLS0+CgoKPC9kaXY+CjwhLS0gY29udGVudHBhbmVsIC0tPgo=","base64"),
                     controller: 'prepareChartCtrl'
                 }
             }
@@ -1133,7 +1195,7 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
             url: '/viewChart',
             views: {
                 'pages': {
-                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+CiAgPGgyPgogICAgPGkgY2xhc3M9ImZhIGZhLWZsYWciPjwvaT4gU2hlZHVsZWQgU2hlZXRzIAogIDwvaDI+CiAgPGRpdiBjbGFzcz0iYnJlYWRjcnVtYi13cmFwcGVyIj4KICAgIDxzcGFuIGNsYXNzPSJsYWJlbCI+WW91IGFyZSBoZXJlOjwvc3Bhbj4KICAgIDxvbCBjbGFzcz0iYnJlYWRjcnVtYiI+CiAgICAgIDxsaT48YSBocmVmPSJpbmRleC5odG1sIj5CcmFja2V0PC9hPgogICAgICA8L2xpPgogICAgICA8bGk+PGEgaHJlZj0iYnV0dG9ucy5odG1sIj5VSSBFbGVtZW50czwvYT4KICAgICAgPC9saT4KICAgICAgPGxpIGNsYXNzPSJhY3RpdmUiPkljb25zPC9saT4KICAgIDwvb2w+CiAgPC9kaXY+CjwvZGl2PgoKPGRpdiBjbGFzcz0iY29udGVudHBhbmVsICI+CiAgPGRpdiBjbGFzcz0icm93Ij4KICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0yIiBuZy1yZXBlYXQ9ImxldmVsIGluIGxldmVscyI+CiAgICAgIDxkaXYgY2xhc3M9ImxldmVsLWhlYWRlciB0ZXh0LWNlbnRlciI+CiAgICAgICAgPGg0PkxldmVsLXt7bGV2ZWwubGV2ZWxJZH19PC9oND4KICAgICAgPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InJvdyIgbmctcmVwZWF0PSJncm91cCBpbiBsZXZlbC5ncm91cHMiIHN0eWxlPSJtYXJnaW4tdG9wOiB7e2dldE9mZnNldChsZXZlbC5sZXZlbElkICwkaW5kZXgpfX0iPgogICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0xMiB0ZXh0LWNlbnRlciBib3JkZXItYm90dG9tIiBzdHlsZT0iaGVpZ2h0OiB7e3VuaXRIZWlnaHQrJ3B4J319Ij4KICAgICAgICAgIDxzcGFuIGNsYXNzPSJ0ZXh0LWJvdHRvbS1taWRkbGUgZm9udC1yZWQtYm9sZCI+e3tncm91cC5wbGF5ZXIxLm5hbWV9fSZuYnNwOyZuYnNwOyZuYnNwOyhJZDp7e2dyb3VwLnBsYXllcjEucGFydGljaXBhbnRJZH19KTwvc3Bhbj4KICAgICAgICA8L2Rpdj4KICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtMTIgdGV4dC1jZW50ZXIgYm9yZGVyLXJpZ2h0LWJvdHRvbSIgc3R5bGU9ImhlaWdodDoge3tnZXRIZWlnaHQobGV2ZWwubGV2ZWxJZCl9fSIgbmctc2hvdz0iZ3JvdXAucGxheWVyMiIgbmctY2xhc3M9InsnbGFzdC1sZXZlbCc6aXNMYXN0TGV2ZWwobGV2ZWwubGV2ZWxJZCl9Ij4KICAgICAgICAgIDxzcGFuIGNsYXNzPSJ0ZXh0LWJvdHRvbS1taWRkbGUgZm9udC1ibHVlLWJvbGQiPnt7Z3JvdXAucGxheWVyMi5uYW1lfX0mbmJzcDsmbmJzcDsmbmJzcDsoSWQ6e3tncm91cC5wbGF5ZXIyLnBhcnRpY2lwYW50SWR9fSk8L3NwYW4+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgPC9kaXY+CiAgPCEtLSBwYW5lbCAtLT4KCjwvZGl2Pgo8IS0tIGNvbnRlbnRwYW5lbCAtLT4K","base64"),
+                    template: Buffer("PGRpdiBjbGFzcz0icGFnZWhlYWRlciI+CiAgPGgyPgogICAgPGkgY2xhc3M9ImZhIGZhLWZsYWciPjwvaT4gU2hlZHVsZWQgU2hlZXRzIAogIDwvaDI+CiAgPGRpdiBjbGFzcz0iYnJlYWRjcnVtYi13cmFwcGVyIj4KICAgIDxwYWdpbmF0aW9uIGJvdW5kYXJ5LWxpbmtzPSJ0cnVlIiB0b3RhbC1pdGVtcz0iZXZlbnRzLmxlbmd0aCIgaXRlbXMtcGVyLXBhZ2U9Iml0ZW1zUGVyUGFnZSIgbWF4LXNpemU9IjEwIiBuZy1tb2RlbD0iY3VycmVudEV2ZW50IiBjbGFzcz0icGFnaW5hdGlvbi1zbSBtYXJnaW4tcmVzZXQiIHByZXZpb3VzLXRleHQ9IiZsc2FxdW87IiBuZXh0LXRleHQ9IiZyc2FxdW87IiBmaXJzdC10ZXh0PSImbGFxdW87IiBsYXN0LXRleHQ9IiZyYXF1bzsiPjwvcGFnaW5hdGlvbj4KICA8L2Rpdj4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJjb250ZW50cGFuZWwgIj4KICA8ZGl2IGNsYXNzPSJyb3ciPgogICAgPGRpdiBjbGFzcz0iY29sLW1kLTIiIG5nLXJlcGVhdD0ibGV2ZWwgaW4gbGV2ZWxzIj4KICAgICAgPGRpdiBjbGFzcz0ibGV2ZWwtaGVhZGVyIHRleHQtY2VudGVyIj4KICAgICAgICA8aDQ+TGV2ZWwte3tsZXZlbC5sZXZlbElkfX08L2g0PgogICAgICA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icm93IiBuZy1yZXBlYXQ9Imdyb3VwIGluIGxldmVsLmdyb3VwcyIgc3R5bGU9Im1hcmdpbi10b3A6IHt7Z2V0T2Zmc2V0KGxldmVsLmxldmVsSWQgLCRpbmRleCl9fSI+CiAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTEyIHRleHQtY2VudGVyIGJvcmRlci1ib3R0b20iIHN0eWxlPSJoZWlnaHQ6IHt7dW5pdEhlaWdodCsncHgnfX0iPgogICAgICAgICAgPHNwYW4gY2xhc3M9InRleHQtYm90dG9tLW1pZGRsZSBmb250LXJlZC1ib2xkIj57e2dyb3VwLnBsYXllcjEubmFtZX19Jm5ic3A7Jm5ic3A7Jm5ic3A7KElkOnt7Z3JvdXAucGxheWVyMS5wYXJ0aWNpcGFudElkfX0pPC9zcGFuPgogICAgICAgIDwvZGl2PgogICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0xMiB0ZXh0LWNlbnRlciBib3JkZXItcmlnaHQtYm90dG9tIiBzdHlsZT0iaGVpZ2h0OiB7e2dldEhlaWdodChsZXZlbC5sZXZlbElkKX19IiBuZy1zaG93PSJncm91cC5wbGF5ZXIyIiBuZy1jbGFzcz0ieydsYXN0LWxldmVsJzppc0xhc3RMZXZlbChsZXZlbC5sZXZlbElkKX0iPgogICAgICAgICAgPHNwYW4gY2xhc3M9InRleHQtYm90dG9tLW1pZGRsZSBmb250LWJsdWUtYm9sZCI+e3tncm91cC5wbGF5ZXIyLm5hbWV9fSZuYnNwOyZuYnNwOyZuYnNwOyhJZDp7e2dyb3VwLnBsYXllcjIucGFydGljaXBhbnRJZH19KTwvc3Bhbj4KICAgICAgICA8L2Rpdj4KICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICA8L2Rpdj4KICA8IS0tIHBhbmVsIC0tPgoKPC9kaXY+CjwhLS0gY29udGVudHBhbmVsIC0tPgo=","base64"),
                     controller: 'viewChartCtrl'
                 }
             }

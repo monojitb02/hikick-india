@@ -62,15 +62,18 @@ module.exports = function($scope, $http, $state) {
         .success(function(data) {
             if (data.success) {
                 gameEvents = refreshSheduleStatus(data.data);
+                console.log(gameEvents[0].events[0]);
+                $scope.gameEvents = gameEvents;
             }
         })
         .error(function(data, status, headers, config) {
             //TO_DO:show error message
         });
 
-    $scope.getGames = function() {
+    /*$scope.getGames = function() {
+        console.log(gameEvents);
         return gameEvents;
-    };
+    };*/
     /* deprecated function
         $scope.getCandidatesGotBy = function(eventId) {
             var eventData = sheduleStatus.filter(function(element) {
@@ -123,10 +126,10 @@ module.exports = function($scope, $http, $state) {
                 }
             })
             .success(function(data) {
-
+                console.log(data);
             })
             .error(function(err) {
-
+                console.log(err);
             })
     }
 }
