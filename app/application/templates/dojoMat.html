@@ -1,10 +1,10 @@
-<div class="pageheader dojo-page-header">
-  <h2 class="pull-left"><i class="fa fa-trophy"></i> Dojo Mat-{{matId}}
+<div class="pageheader">
+  <h2><i class="fa fa-trophy"></i> Dojo Mat-{{matId}}
   </h2>
 
   <!-- <div class="clock col-sm-4 col-sm-offset-4"></div> -->
 
-  <div class="pull-right">
+  <div class="dojo-header-right">
     Set Event:
     <select class="form-control inline-box" ng-model="selectedEvent" ng-options="eventId.name for eventId in eventIds" ng-disabled="matchStarted">
       <!-- ng-change="getMatches()"
