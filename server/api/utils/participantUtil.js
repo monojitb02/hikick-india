@@ -17,6 +17,19 @@ module.exports = {
 
         return deferred.promise;
     },
+    deleteParticipant: function(participantObject) {
+        var deferred = Q.defer();
+        participantModel
+            .findOneAndRemove(participantObject)
+            .exec(function(err, result) {
+                if (err) {
+                    deferred.reject(err);
+                } else {
+                    deferred.resolve(result);
+                }
+            });
+        return deferred.promise;
+    },
 
     /**
      *  get unique list of clubs from database

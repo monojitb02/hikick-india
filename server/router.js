@@ -32,6 +32,7 @@ module.exports = function(app) {
     //Candidates Routs
     app.post('/api/participant/add', participantController.add);
     app.put('/api/participant/update', participantController.update);
+    app.put('/api/participant/delete', participantController.delete);
     app.get('/api/participant/search', participantController.search);
     app.get('/api/participant/list', participantController.getAllParticipant);
     app.get('/api/participant/find', participantController.getParticipant);

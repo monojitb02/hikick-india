@@ -29,6 +29,6 @@ require('flipclock');
 
 var App = require('./app/application/app.module');
 
-angular.element().ready(function() {
-    angular.resumeBootstrap([App['name']]);
-});
+// angular.element().ready(function() {
+//     angular.resumeBootstrap([App['name']]);
+// });

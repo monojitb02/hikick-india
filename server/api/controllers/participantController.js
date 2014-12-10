@@ -75,6 +75,31 @@
              })
              .done();
      },
+     delete: function(req, res) {
+         var workflow = lib.workflow(req, res),
+             participantId = req.body.participantId;
+         if (participantId === undefined) {
+             workflow.outcome.errfor.message = lib.message.PARTICIPANTID_REQUIRED;
+             workflow.emit('response');
+             return;
+         }
+         participantUtil
+             .deleteParticipant({
+                 participantId: participantId
+             })
+             .then(function(data) {
+                 console.log(data, 'is deleted');
+                 if (data) {
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.errfor.message = lib.message.UPDATE_NON_EXISTING_DOCUMENT_FAILED;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 utils.errorNotifier(err, workflow);
+             })
+             .done();
+     },
      getCubs: function(req, res) {
          var workflow = lib.workflow(req, res);
          participantUtil
@@ -174,6 +199,4 @@
              })
              .done();
      }
-
-
  };
