@@ -27,13 +27,34 @@
              });
      },
      /*
+      * get shedule of all events
+      */
+     getAllShedule: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         sheduleUtil
+             .getShedule({})
+             .then(function(data) {
+                 if (!data.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = data;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
+     /*
       * get shedule of a perticular event
       */
      getCompeteShedule: function(req, res) {
-         var workflow = lib.workflow(req, res);
-         eventId = req.query.event_id
+         var workflow = lib.workflow(req, res),
+             eventId = req.query.event_id;
          sheduleUtil
-             .getShedule(eventId)
+             .getShedule({
+                 event: eventId
+             })
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;

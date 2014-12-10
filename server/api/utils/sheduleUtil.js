@@ -48,6 +48,7 @@ var lib = require('../../lib'),
             queryObject = prepareQueryforEvent(event);
         participantModel
             .find(queryObject)
+            .lean()
             .exec(function(err, data) {
                 if (err) {
                     deferred.reject(err);
@@ -75,6 +76,7 @@ var lib = require('../../lib'),
                             .then(function(participants) {
                                 var tempEvent = event.toObject();
                                 tempEvent.maximumByCount = getByCount(participants.length);
+                                tempEvent.participantCount = participants.length;
                                 result.push(tempEvent);
                             }, function(err) {
                                 errorCount++;
@@ -142,18 +144,18 @@ var lib = require('../../lib'),
         } else {
             participantsGotBy = [];
         }
-        console.log('maximumSerialNo', maximumSerialNo, participants, participantsGotBy);
+        // console.log('maximumSerialNo', maximumSerialNo, participantsGotBy);
         for (var groupId = 0; groupId < (maximumSerialNo / 2); groupId++) {
             secretSerialNo1 = groupId * 2 + 1;
             secretSerialNo2 = secretSerialNo1 + 1;
 
             player1 = participants.splice(Math.floor((Math.random() * participants.length)), 1)[0];
-            console.log('groupId', groupId, 'player1', player1);
+            // console.log('groupId', groupId, 'player1', player1);
             if (hasGotBy(player1)) {
-                console.log('player1 got by in grpid', groupId, 'player', player1);
+                // console.log('player1 got by in grpid', groupId, 'player', player1);
                 player1.byFlag = true;
                 player1.currentLevel = 2;
-                player1.secretSerialNo = secretSerialNo1;
+                player1.secretSerialNumber = secretSerialNo1;
                 resultArray.push(player1);
             } else {
                 possiblePlayer2array = participants.filter(function(player2) {
@@ -161,7 +163,7 @@ var lib = require('../../lib'),
                         return true;
                     }
                 });
-                console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
+                // console.log('groupId', groupId, 'possiblePlayer2array', possiblePlayer2array);
                 if (!possiblePlayer2array.length) {
                     possiblePlayer2array = participants.filter(function(player2) {
                         return !hasGotBy(player2)
@@ -171,11 +173,11 @@ var lib = require('../../lib'),
                 participants = participants.filter(function(participant) {
                     return participant.participantId !== player2.participantId;
                 });
-                console.log('player2', player2);
-                player1.secretSerialNo = secretSerialNo1;
+                // console.log('player2', player2);
+                player1.secretSerialNumber = secretSerialNo1;
                 player2.currentLevel = 1;
                 resultArray.push(player1);
-                player2.secretSerialNo = secretSerialNo2;
+                player2.secretSerialNumber = secretSerialNo2;
                 player1.currentLevel = 1;
                 resultArray.push(player2);
             }
@@ -188,31 +190,36 @@ var lib = require('../../lib'),
             successCount = 0,
             errorCount = 0,
             responseLock = false;
-        sheduledList.forEach(function(participant) {
-            new sheduleModel({
-                    event: event_id,
-                    participant: participant._id,
-                    currentLevel: participant.currentLevel,
-                    secretSerialNumber: participant.secretSerialNumber,
-                    byFlag: participant.byFlag
-                })
-                .save(function(err, data) {
-                    if (err) {
-                        console.log('Error in save Shedules', err);
-                        errorCount++;
-                    } else {
-                        successCount++;
-                    }
-                    if (successCount + errorCount === sheduledList.length && !responseLock) {
-                        responseLock = true;
-                        if (errorCount) {
-                            deferred.reject();
+        sheduleModel.remove({
+            event: event_id
+        }).exec(function(err, data) {
+            sheduledList.forEach(function(participant) {
+                new sheduleModel({
+                        event: event_id,
+                        participant: participant._id,
+                        currentLevel: participant.currentLevel,
+                        secretSerialNumber: participant.secretSerialNumber,
+                        byFlag: participant.byFlag
+                    })
+                    .save(function(err, data) {
+                        if (err) {
+                            console.log('Error in save Shedules', err);
+                            errorCount++;
                         } else {
-                            deferred.resolve();
+                            successCount++;
                         }
-                    }
-                })
+                        if (successCount + errorCount === sheduledList.length && !responseLock) {
+                            responseLock = true;
+                            if (errorCount) {
+                                deferred.reject();
+                            } else {
+                                deferred.resolve();
+                            }
+                        }
+                    })
+            })
         })
+
         return deferred.promise;
     };
 module.exports = {
@@ -279,28 +286,18 @@ module.exports = {
      *  get shedule details data from database
      *
      */
-    //TO_DO:not verified
-    getCompeteShedule: function(eventId) {
-        var deferred = Q.defer(),
-            event;
+    getShedule: function(queryObject) {
+        var deferred = Q.defer();
         sheduleModel
-            .find({
-                event: eventId
-            })
+            .find(queryObject)
+            .populate('participant')
             .exec(function(err, result) {
                 if (err) {
                     deferred.reject(err);
                 } else {
                     if (result.length) {
-                        event = result[0].event;
-                        result.forEach(function(sheduleObject) {
-                            lib._.omit(sheduleObject, 'event');
-                        });
+                        deferred.resolve(result);
                     }
-                    deferred.resolve({
-                        event: event,
-                        shedule: result
-                    });
                 }
             });
         return deferred.promise;
@@ -320,9 +317,10 @@ module.exports = {
                 if (result) {
                     getParticipantForEvent(result)
                         .then(function(participants) {
-                            console.log('eventsParticipants:', participants);
+                            // participants = participants.toObject();
+                            // console.log('eventsParticipants:', participants);
                             var reorderedParticipants = getFixtures(participants, candidateGiveBy);
-                            console.log('reorderedParticipants:', reorderedParticipants);
+                            // console.log('reorderedParticipants:', reorderedParticipants);
                             saveShedule(reorderedParticipants, result._id)
                                 .then(function() {
                                     eventModel

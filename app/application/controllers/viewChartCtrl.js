@@ -1,10 +1,14 @@
 'use strict';
-var unitHeight = 25,
+
+var api = require('../../util/api'),
+    unitHeight = 25,
+    completeShedule = [],
     /*
         getMaxPlayerPossible = function(originalNumber) {
             return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
         },
     */
+
     completeShedule = [{
         event: 1,
         participant: {
@@ -87,6 +91,7 @@ var unitHeight = 25,
         secretSerialNumber: 4,
         byFlag: false
     }],
+
     getEvents = function(shedules) {
         var events = [];
         shedules.forEach(function(shedule) {
@@ -162,7 +167,7 @@ var unitHeight = 25,
             result = players.filter(function(player) {
                 return (player.currentLevel >= level &&
                     player.secretSerialNumber > lowerLimit &&
-                    player.secretSerialNumber <= upperLimit)
+                    player.secretSerialNumber <= upperLimit);
             });
         if (result.length > 1) {
             console.log('somthing fishy');
@@ -174,7 +179,6 @@ var unitHeight = 25,
         }
     };
 module.exports = function($scope, $http, $state) {
-    // $scope.levels = getFormation(shedules);
     $scope.unitHeight = unitHeight;
     $scope.isLastLevel = function(levelId) {
         return levelId === getMaxLevel($scope.shedules);
@@ -188,19 +192,33 @@ module.exports = function($scope, $http, $state) {
         }
         return ((Math.pow(2, levelId) - 1) * unitHeight) + 'px';
     };
-    //pagination control
     $scope.currentEvent = 1;
     $scope.itemsPerPage = 1;
-    $scope.events = getEvents(completeShedule);
-    //completeShedule comming from server
-    $scope.shedules = completeShedule.filter(function(shedule) {
-        return shedule.event === $scope.events[$scope.currentEvent - 1];
-    });
-    $scope.$watch('currentEvent', function() {
-        $scope.levels = getFormation(completeShedule.filter(function(shedule) {
-            console.log($scope.events, $scope.currentEvent);
-            return shedule.event === $scope.events[$scope.currentEvent - 1];
-        }));
-    });
-    // $scope.events = [1, 2, 3, 4];
+    $http({
+            url: api.getAllShedule,
+            method: 'GET'
+        })
+        .success(function(data) {
+            if (data.success) {
+                completeShedule = data.data;
+                $scope.events = getEvents(completeShedule);
+                $scope.$watch('currentEvent', function() {
+                    $scope.shedules = completeShedule.filter(function(shedule) {
+                        return shedule.event === $scope.events[$scope.currentEvent - 1];
+                    });
+                    $scope.levels = getFormation($scope.shedules);
+                });
+            }
+        })
+        .error(function() {
+            //TO_DO:show error message
+        });
+    /*
+        $scope.events = getEvents(completeShedule);
+        $scope.$watch('currentEvent', function() {
+            $scope.shedules = completeShedule.filter(function(shedule) {
+                return shedule.event === $scope.events[$scope.currentEvent - 1];
+            });
+            $scope.levels = getFormation($scope.shedules);
+        });*/
 };

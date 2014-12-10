@@ -2,7 +2,7 @@
 
 var api = require('../../util/api');
 var fs = require('fs');
-module.exports = function($scope, $state, $http, $modal, exchangeParticipant) {
+module.exports = function($scope, $state, $http, $timeout, $modal, exchangeParticipant) {
     var hideMessage = function() {
         $timeout(function() {
             $scope.showMessage = false;
@@ -50,7 +50,7 @@ module.exports = function($scope, $state, $http, $modal, exchangeParticipant) {
             .success(function(result) {
                 if (result.success) {
                     $scope.participant = result.data[0];
-                    var modalInstance = $modal.open({
+                    $modal.open({
                         template: fs.readFileSync(__dirname + '/../templates/viewParticipantModal.html'),
                         controller: 'viewParticipantModalCtrl',
                         size: 'lg',
@@ -68,12 +68,13 @@ module.exports = function($scope, $state, $http, $modal, exchangeParticipant) {
     //opens the modal window to delete participant details
     $scope.deleteDetails = function(participant) {
         $scope.participant = participant;
-        var modalInstance = $modal.open({
+        $modal.open({
             template: fs.readFileSync(__dirname + '/../templates/deleteParticipantModal.html'),
             controller: 'deleteParticipantModalCtrl',
             size: 'sm',
             scope: $scope
         });
+
     };
     //opens the modal window to edit participant details
     $scope.editDetails = function(participant) {
@@ -100,4 +101,5 @@ module.exports = function($scope, $state, $http, $modal, exchangeParticipant) {
                 hideMessage();
             });
     };
+
 };
