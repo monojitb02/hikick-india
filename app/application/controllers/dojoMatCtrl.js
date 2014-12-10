@@ -1,6 +1,8 @@
 'use strict';
-var defaultTimerSeconds = 180,
-    submitGracePeriod = 5000;
+var api = require('../../util/api'),
+    defaultTimerSeconds = 180,
+    submitGracePeriod = 5000,
+    eventList = [];
 module.exports = function($scope, $http, $state, $timeout, $interval) {
     var clock = jQuery('.clock').FlipClock({
             countdown: true,
@@ -81,18 +83,12 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
 
 
     $scope.warningArray = ['C', 'K', 'CH', 'H'];
-    var array = [];
-    for (var i = 1; i <= 53; i++) {
-        array.push({
-            name: String(i)
-        });
-    }
-    $scope.eventIds = array;
     $scope.getMatches = function() {
         console.log('connecting to server');
     };
 
     $scope.selectedEvent = {};
+
     $scope.player1WarningArray1 = [];
     $scope.player1WarningArray2 = [];
     $scope.player2WarningArray1 = [];
@@ -196,8 +192,44 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
 
     };
     $scope.updateMatchList = function() {
-
+        $http({
+                url: api.getEventShedule,
+                method: 'GET'
+            })
+            .success(function(data) {
+                if (data.success) {
+                    eventList = data.data;
+                    $scope.selectedEvent = eventList.filter(function(event) {
+                        return event._id === $scope.events[$scope.currentEvent - 1];
+                    })[0];
+                }
+            })
+            .error(function() {
+                //TO_DO:show error message
+            });
     }
-
+    $http({
+            url: api.getEventList,
+            method: 'GET'
+        })
+        .success(function(data) {
+            if (data.success) {
+                $scope.events. = data.data;
+                $scope.selectedEvent = $scope.events.filter(function(event) {
+                    return event._id === $scope.events[$scope.currentEvent - 1];
+                })[0];
+                var array = [];
+                for (var i = 0; i <= $scope.events.length; i++) {
+                    array.push({
+                        name: String($scope.events[i].eventId)
+                    });
+                }
+                $scope.eventIds = array;
+            }
+        })
+        .error(function() {
+            //TO_DO:show error message
+        });
     $scope.resetTimer();
+    $scope.updateMatchList();
 }

@@ -3,95 +3,12 @@
 var api = require('../../util/api'),
     unitHeight = 25,
     completeShedule = [],
+    eventList = [],
     /*
         getMaxPlayerPossible = function(originalNumber) {
             return Math.pow(2, Math.ceil(Math.log(originalNumber) / Math.LN2));
         },
     */
-
-    completeShedule = [{
-        event: 1,
-        participant: {
-            participantId: 1,
-            name: 'number1'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 1,
-        byFlag: false
-    }, {
-        event: 1,
-        participant: {
-            participantId: 9,
-            name: 'number8'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 8,
-        byFlag: true
-    }, {
-        event: 1,
-        participant: {
-            participantId: 2,
-            name: 'number3'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 3,
-        byFlag: false
-    }, {
-        event: 1,
-        participant: {
-            participantId: 3,
-            name: 'number4'
-        },
-        currentLevel: 2,
-        secretSerialNumber: 4,
-        byFlag: false
-    }, {
-        event: 1,
-        participant: {
-            participantId: 4,
-            name: 'number5'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 5,
-        byFlag: true
-    }, {
-        event: 1,
-        participant: {
-            participantId: 5,
-            name: 'number7'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 7,
-        byFlag: false
-    }, {
-        event: 2,
-        participant: {
-            participantId: 1,
-            name: 'number1'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 1,
-        byFlag: false
-    }, {
-        event: 2,
-        participant: {
-            participantId: 2,
-            name: 'number3'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 3,
-        byFlag: false
-    }, {
-        event: 2,
-        participant: {
-            participantId: 3,
-            name: 'number4'
-        },
-        currentLevel: 1,
-        secretSerialNumber: 4,
-        byFlag: false
-    }],
-
     getEvents = function(shedules) {
         var events = [];
         shedules.forEach(function(shedule) {
@@ -192,6 +109,30 @@ module.exports = function($scope, $http, $state) {
         }
         return ((Math.pow(2, levelId) - 1) * unitHeight) + 'px';
     };
+    $scope.getWeightLimit = function(event) {
+        if (event) {
+            if (event.weightLimitUpper === 1000 && event.weightLimitLower === 0) {
+                return 'N/A';
+            }
+            if (event.weightLimitUpper === 1000) {
+                return 'above ' + event.weightLimitLower + ' kg';
+            } else {
+                return 'under ' + event.weightLimitUpper + ' kg';
+            }
+        }
+    };
+    $scope.getAgeLimit = function(event) {
+        if (event) {
+            if (event.ageLimitUpper === 1000 && event.ageLimitLower === 0) {
+                return 'N/A';
+            }
+            if (event.ageLimitUpper === 1000) {
+                return 'above ' + event.ageLimitLower + ' Years';
+            } else {
+                return 'under ' + event.ageLimitUpper + ' Years';
+            }
+        }
+    };
     $scope.currentEvent = 1;
     $scope.itemsPerPage = 1;
     $http({
@@ -203,6 +144,10 @@ module.exports = function($scope, $http, $state) {
                 completeShedule = data.data;
                 $scope.events = getEvents(completeShedule);
                 $scope.$watch('currentEvent', function() {
+                    $scope.selectedEvent = eventList.filter(function(event) {
+                        return $scope.events.length && event._id === $scope.events[$scope.currentEvent - 1];
+                    })[0];
+                    $scope.events[$scope.currentEvent - 1]
                     $scope.shedules = completeShedule.filter(function(shedule) {
                         return shedule.event === $scope.events[$scope.currentEvent - 1];
                     });
@@ -213,12 +158,19 @@ module.exports = function($scope, $http, $state) {
         .error(function() {
             //TO_DO:show error message
         });
-    /*
-        $scope.events = getEvents(completeShedule);
-        $scope.$watch('currentEvent', function() {
-            $scope.shedules = completeShedule.filter(function(shedule) {
-                return shedule.event === $scope.events[$scope.currentEvent - 1];
-            });
-            $scope.levels = getFormation($scope.shedules);
-        });*/
+    $http({
+            url: api.getEventList,
+            method: 'GET'
+        })
+        .success(function(data) {
+            if (data.success) {
+                eventList = data.data;
+                $scope.selectedEvent = eventList.filter(function(event) {
+                    return event._id === $scope.events[$scope.currentEvent - 1];
+                })[0];
+            }
+        })
+        .error(function() {
+            //TO_DO:show error message
+        });
 };

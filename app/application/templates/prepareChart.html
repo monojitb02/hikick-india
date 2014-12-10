@@ -24,7 +24,7 @@
         <div class="col-md-6" ng-repeat="event in eventGroup">
           <div class="panel panel-default">
             <div class="panel-heading background-aqua sliding-panel events-panel clickable maximize" ng-click="slidePanel($event)">
-              <h4 class="panel-title">Event Id: {{event.eventId}} Weight: {{getWeightLimit(event)}} Age: {{getAgeLimit(event)}} Category: {{event.gender==='M'?'Male':'Female'}}</h4>
+              <h4 class="panel-title">Event No.: {{event.eventId}} Weight: {{getWeightLimit(event)}} Age: {{getAgeLimit(event)}} Category: {{event.gender==='M'?'Male':'Female'}}</h4>
               <div class="status-indicator" ng-class="{'background-green':!event.pending,'background-red':event.pending}" ng-attr-title="{{event.pending?'pending':'Sheduled'}}"></div>
             </div>
             <div class="panel-body background-ash">

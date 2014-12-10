@@ -8,7 +8,22 @@
      sheduleUtil = require('../utils/sheduleUtil');
 
  module.exports = {
-
+     getEventList: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         sheduleUtil
+             .getEventList()
+             .then(function(result) {
+                 if (!result.length) {
+                     workflow.outcome.errfor.message = lib.message.NO_DATA;
+                     workflow.emit('response');
+                 } else {
+                     workflow.outcome.data = result;
+                     workflow.emit('response');
+                 }
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
+     },
      searchParticipantForBy: function(req, res) {
          var participants = [];
          sheduleUtil
@@ -48,14 +63,15 @@
      /*
       * get shedule of a perticular event
       */
-     getCompeteShedule: function(req, res) {
+     getEventShedule: function(req, res) {
          var workflow = lib.workflow(req, res),
-             eventId = req.query.event_id;
+             event_id = req.query.event_id;
          sheduleUtil
              .getShedule({
-                 event: eventId
+                 event: event_id
              })
              .then(function(data) {
+                 console.log('data', data)
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
                      workflow.emit('response');

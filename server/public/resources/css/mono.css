@@ -19,6 +19,8 @@
 }
 .font-red-bold, .font-blue-bold {
     font-weight: bold;
+    font-size: 12px;
+    line-height: 11px;
 }
 .font-red-bold {
     color: #F00;
@@ -42,7 +44,7 @@
     position: absolute;
     top: 42;
     left: 0;
-    width: 100%;
+    width: 94%;
     z-index: 60;
 }
 .dojo-header-right {

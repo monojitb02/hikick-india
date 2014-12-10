@@ -20,5 +20,7 @@ module.exports = {
     //shedules
     sheduleSatus: baseUrl + '/shedule/status',
     sheduleEvent: baseUrl + '/shedule/sheduleEvent',
-    getAllShedule: baseUrl + '/shedule/get_all_shedules'
+    getAllShedule: baseUrl + '/shedule/get_all_shedules',
+    getEventList: baseUrl + '/shedule/get_event_list',
+    getEventShedule: baseUrl + '/shedule/get_event_shedules'
 };

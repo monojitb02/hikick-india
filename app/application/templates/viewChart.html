@@ -2,24 +2,25 @@
   <h2>
     <i class="fa fa-flag"></i> Sheduled Sheets 
   </h2>
+  <span>Event NO.: {{selectedEvent.eventId}} |  Event Name: {{selectedEvent.eventName}} | Genger Category: {{selectedEvent.gender}} | Weight Category: {{getWeightLimit(selectedEvent)}} | Age Category: {{getAgeLimit(selectedEvent)}}</span>
   <div class="breadcrumb-wrapper">
-    <pagination boundary-links="true" total-items="events.length" items-per-page="itemsPerPage" max-size="10" ng-model="currentEvent" class="pagination-sm margin-reset" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    <pagination boundary-links="true" total-items="events.length" items-per-page="itemsPerPage" max-size="5" ng-model="currentEvent" class="pagination-sm margin-reset" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
   </div>
 </div>
 
 <div class="contentpanel chart-container">
 
-  <div class="row">
-    <div class="col-md-2" ng-repeat="level in levels">
+  <div class="chart-frame">
+    <div ng-repeat="level in levels" ng-class="{'col-md-1':levels.length>6,'col-md-2':levels.length<=6}">
       <div class="level-header text-center">
         <h4>Level-{{level.levelId}}</h4>
       </div>
       <div class="row" ng-repeat="group in level.groups" style="margin-top: {{getOffset(level.levelId ,$index)}}">
         <div class="col-md-12 text-center border-bottom" style="height: {{unitHeight+'px'}}">
-          <span class="text-bottom-middle font-red-bold">{{group.player1.name}}&nbsp;({{group.player1.participantId}})</span>
+          <span class="text-bottom-middle font-red-bold" title="{{group.player1.name}}&nbsp;({{group.player1.participantId}})">{{group.player1.name}}</span>
         </div>
         <div class="col-md-12 text-center border-right-bottom" style="height: {{getHeight(level.levelId)}}" ng-show="group.player2" ng-class="{'last-level':isLastLevel(level.levelId)}">
-          <span class="text-bottom-middle font-blue-bold">{{group.player2.name}}&nbsp;({{group.player2.participantId}})</span>
+          <span class="text-bottom-middle font-blue-bold" title="{{group.player2.name}}&nbsp;({{group.player2.participantId}})">{{group.player2.name}}</span>
         </div>
       </div>
     </div>

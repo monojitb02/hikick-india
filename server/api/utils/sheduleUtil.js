@@ -127,6 +127,9 @@ var lib = require('../../lib'),
                     return playerGotby.participantId === participant.participantId;
                 }).length;
             };
+        if (participants.length === 0) {
+            return false;
+        }
         participantsGotBy = participantsGotBy || [];
         if (participants.length !== maximumSerialNo) {
             if ((maximumSerialNo - participants.length) > participantsGotBy.length) {
@@ -224,6 +227,20 @@ var lib = require('../../lib'),
     };
 module.exports = {
 
+    getEventList: function() {
+        var deferred = Q.defer();
+        eventModel
+            .find()
+            .exec(function(err, result) {
+                if (err) {
+                    deferred.reject(err);
+                } else {
+                    deferred.resolve(result);
+                }
+            });
+        return deferred.promise;
+    },
+
     /**
      *  get all shedule hint data from database
      *
@@ -295,9 +312,7 @@ module.exports = {
                 if (err) {
                     deferred.reject(err);
                 } else {
-                    if (result.length) {
-                        deferred.resolve(result);
-                    }
+                    deferred.resolve(result);
                 }
             });
         return deferred.promise;
