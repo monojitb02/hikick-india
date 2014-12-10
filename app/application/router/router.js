@@ -42,6 +42,15 @@ module.exports = function($stateProvider, $locationProvider, $urlRouterProvider)
                 }
             }
         })
+        .state('app.editCandidate', {
+            url: '/editCandidate',
+            views: {
+                'pages': {
+                    template: fs.readFileSync(__dirname + '/../templates/editParticipant.html'),
+                    controller: 'editParticipantCtrl'
+                }
+            }
+        })
         .state('app.prepareChart', {
             url: '/prepareChart',
             views: {

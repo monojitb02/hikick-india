@@ -4,20 +4,19 @@
     Candidate's List
  </h2>
   <div class="col-sm-6 header-searchbox">
-    <p class="input-group">
-      <input type="text" placeholder="Search participant.." class="form-control col-sm-11" ng-keyup="checkEnter($event)" ng-model="searchKey">
-    </p>
+    <input type="text" placeholder="Search participant.." class="form-control col-sm-11" ng-keyup="search()" ng-model="searchKey">
   </div>
+
+  <!-- Pagination-->
+  <pagination boundary-links="true" total-items="afterSearchParticipants.length" items-per-page="itemsPerPage" max-size="10" ng-model="currentPage" class="pagination-sm margin-reset pull-right" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 </div>
 
 <alert type="danger" ng-show="showMessage" close="showMessage=false">
   {{message}}
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 </alert>
-<div class="contentpanel">
-  <!-- Pagination-->
-  <pagination boundary-links="true" total-items="totalParticipants.length" items-per-page="itemsPerPage" max-size="10" ng-model="currentPage" class="pagination-sm margin-reset" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 
+<div class="contentpanel">
   <div class="row">
     <div class="col-sm-12">
       <div class="table-responsive">
@@ -33,7 +32,7 @@
             </tr>
           </thead>
           <tbody class="attender-list-padding">
-            <tr ng-repeat="participant in participants | filter:{name:searchKey}">
+            <tr ng-repeat="participant in participants">
               <td>{{participant.name}}</td>
               <td>{{participant.participantId}}</td>
               <td>{{participant.dob | date}}</td>

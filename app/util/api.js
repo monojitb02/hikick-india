@@ -15,6 +15,7 @@ module.exports = {
     participantList: baseUrl + '/participant/list',
     findParticipant: baseUrl + '/participant/find',
     deleteParticipant: baseUrl + '/participant/delete',
+    editParticipant: baseUrl + '/participant/update',
 
     //shedules
     sheduleSatus: baseUrl + '/shedule/status',

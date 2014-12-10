@@ -68,7 +68,7 @@ var unitHeight = 25,
         currentLevel: 1,
         secretSerialNumber: 1,
         byFlag: false
-    } {
+    }, {
         event: 2,
         participant: {
             participantId: 2,

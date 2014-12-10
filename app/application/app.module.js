@@ -1,7 +1,8 @@
 'use strict';
 
 require('./directives');
-var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'app.directive'])
+require('./services');
+var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'app.directive', 'app.service'])
     .controller('mainFrameCtrl', require('./controllers/mainFrameCtrl'))
     .controller('loginCtrl', require('./controllers/loginCtrl'))
     .controller('homeCtrl', require('./controllers/homeCtrl'))
@@ -14,6 +15,7 @@ var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'ap
     .controller('registrationModalCtrl', require('./controllers/registrationModalCtrl'))
     .controller('viewParticipantModalCtrl', require('./controllers/viewParticipantModalCtrl'))
     .controller('deleteParticipantModalCtrl', require('./controllers/deleteParticipantModalCtrl'))
+    .controller('editParticipantCtrl', require('./controllers/editParticipantCtrl'))
     .config(require('./router/router'));
 
 module.exports = App;
