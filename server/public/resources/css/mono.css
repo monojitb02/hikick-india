@@ -1,5 +1,8 @@
 /******************** For view-chart **********************/
 
+.chart-container {
+    overflow: auto;
+}
 .text-bottom-middle {
     position: absolute;
     width: 100%;
