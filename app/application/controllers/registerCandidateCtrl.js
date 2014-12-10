@@ -29,7 +29,7 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
     };
     //opens the modal window and create controller for it
     $scope.openModal = function(size) {
-        var modalInstance = $modal.open({
+        $modal.open({
             template: require('fs').readFileSync(__dirname + '/../templates/registrationModal.html'),
             controller: 'registrationModalCtrl',
             size: size,
@@ -108,8 +108,6 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
                     });
                     $scope.club = $scope.clubs[$scope.clubs.length - 1];
                 });
-
-
                 $scope.searchKey = '';
             } else {
                 $scope.message = result.errfor.message;
