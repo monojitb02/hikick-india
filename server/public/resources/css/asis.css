@@ -85,8 +85,13 @@
     border-bottom: 1px solid #ccc;
     text-align: left;
 }
-/************************* view list page*****************/
+/************************* view candidate list page*****************/
 
-.participant-info-modal {
+.candidate-list-header, .participant-info-modal {
     overflow: auto;
+}
+.candidate-list-pagination {
+    position: absolute;
+    top: 20px;
+    right: 20px;
 }

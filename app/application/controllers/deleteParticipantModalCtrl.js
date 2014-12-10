@@ -2,20 +2,22 @@
 
 var api = require('../../util/api');
 
-module.exports = function($scope, $http, $modalInstance) {
+module.exports = function($scope, $http, $modalInstance, $timeout) {
     var hideMessage = function() {
         $timeout(function() {
             $modalInstance.close();
-        }, 2000);
+        }, 1500);
     };
 
     //close the modal window
     $scope.delete = function() {
         $scope.hideClose = true;
-
         $http({
-                url: api.participantList,
-                method: "GET"
+                url: api.deleteParticipant,
+                method: "PUT",
+                data: {
+                    participantId: $scope.participant.participantId
+                }
             })
             .success(function(result) {
                 $scope.hideClose = false;
@@ -36,4 +38,7 @@ module.exports = function($scope, $http, $modalInstance) {
     $scope.close = function() {
         $modalInstance.close();
     };
+    $modalInstance.result.then(function() {
+        $scope.clearItem();
+    });
 }

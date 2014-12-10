@@ -214,7 +214,7 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
         })
         .success(function(data) {
             if (data.success) {
-                $scope.events. = data.data;
+                $scope.events = data.data;
                 $scope.selectedEvent = $scope.events.filter(function(event) {
                     return event._id === $scope.events[$scope.currentEvent - 1];
                 })[0];

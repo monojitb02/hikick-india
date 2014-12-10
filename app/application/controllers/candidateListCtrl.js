@@ -72,6 +72,7 @@ module.exports = function($scope, $state, $http, $timeout, $modal, exchangeParti
             template: fs.readFileSync(__dirname + '/../templates/deleteParticipantModal.html'),
             controller: 'deleteParticipantModalCtrl',
             size: 'sm',
+            backdrop: 'static',
             scope: $scope
         });
 
@@ -102,4 +103,15 @@ module.exports = function($scope, $state, $http, $timeout, $modal, exchangeParti
             });
     };
 
+    //clears the deleted item from list when modal is closed
+    $scope.clearItem = function() {
+        for (var i in $scope.totalParticipants) {
+            if ($scope.totalParticipants[i].participantId === $scope.participant.participantId) {
+                $scope.totalParticipants.splice(i, 1);
+                break;
+            }
+        }
+        $scope.afterSearchParticipants = $scope.totalParticipants;
+        $scope.participants = $scope.afterSearchParticipants.slice(($scope.currentPage - 1) * $scope.itemsPerPage, ($scope.currentPage * $scope.itemsPerPage));
+    };
 };
