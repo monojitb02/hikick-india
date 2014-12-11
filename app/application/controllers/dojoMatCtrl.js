@@ -192,9 +192,13 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
 
     };
     $scope.updateMatchList = function() {
+        console.log($scope.selectedEvent._id);
         $http({
                 url: api.getEventShedule,
-                method: 'GET'
+                method: 'GET',
+                params: {
+                    event_id: $scope.selectedEvent._id
+                }
             })
             .success(function(data) {
                 if (data.success) {
@@ -219,7 +223,7 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
                     return event._id === $scope.events[$scope.currentEvent - 1];
                 })[0];
                 var array = [];
-                for (var i = 0; i <= $scope.events.length; i++) {
+                for (var i in $scope.events) {
                     array.push({
                         name: String($scope.events[i].eventId)
                     });

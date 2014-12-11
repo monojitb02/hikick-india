@@ -66,6 +66,12 @@
      getEventShedule: function(req, res) {
          var workflow = lib.workflow(req, res),
              event_id = req.query.event_id;
+         console.log(req.query);
+         if (event_id === undefined) {
+             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+             workflow.emit('response');
+             return;
+         }
          sheduleUtil
              .getShedule({
                  event: event_id

@@ -173,6 +173,7 @@
     padding: 24px 0px;
 }
 .category-heading-container {
+    width: 100%;
     position: absolute;
     bottom: 105px;
 }

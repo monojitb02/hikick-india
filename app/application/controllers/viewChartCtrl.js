@@ -97,6 +97,7 @@ var api = require('../../util/api'),
     };
 module.exports = function($scope, $http, $state) {
     $scope.unitHeight = unitHeight;
+    // $scope.events = [];
     $scope.isLastLevel = function(levelId) {
         return levelId === getMaxLevel($scope.shedules);
     };
@@ -166,7 +167,7 @@ module.exports = function($scope, $http, $state) {
             if (data.success) {
                 eventList = data.data;
                 $scope.selectedEvent = eventList.filter(function(event) {
-                    return event._id === $scope.events[$scope.currentEvent - 1];
+                    return $scope.events.length && event._id === $scope.events[$scope.currentEvent - 1];
                 })[0];
             }
         })

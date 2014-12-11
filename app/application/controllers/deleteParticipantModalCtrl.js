@@ -22,8 +22,11 @@ module.exports = function($scope, $http, $modalInstance, $timeout) {
             .success(function(result) {
                 $scope.hideClose = false;
                 if (result.success) {
+                    // $scope.messageType = 'success';
                     $scope.messageModal = lang.deletedSuccessfully;
+                    $scope.clearItem();
                 } else {
+                    // $scope.messageType = 'danger';
                     $scope.messageModal = result.errfor.message;
                 }
                 $scope.showMessageModal = true;
@@ -38,7 +41,4 @@ module.exports = function($scope, $http, $modalInstance, $timeout) {
     $scope.close = function() {
         $modalInstance.close();
     };
-    $modalInstance.result.then(function() {
-        $scope.clearItem();
-    });
 }

@@ -6,7 +6,7 @@
 
   <div class="dojo-header-right">
     Set Event:
-    <select class="form-control inline-box" ng-model="selectedEvent" ng-options="eventId.name for eventId in eventIds" ng-disabled="matchStarted">
+    <select class="form-control inline-box" ng-model="currentEvent" ng-options="eventId.name for eventId in eventIds" ng-disabled="matchStarted" ng-change="updateMatchList()">
       <!-- ng-change="getMatches()"
       <option value="{{eventId}}" ng-repeat="evenId in getEventIds">{{eventId}}</option> -->
     </select> Select Match:
