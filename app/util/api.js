@@ -22,5 +22,11 @@ module.exports = {
     sheduleEvent: baseUrl + '/shedule/sheduleEvent',
     getAllShedule: baseUrl + '/shedule/get_all_shedules',
     getEventList: baseUrl + '/shedule/get_event_list',
-    getEventShedule: baseUrl + '/shedule/get_event_shedules'
+    getEventShedule: baseUrl + '/shedule/get_event_shedules',
+
+
+    //matches
+    addMatch: baseUrl + '/match/add',
+    getMatchList: baseUrl + '/match/list',
+    getMatch: baseUrl + '/match/find'
 };

@@ -22,16 +22,6 @@ var lib = require('../../lib'),
             type: Number,
             required: true
         },
-        redCornerPlayer: {
-            type: Schema.Types.ObjectId,
-            ref: 'participant',
-            required: true
-        },
-        blueCornerPlayer: {
-            type: Schema.Types.ObjectId,
-            ref: 'participant',
-            required: true
-        },
         referee: {
             type: String,
             required: true
@@ -39,6 +29,11 @@ var lib = require('../../lib'),
         timeBreaks: [{
             type: Date
         }],
+        redCornerPlayer: {
+            type: Schema.Types.ObjectId,
+            ref: 'participant',
+            required: true
+        },
         redCornerPoints: [{
             point: {
                 type: Number,
@@ -50,6 +45,11 @@ var lib = require('../../lib'),
         }],
         redCornerWarnings1: [String],
         redCornerWarnings2: [String],
+        blueCornerPlayer: {
+            type: Schema.Types.ObjectId,
+            ref: 'participant',
+            required: true
+        },
         blueCornerPoints: [{
             point: {
                 type: Number,

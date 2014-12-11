@@ -11,7 +11,8 @@ var lib = require('./lib'),
     userController = require('./api/controllers/userController'),
     participantController = require('./api/controllers/participantController'),
     tempParticipantController = require('./api/controllers/tempParticipantController'),
-    sheduleController = require('./api/controllers/sheduleController');
+    sheduleController = require('./api/controllers/sheduleController'),
+    matchController = require('./api/controllers/matchController');
 /*
 /*
  *utils
@@ -51,5 +52,11 @@ module.exports = function(app) {
     app.get('/api/shedule/get_all_shedules', sheduleController.getAllShedule);
     app.get('/api/shedule/get_event_list', sheduleController.getEventList);
     app.get('/api/shedule/get_event_shedules', sheduleController.getEventShedule);
+
+
+    //Match Routs
+    app.post('/api/match/add', matchController.add);
+    app.get('/api/match/list', matchController.getAllMatches);
+    app.get('/api/match/find', matchController.getMatch);
 
 };

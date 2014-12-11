@@ -5,8 +5,7 @@
  'use strict';
  var lib = require('../../lib'),
      utils = require('../utils'),
-     matchUtil = require('../utils/matchUtil'),
-     sheduleUtil = require('../utils/sheduleUtil');
+     matchUtil = require('../utils/matchUtil');
 
  module.exports = {
      /**
@@ -14,27 +13,27 @@
       */
      add: function(req, res) {
          var workflow = lib.workflow(req, res),
-             participantData = req.body;
+             matchData = req.body;
+         /*   if (!matchData.date ||
+                !matchData.event ||
+                !matchData.level ||
+                !matchData.dojoNumber ||
+                !matchData.referee ||
+                !matchData.timeBreaks ||
+                !matchData.redCornerPlayer ||
+                !matchData.redCornerPoints ||
+                !matchData.redCornerWarnings1 ||
+                !matchData.redCornerWarnings2 ||
+                !matchData.blueCornerPlayer ||
+                !matchData.blueCornerPoints ||
+                !matchData.blueCornerWarnings1 ||
+                !matchData.blueCornerWarnings2 ||
+                !matchData.winner) {
 
-         if (participantData.dob && new Date(participantData.dob) === 'Invalid Date') {
-             workflow.outcome.errfor.message = lib.message.INVALID_DATE;
-             workflow.emit('response');
-             return;
-         }
-         if (participantData.weight && isNaN(participantData.weight)) {
-             workflow.outcome.errfor.message = lib.message.INVALID_WEIGHT;
-             workflow.emit('response');
-             return;
-         }
-         if (participantData._id) {
-             console.log(participantData);
-             delete participantData._id;
-             console.log(participantData);
-         }
-         participantData.dob = new Date(participantData.dob);
-         participantData.weight = Number(participantData.weight);
+            }*/
+
          matchUtil
-             .addParticipant(participantData)
+             .addMatches(matchData)
              .then(function(data) {
                  workflow.outcome.data = data;
                  workflow.emit('response');
@@ -43,40 +42,13 @@
              })
              .done();
      },
-     /**
-      * update candidates profile
-      */
-     //FIX_ME:choiceOfEvent part not updating
-     update: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             participantData = req.body;
-         if (participantData._id === undefined) {
-             workflow.outcome.errfor.message = lib.message.ID_REQUIRED;
-             workflow.emit('response');
-             return;
-         }
-         matchUtil
-             .updateParticipant(participantData)
-             .then(function(data) {
-                 if (!data) {
-                     workflow.outcome.errfor.message = lib.message.UPDATE_NON_EXISTING_DOCUMENT_FAILED;
-                     workflow.emit('response');
-                 } else {
-                     workflow.outcome.data = data;
-                     workflow.emit('response');
-                 }
-             }, function(err) {
-                 utils.errorNotifier(err, workflow);
-             })
-             .done();
-     },
      /*
-      * get details of all candidates
+      * get list of all match
       */
-     getAllParticipant: function(req, res) {
+     getAllMatches: function(req, res) {
          var workflow = lib.workflow(req, res);
          matchUtil
-             .getParticipantList()
+             .getMatchList()
              .then(function(data) {
                  if (!data.length) {
                      workflow.outcome.errfor.message = lib.message.NO_DATA;
@@ -91,20 +63,20 @@
      },
 
      /*
-      * get details of a perticular candidate during registration
+      * get details of a perticular match
       */
-     getParticipant: function(req, res) {
+     getMatch: function(req, res) {
          var workflow = lib.workflow(req, res),
-             participantId = req.query.participantId;
+             matchId = req.query.matchId;
 
-         if (participantId === undefined) {
+         if (matchId === undefined) {
              workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
              workflow.emit('response');
              return;
          }
          matchUtil
-             .findParticipant({
-                 _id: participantId
+             .findMatch({
+                 _id: matchId
              })
              .then(function(data) {
                  if (!data.length) {
@@ -117,41 +89,6 @@
              }, function(err) {
                  workflow.emit('exception', err);
              });
-     },
-
-     /**
-      * search candidates
-      */
-     search: function(req, res) {
-         var workflow = lib.workflow(req, res),
-             name = req.query.name,
-             reg,
-             searchOptoions;
-         if (!name) {
-             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
-             workflow.emit('response');
-             return;
-         }
-         reg = new RegExp(name.split(' ').join('|'));
-         matchUtil
-             .getParticipantList({
-                 name: {
-                     $regex: reg,
-                     $options: 'i'
-                 }
-             })
-             .then(function(data) {
-                 if (data.length === 0) {
-                     workflow.outcome.errfor.message = lib.message.NO_DATA;
-                     workflow.emit('response');
-                 } else {
-                     workflow.outcome.data = data;
-                     workflow.emit('response');
-                 }
-             }, function(err) {
-                 workflow.emit('exception', err);
-             })
-             .done();
      }
 
 
