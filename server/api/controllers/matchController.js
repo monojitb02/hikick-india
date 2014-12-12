@@ -5,7 +5,8 @@
  'use strict';
  var lib = require('../../lib'),
      utils = require('../utils'),
-     matchUtil = require('../utils/matchUtil');
+     matchUtil = require('../utils/matchUtil'),
+     sheduleUtil = require('../utils/sheduleUtil');
 
  module.exports = {
      /**
@@ -35,12 +36,21 @@
          matchUtil
              .addMatches(matchData)
              .then(function(data) {
-                 workflow.outcome.data = data;
-                 workflow.emit('response');
+                 sheduleUtil
+                     .incrementPlayerLevel(matchData.winner)
+                     .then(function(numberAffected) {
+                         if (!numberAffected) {
+                             console.log('Fatal error : match saved but currentLevel not incremented for ', matchData)
+                         } else {
+                             workflow.outcome.data = data;
+                             workflow.emit('response');
+                         }
+                     }, function(err) {
+                         workflow.emit('exception', err);
+                     });
              }, function(err) {
                  utils.errorNotifier(err, workflow);
-             })
-             .done();
+             });
      },
      /*
       * get list of all match

@@ -142,6 +142,7 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
                     blockFreeze = false;
                 } else {
                     console.log('matchEnded');
+                    $scope.winner = $scope.player2Score > $scope.player1Score ? $scope.player2Score : $scope.player1Score;
                     $scope.matchEnded = true;
                 }
             }, submitGracePeriod);
@@ -256,9 +257,14 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
         // console.log('toggleWarning', $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player2WarningArray1, $scope.player2WarningArray2)
     };
     $scope.submit = function() {
+        var matchData;
+        if (clock.running) {
+            clock.stop();
+        }
+        $scope.winner = $scope.player2Score > $scope.player1Score ? $scope.player2 : $scope.player1;
         //console.log($scope.matId, $scope.player1, $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player1Score, $scope.player1ScoreArray, $scope.timeBreaks);
         //console.log($scope.matId, $scope.player2, $scope.player2WarningArray1, $scope.player2WarningArray2, $scope.player2Score, $scope.player2ScoreArray, $scope.timeBreaks);
-        var matchData = {
+        matchData = {
             date: new Date(),
             event: $scope.currentEvent._id,
             level: $scope.currentLevel,

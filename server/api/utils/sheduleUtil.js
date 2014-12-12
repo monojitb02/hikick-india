@@ -363,5 +363,26 @@ module.exports = {
                 }
             });
         return deferred.promise;
+    },
+    incrementPlayerLevel: function(participant_id) {
+        var deferred = Q.defer();
+        console.log('level increment request', participant_id);
+        sheduleModel
+            .findOneAndUpdate({
+                participant: participant_id
+            }, {
+                $inc: {
+                    currentLevel: 1
+                }
+            })
+            .exec(function(err, result) {
+                console.log('increment', err, result);
+                if (err) {
+                    deferred.reject(err);
+                }
+                deferred.resolve(result);
+            });
+
+        return deferred.promise;
     }
 };

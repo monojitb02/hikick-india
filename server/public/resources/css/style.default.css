@@ -62,7 +62,7 @@ strong {
 
 .headerbar {
     border-left: 1px solid #eee;
-    background: #fff;
+    background: #272727;
 }
 .headerbar::after {
     clear: both;
@@ -515,7 +515,7 @@ strong {
 .mainpanel {
     margin-left: 240px;
     background: #e4e7ea;
-    min-height: 800px;
+    min-height: 100vh;
 }
 .pageheader {
     padding: 15px;

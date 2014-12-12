@@ -23,8 +23,7 @@ var lib = require('../../lib'),
             required: true
         },
         referee: {
-            type: String,
-            required: true
+            type: String
         },
         timeBreaks: [{
             type: Date

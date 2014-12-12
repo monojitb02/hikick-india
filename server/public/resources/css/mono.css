@@ -1,3 +1,9 @@
+/**********************Dash board ******************/
+
+.dash-board-image {
+    width: 100%;
+    height: 100vh;
+}
 /******************** For view-chart **********************/
 
 .chart-container {
@@ -47,10 +53,8 @@
     width: 94%;
     z-index: 60;
 }
-.dojo-header-right {
-    position: absolute;
-    right: 10px;
-    top: 15px;
+.no-margin-right {
+    margin-right: 0px !important;
 }
 .inline-box {
     display: inline;
@@ -62,7 +66,7 @@
     position: relative;
 }
 .select-match-box {
-    width: 250px;
+    width: 280px;
 }
 .clock {
     z-index: 30;
