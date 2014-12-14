@@ -1,59 +1,50 @@
-<div class="pageheader">
-    <h2>
+<div class="pageheader candidate-list-header">
+  <h2 class="col-sm-4">
     <i class="fa fa-list"></i> 
     Candidate's List
  </h2>
-    <div class="col-sm-6 header-searchbox">
-        <p class="input-group">
-            <input type="text" placeholder="Search participant.." class="form-control col-sm-11" ng-keyup="checkEnter($event)" ng-model="searchKey">
-        </p>
-    </div>
+  <div class="col-sm-3">
+    <input type="text" placeholder="Search participant.." class="form-control col-sm-11" ng-keyup="checkEnter($event)" ng-model="searchKey">
+  </div>
+  <pagination class="candidate-list-pagination no-margin" boundary-links="true" total-items="totalParticipants.length" items-per-page="itemsPerPage" max-size="10" ng-model="currentPage" class="pagination-sm margin-reset" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 </div>
 
-<alert type="danger" ng-show="showMessage" close="showMessage=false">
-    {{message}}
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+<alert type="danger" ng-show="showMessage" close="showMessage=false" class="no-margin">
+  {{message}}
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 </alert>
 <div class="contentpanel">
-    <!-- Pagination-->
-    <pagination boundary-links="true" total-items="totalParticipants.length" items-per-page="itemsPerPage" max-size="10" ng-model="currentPage" class="pagination-sm margin-reset" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+  <!-- Pagination-->
 
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="table-responsive">
-                <table class="table table-striped mb30">
-                    <thead class="attender-list-padding">
-                        <tr>
-                            <th>Name</th>
-                            <th>Participant Id</th>
-                            <th>DOB</th>
-                            <th>Weight</th>
-                            <th>Country</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="attender-list-padding">
-                        <tr ng-repeat="participant in participants | filter:{name:searchKey}">
-                            <td>{{participant.name}}</td>
-                            <td>{{participant.participantId}}</td>
-                            <td>{{participant.dob | date}}</td>
-                            <td>{{participant.weight}}</td>
-                            <td>{{participant.country}}</td>
-                            <td class="action-td">
-                                <a class="btn btn-info m-r-3" ng-click="viewDetails(participant)">
-                                    <i class="fa fa-eye icon m-r-3"></i>View
-                                </a>
-                                <a class="btn btn-primary m-r-3" ng-click="editDetails(participant)">
-                                    <i class="fa fa-edit icon m-r-3"></i>Edit
-                                </a>
-                                <a class="btn btn-danger" ng-click="deleteDetails(participant)">
-                                    <i class="fa fa-warning icon m-r-3"></i>Delete
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="table-responsive">
+        <table class="table table-striped mb30">
+          <thead class="attender-list-padding">
+            <tr>
+              <th>Red corner</th>
+              <th>Blue Corner</th>
+              <th>Date</th>
+              <th>Event</th>
+              <th>Level</th>
+              <th>Dojo</th>
+              <th>Winner</th>
+            </tr>
+          </thead>
+          <tbody class="attender-list-padding">
+            <tr ng-repeat="match in matches" ng-click="viewDetails(match)" class="clickable">
+              <!-- | filter:{name:searchKey} -->
+              <td>{{match.redCornerPlayer.name}}</td>
+              <td>{{match.blueCornerPlayer.name}}</td>
+              <td>{{match.date | date}}</td>
+              <td>{{match.event.eventId}}</td>
+              <td>{{match.level}}</td>
+              <td>{{match.dojoNumber}}</td>
+              <td>{{match.winner.name}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
 </div>

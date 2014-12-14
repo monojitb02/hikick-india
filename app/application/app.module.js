@@ -12,6 +12,7 @@ var App = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngTagsInput', 'ap
     .controller('viewChartCtrl', require('./controllers/viewChartCtrl'))
     .controller('dojoMatCtrl', require('./controllers/dojoMatCtrl'))
     .controller('gameHistoryCtrl', require('./controllers/gameHistoryCtrl'))
+    .controller('gameHistoryModalCtrl', require('./controllers/gameHistoryModalCtrl'))
     .controller('registrationModalCtrl', require('./controllers/registrationModalCtrl'))
     .controller('viewParticipantModalCtrl', require('./controllers/viewParticipantModalCtrl'))
     .controller('deleteParticipantModalCtrl', require('./controllers/deleteParticipantModalCtrl'))

@@ -32,7 +32,7 @@
                 <auto-complete source="searchCandidates($query,event.eventId)" min-length="2"></auto-complete>
               </tags-input>
               <p>
-                <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}" ng-click="submitShedule(event)">
+                <button class="btn btn-block" ng-class="{'btn-primary':event.pending,'btn-danger':!event.pending}" ng-click="submitShedule(event,$parent.$parent.$index,$parent.$index, $index)" ng-disabled="event.participantCount < 4">
                   <span class="badge pull-left">{{event.participantCount}}</span>Shedule It<span class="badge pull-right">{{event.maximumByCount-event.candidatesGotBy.length}}</span>
                 </button>
               </p>

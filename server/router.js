@@ -52,7 +52,7 @@ module.exports = function(app) {
     app.get('/api/shedule/get_all_shedules', sheduleController.getAllShedule);
     app.get('/api/shedule/get_event_list', sheduleController.getEventList);
     app.get('/api/shedule/get_event_shedules', sheduleController.getEventShedule);
-
+    app.get('/api/shedule/print_players_chart', sheduleController.printPlayersChart);
 
     //Match Routs
     app.post('/api/match/add', matchController.add);

@@ -43,6 +43,7 @@ module.exports = {
         var deferred = Q.defer();
         matchModel
             .find(searchObject)
+            .populate('redCornerPlayer blueCornerPlayer winner event')
             .exec(function(err, result) {
                 if (err) {
                     deferred.reject(err);

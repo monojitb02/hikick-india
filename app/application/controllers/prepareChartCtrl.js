@@ -55,31 +55,8 @@ module.exports = function($scope, $http, $state) {
         if (docHeight > jQuery('.mainpanel').height())
             jQuery('.mainpanel').height(docHeight);
     };
-    $http({
-            url: api.sheduleSatus,
-            method: 'GET'
-        })
-        .success(function(data) {
-            if (data.success) {
-                gameEvents = refreshSheduleStatus(data.data);
-                $scope.gameEvents = gameEvents;
-            }
-        })
-        .error(function(data, status, headers, config) {
-            //TO_DO:show error message
-        });
 
-    /*$scope.getGames = function() {
-        console.log(gameEvents);
-        return gameEvents;
-    };*/
-    /* deprecated function
-        $scope.getCandidatesGotBy = function(eventId) {
-            var eventData = sheduleStatus.filter(function(element) {
-                return element.eventId === eventId;
-            })[0];
-            return eventData.candidatesGotBy || [];
-        };*/
+
     $scope.searchCandidates = function(query, eventId) {
         return $http.get('/api/shedule/search_participant?query=' + query + '&eventId=' + eventId);
     };
@@ -104,7 +81,7 @@ module.exports = function($scope, $http, $state) {
         }
     };
 
-    $scope.submitShedule = function(event) {
+    $scope.submitShedule = function(event, index1, index2, index3) {
         var candidatesGotBy = [];
         if (event.candidatesGotBy &&
             event.candidatesGotBy.length !== 0 &&
@@ -126,10 +103,23 @@ module.exports = function($scope, $http, $state) {
             })
             .success(function(data) {
                 gameEvents = refreshSheduleStatus(data.data);
-                $scope.gameEvents = gameEvents;
+                $scope.gameEvents[index1].events[index2][index3] = gameEvents[index1].events[index2][index3];
             })
             .error(function(err) {
                 console.log(err);
-            })
+            });
     }
+    $http({
+            url: api.sheduleSatus,
+            method: 'GET'
+        })
+        .success(function(data) {
+            if (data.success) {
+                gameEvents = refreshSheduleStatus(data.data);
+                $scope.gameEvents = gameEvents;
+            }
+        })
+        .error(function(data, status, headers, config) {
+            //TO_DO:show error message
+        });
 }

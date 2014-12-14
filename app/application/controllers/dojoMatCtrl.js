@@ -1,7 +1,7 @@
 'use strict';
 var api = require('../../util/api'),
     defaultTimerSeconds = 180,
-    submitGracePeriod = 5000,
+    submitGracePeriod = 120000,
     shedules = [];
 module.exports = function($scope, $http, $state, $timeout, $interval) {
     var clock = jQuery('.clock').FlipClock({
@@ -133,11 +133,11 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
             blockFreeze = false;
             $scope.showProgress = true;
             $interval(function() {
-                $scope.progressValue += (100 / 50);
-            }, 100, 50)
+                $scope.progressValue += (100 / 200);
+            }, 600, 200)
             $timeout(function() {
                 $scope.showProgress = false;
-                $scope.progressValue = 2;
+                $scope.progressValue = 0;
                 if (blockFreeze) {
                     blockFreeze = false;
                 } else {
@@ -167,7 +167,7 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
             $scope.resetTimer();
             $scope.matchStarted = false;
             $scope.matchEnded = false;
-            $scope.progressValue = 2;
+            $scope.progressValue = 0;
             $scope.updateMatchList();
         },
         blockFreeze = false;
@@ -179,7 +179,7 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
         clock.setTime($scope.timerMinute * 60 + $scope.timerSecond);
         blockFreeze = true;
         $scope.showProgress = false;
-        $scope.progressValue = 2;
+        $scope.progressValue = 0;
     };
     $scope.resetTimer = function() {
         jQuery("#second").val('0');
@@ -264,6 +264,16 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
         $scope.winner = $scope.player2Score > $scope.player1Score ? $scope.player2 : $scope.player1;
         //console.log($scope.matId, $scope.player1, $scope.player1WarningArray1, $scope.player1WarningArray2, $scope.player1Score, $scope.player1ScoreArray, $scope.timeBreaks);
         //console.log($scope.matId, $scope.player2, $scope.player2WarningArray1, $scope.player2WarningArray2, $scope.player2Score, $scope.player2ScoreArray, $scope.timeBreaks);
+        if ($scope.player1WarningArray1.indexOf('H') > -1 ||
+            $scope.player1WarningArray2.indexOf('H') > -1) {
+            $scope.winner = $scope.player2;
+        } else if ($scope.player2WarningArray1.indexOf('H') > -1 ||
+            $scope.player2WarningArray2.indexOf('H') > -1) {
+            $scope.winner = $scope.player1;
+        }
+        if ($scope.player1Score === $scope.player2Score) {
+            return;
+        }
         matchData = {
             date: new Date(),
             event: $scope.currentEvent._id,
@@ -296,7 +306,6 @@ module.exports = function($scope, $http, $state, $timeout, $interval) {
             .error(function() {
                 //TO_DO:show error message
             });
-        console.log(matchData);
 
     };
     $scope.selectFixture = function(fixture) {

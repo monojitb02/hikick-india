@@ -110,7 +110,6 @@
       */
      addShedule: function(req, res) {
          var workflow = lib.workflow(req, res);
-         console.log('adShedule Request received');
          if (req.body.eventId === undefined) {
              workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
              workflow.emit('response');
@@ -129,7 +128,6 @@
                              workflow.outcome.data = data.sort(function(first, second) {
                                  return first.eventId > second.eventId ? 1 : -1
                              });
-                             console.log('addShedule done');
                              workflow.emit('response');
                          }
                      }, function(err) {
@@ -138,6 +136,24 @@
              }, function(err) {
                  workflow.emit('exception', err);
              });
+     },
+     printPlayersChart: function(req, res) {
+         var workflow = lib.workflow(req, res);
+         if (req.query.eventId === undefined) {
+             workflow.outcome.errfor.message = lib.message.FIELD_REQUIRED;
+             workflow.emit('response');
+             return;
+         }
+         sheduleUtil
+             .getPlayersChart(req.query.eventId)
+             .then(function(csvData) {
+                 res.set({
+                     'Content-Disposition': 'attachment; filename=participant_list_' + req.query.eventId + '.csv'
+                 });
+                 //res.contentType('text/csv');
+                 res.send(csvData);
+             }, function(err) {
+                 workflow.emit('exception', err);
+             });
      }
-
  };

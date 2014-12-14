@@ -56,6 +56,9 @@
 .no-margin-right {
     margin-right: 0px !important;
 }
+.no-margin {
+    margin: 0px !important;
+}
 .inline-box {
     display: inline;
     width: auto;
@@ -180,4 +183,15 @@
     width: 100%;
     position: absolute;
     bottom: 105px;
+}
+/* ************gameHistory Modal**************** */
+
+.match-table {
+    margin-top: 15px;
+}
+.match-table-red {
+    background-color: #FFAEAE;
+}
+.match-table-blue {
+    background-color: #A6A6FF;
 }

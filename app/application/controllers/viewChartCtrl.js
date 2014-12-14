@@ -142,7 +142,9 @@ module.exports = function($scope, $http, $state) {
         })
         .success(function(data) {
             if (data.success) {
-                completeShedule = data.data;
+                completeShedule = data.data.sort(function(player1, player2) {
+                    return (player1.event > player2.event) ? 1 : -1;
+                });
                 $scope.events = getEvents(completeShedule);
                 $scope.$watch('currentEvent', function() {
                     $scope.selectedEvent = eventList.filter(function(event) {
@@ -154,24 +156,25 @@ module.exports = function($scope, $http, $state) {
                     });
                     $scope.levels = getFormation($scope.shedules);
                 });
+                $http({
+                        url: api.getEventList,
+                        method: 'GET'
+                    })
+                    .success(function(data) {
+                        if (data.success) {
+                            eventList = data.data;
+                            $scope.selectedEvent = eventList.filter(function(event) {
+                                return $scope.events.length && event._id === $scope.events[$scope.currentEvent - 1];
+                            })[0];
+                        }
+                    })
+                    .error(function() {
+                        //TO_DO:show error message
+                    });
             }
         })
         .error(function() {
             //TO_DO:show error message
         });
-    $http({
-            url: api.getEventList,
-            method: 'GET'
-        })
-        .success(function(data) {
-            if (data.success) {
-                eventList = data.data;
-                $scope.selectedEvent = eventList.filter(function(event) {
-                    return $scope.events.length && event._id === $scope.events[$scope.currentEvent - 1];
-                })[0];
-            }
-        })
-        .error(function() {
-            //TO_DO:show error message
-        });
+
 };

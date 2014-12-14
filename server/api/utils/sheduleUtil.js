@@ -366,7 +366,6 @@ module.exports = {
     },
     incrementPlayerLevel: function(participant_id) {
         var deferred = Q.defer();
-        console.log('level increment request', participant_id);
         sheduleModel
             .findOneAndUpdate({
                 participant: participant_id
@@ -376,13 +375,56 @@ module.exports = {
                 }
             })
             .exec(function(err, result) {
-                console.log('increment', err, result);
                 if (err) {
                     deferred.reject(err);
                 }
                 deferred.resolve(result);
             });
 
+        return deferred.promise;
+    },
+    getPlayersChart: function(eventId) {
+        var deferred = Q.defer(),
+            convertToCSV = function(objArray) { //converts array of attendance objects in a csv string
+                var array = objArray,
+                    str = 'Participant ID,Candidate\'s Name,Instructor\'s Name,Country,State,Club,Contact Number';
+
+                str += '\r\n';
+                for (var i = 0; i < array.length; i++) {
+                    var player = array[i],
+                        line = [];
+                    line.push(player.participantId);
+                    line.push(player.name);
+                    line.push(player.instructor);
+                    line.push(player.country);
+                    line.push(player.state.name);
+                    line.push(player.clubName);
+                    line.push(player.contactNumber);
+
+                    str += line.join(',') + '\r\n';
+                }
+                return str;
+            };
+        eventModel
+            .findOne({
+                eventId: eventId
+            })
+            .exec(function(err, event) {
+                if (err) {
+                    deferred.reject(err);
+                }
+                if (event) {
+                    getParticipantForEvent(event)
+                        .then(function(participants) {
+                            var sortedParticipants = participants.sort(function(participant1, participant2) {
+                                return (participant1.participantId > participant2.participantId) ? 1 : -1;
+                            });
+                            deferred.resolve(convertToCSV(sortedParticipants));
+                        }, function(err) {
+                            deferred.reject(err);
+                        });
+                }
+            });
         return deferred.promise;
     }
 };

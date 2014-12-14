@@ -1,0 +1,115 @@
+<div class="modal-header">
+  <h3 class="modal-title">Detail Information</h3>
+</div>
+<div class="modal-body participant-info-modal">
+  <div>
+    <span class="col-sm-2">Event name : </span>
+    <span class="col-sm-2">{{currentMatch.event.eventName}}</span>
+    <span class="col-sm-2">Event Number : </span>
+    <span class="col-sm-2">{{currentMatch.event.eventId}}</span>
+    <span class="col-sm-2">Round : </span>
+    <span class="col-sm-2">{{currentMatch.level}}</span>
+  </div>
+  <div>
+    <span class="col-sm-2">Dojo Number : </span>
+    <span class="col-sm-2">{{currentMatch.dojoNumber}}</span>
+    <span class="col-sm-2">Referee's Name : </span>
+    <span class="col-sm-2">{{currentMatch.referee}}</span>
+    <span class="col-sm-1">Date : </span>
+    <span class="col-sm-3">{{currentMatch.date | date :'medium'}}</span>
+  </div>
+  <div>
+    <span class="col-sm-2">Time Breaks</span>
+    <span ng-repeat="timeBreak in currentMatch.timeBreaks">| {{timeBreak | date : 'mediumTime'}} |</span>
+  </div>
+  <div>
+
+    <div class="col-sm-6 match-table match-table-red">
+      <p>
+        <span class="col-sm-4">Player Name : </span>
+        <span class="col-sm-8">{{currentMatch.redCornerPlayer.name}}</span>
+      </p>
+      <div class="col-sm-2">Points : </div>
+      <div class="col-sm-10">
+        <div ng-repeat="point in currentMatch.redCornerPoints">
+          <span class="col-sm-3">Point : </span>
+          <span class="col-sm-1">{{point.point}}</span>
+          <span class="col-sm-3">Time : </span>
+          <span class="col-sm-5">{{point.time | date : 'HH : mm : ss : sss'}}</span>
+        </div>
+      </div>
+      <div ng-show="currentMatch.redCornerWarnings1.length">
+        <div class="col-sm-6">Warnings of Category 1 : </div>
+        <div class="col-sm-6">
+          {{currentMatch.redCornerWarnings1.join(',')}}
+        </div>
+      </div>
+      <div ng-show="currentMatch.redCornerWarnings2.length">
+        <div class="col-sm-6">Warnings of Category 2 : </div>
+        <div class="col-sm-6">
+          {{currentMatch.redCornerWarnings2.join(',')}}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 match-table match-table-blue">
+      <p>
+        <span class="col-sm-4">Player Name : </span>
+        <span class="col-sm-8">{{currentMatch.blueCornerPlayer.name}}</span>
+      </p>
+      <div class="col-sm-2">Points : </div>
+      <div class="col-sm-10">
+        <div ng-repeat="point in currentMatch.blueCornerPoints">
+          <span class="col-sm-3">Point : </span>
+          <span class="col-sm-1">{{point.point}}</span>
+          <span class="col-sm-3">Time : </span>
+          <span class="col-sm-5">{{point.time | date : 'HH : mm : ss : .sss'}}</span>
+        </div>
+      </div>
+      <div ng-show="currentMatch.blueCornerWarnings1.length">
+        <div class="col-sm-6">Warnings of Category 1 : </div>
+        <div class="col-sm-6">
+          {{currentMatch.blueCornerWarnings1.join(',')}}
+        </div>
+      </div>
+      <div ng-show="currentMatch.blueCornerWarnings2.length">
+        <div class="col-sm-6">Warnings of Category 2 : </div>
+        <div class="col-sm-6">
+          {{currentMatch.blueCornerWarnings2.join(',')}}
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!--   <p>
+  <span class="col-sm-4">Choice of Event : </span>
+    <span class="col-sm-8">
+    <span class="col-sm-4" ng-show="participant.choiceOfEvents.kata">Kata</span>
+    <span class="col-sm-4" ng-show="participant.choiceOfEvents.kumite">Kumite</span>
+    <span class="col-sm-4" ng-show="participant.choiceOfEvents.weapons">Weapons</span>
+    </span>
+    </p>
+    <p>
+      <span class="col-sm-4">Date of Birth : </span>
+      <span class="col-sm-8">{{participant.dob | date}}</span>
+    </p>
+    <p>
+      <span class="col-sm-4">Email : </span>
+      <span class="col-sm-8">{{participant.email}}</span>
+    </p>
+    <p>
+      <span class="col-sm-4">Contact No : </span>
+      <span class="col-sm-8">{{participant.contactNumber}}</span>
+    </p>
+    <p>
+      <span class="col-sm-4">Address : </span>
+      <span class="col-sm-8">{{participant.address}}</span>
+    </p>
+    <p>
+      <span class="col-sm-4">Weight : </span>
+      <span class="col-sm-8">{{participant.weight}} Kg</span>
+    </p> -->
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" ng-click="close()">Close</button>
+</div>

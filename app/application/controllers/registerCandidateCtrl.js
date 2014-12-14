@@ -208,4 +208,31 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
             }
         });
     });
+
+    /*
+        $http({
+            url: api.clubs,
+            method: 'GET'
+        }).success(function(result) {
+            var clubs = [];
+            if (result.success) {
+                for (var i in result.data) {
+                    clubs.push(result.data[i]);
+                }
+            }
+            clubs.push({
+                name: 'Others'
+            });
+            $scope.clubs = clubs;
+
+            clubs = $scope.clubs.filter(function(club) {
+                return (club.name === $scope.participant.clubName)
+            })
+            $scope.club = clubs.length ? clubs[0] : $scope.clubs[$scope.clubs.length - 1];
+        }).error(function() {
+            $scope.clubs.push({
+                name: 'Others'
+            });
+            $scope.club = $scope.clubs[$scope.clubs.length - 1];
+        });*/
 }
