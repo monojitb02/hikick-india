@@ -27,6 +27,29 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
         $scope.participant = {};
         $scope.participant.gender = 'M';
     };
+
+    //get the club names from previous entry
+    $http({
+        url: api.clubs,
+        method: 'GET'
+    }).success(function(result) {
+        $scope.clubs = [];
+        if (result.success) {
+            for (var i in result.data) {
+                $scope.clubs.push(result.data[i]);
+            }
+        }
+        $scope.clubs.push({
+            name: 'Others'
+        });
+
+    }).error(function() {
+        $scope.clubs.push({
+            name: 'Others'
+        });
+        $scope.club = $scope.clubs[$scope.clubs.length - 1];
+    });
+
     //opens the modal window and create controller for it
     $scope.openModal = function(size) {
         $modal.open({
@@ -70,11 +93,11 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
                 registrationId: participant.registrationId
             }
         }).success(function(result) {
-            var dob;
+            var dob, clubs;
             if (result.success) {
                 $scope.showSearchResult = false;
                 $scope.participant = result.data;
-                dob = result.data.dob.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$2,$1,$3");
+                dob = result.data.dob.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2,$1,$3');
                 $scope.participant.dob = new Date(dob).toISOString();
                 $scope.participant.state = findState($scope.states, $scope.participant.state);
                 $scope.participant.choiceOfEvents = {
@@ -83,31 +106,12 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
                     weapons: $scope.participant.weapons,
                 };
 
-                $http({
-                    url: api.clubs,
-                    method: 'GET'
-                }).success(function(result) {
-                    var clubs = [];
-                    if (result.success) {
-                        for (var i in result.data) {
-                            clubs.push(result.data[i]);
-                        }
-                    }
-                    clubs.push({
-                        name: 'Others'
-                    });
-                    $scope.clubs = clubs;
 
-                    clubs = $scope.clubs.filter(function(club) {
-                        return (club.name === $scope.participant.clubName)
-                    })
-                    $scope.club = clubs.length ? clubs[0] : $scope.clubs[$scope.clubs.length - 1];
-                }).error(function() {
-                    $scope.clubs.push({
-                        name: 'Others'
-                    });
-                    $scope.club = $scope.clubs[$scope.clubs.length - 1];
+                clubs = $scope.clubs.filter(function(club) {
+                    return (club.name === $scope.participant.clubName);
                 });
+                $scope.club = clubs.length ? clubs[0] : $scope.clubs[$scope.clubs.length - 1];
+
                 $scope.searchKey = '';
             } else {
                 $scope.message = result.errfor.message;
@@ -208,31 +212,4 @@ module.exports = function($scope, $http, $state, $timeout, $modal) {
             }
         });
     });
-
-    /*
-        $http({
-            url: api.clubs,
-            method: 'GET'
-        }).success(function(result) {
-            var clubs = [];
-            if (result.success) {
-                for (var i in result.data) {
-                    clubs.push(result.data[i]);
-                }
-            }
-            clubs.push({
-                name: 'Others'
-            });
-            $scope.clubs = clubs;
-
-            clubs = $scope.clubs.filter(function(club) {
-                return (club.name === $scope.participant.clubName)
-            })
-            $scope.club = clubs.length ? clubs[0] : $scope.clubs[$scope.clubs.length - 1];
-        }).error(function() {
-            $scope.clubs.push({
-                name: 'Others'
-            });
-            $scope.club = $scope.clubs[$scope.clubs.length - 1];
-        });*/
-}
+};
