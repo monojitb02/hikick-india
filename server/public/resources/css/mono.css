@@ -111,6 +111,10 @@
 .corner .input-group {
     margin: 10px auto;
 }
+.large-font {
+    font-size: 30px;
+    font-weight: bold;
+}
 .corner-name {
     font-size: 80px;
     color: #fff;
@@ -142,7 +146,7 @@
     color: #fff;
 }
 .undo-button .btn {
-    margin: 54px auto 20px;
+    margin: 32px auto 18px;
     height: 66px;
     font-size: 40px;
 }
