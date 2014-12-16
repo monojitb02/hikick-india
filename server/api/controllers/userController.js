@@ -16,7 +16,7 @@ module.exports = {
     login: function(req, res) {
         var email,
             password,
-            clientip = req.connection.remoteAddress,
+            clientip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,
             workflow = lib.workflow(req, res);
         console.log('login attempt from :' + clientip + ' on ' + new Date());
         if (req.session.userId) {

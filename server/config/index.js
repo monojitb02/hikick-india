@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = {
-    db: 'mongodb://localhost/hikick',
-    // db: 'mongodb://hikickdbuser1:anjanmonojit02@ds063160.mongolab.com:63160/hikick',
+    // db: 'mongodb://localhost/hikick',
+    db: 'mongodb://hikickdbuser1:anjanmonojit02@ds063160.mongolab.com:63160/hikick',
     server: {
         host: 'localhost',
         port: process.env.PORT || 8000
