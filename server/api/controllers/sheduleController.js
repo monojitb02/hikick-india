@@ -147,6 +147,7 @@
          sheduleUtil
              .getPlayersChart(req.query.eventId)
              .then(function(csvData) {
+                 console.log('csvData', csvData);
                  res.set({
                      'Content-Disposition': 'attachment; filename=participant_list_' + req.query.eventId + '.csv'
                  });

@@ -13,8 +13,8 @@ module.exports = function($scope, $rootScope, $state, $http, $timeout) {
     var loginForm;
 
     //dummy login
-    $scope.email = 'admin.hikickindia@gmail.com';
-    $scope.password = '1234';
+    // $scope.email = 'admin.hikickindia@gmail.com';
+    // $scope.password = '1234';
 
     //login user
     $scope.login = function() {

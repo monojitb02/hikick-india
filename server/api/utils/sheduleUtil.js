@@ -387,18 +387,27 @@ module.exports = {
         var deferred = Q.defer(),
             convertToCSV = function(objArray) { //converts array of attendance objects in a csv string
                 var array = objArray,
+                    player, line,
                     str = 'Participant ID,Candidate\'s Name,Instructor\'s Name,Country,State,Club,Contact Number';
-
                 str += '\r\n';
                 for (var i = 0; i < array.length; i++) {
-                    var player = array[i],
-                        line = [];
+                    player = array[i];
+                    line = [];
                     line.push(player.participantId);
                     line.push(player.name);
                     line.push(player.instructor);
                     line.push(player.country);
-                    line.push(player.state.name);
-                    line.push(player.clubName);
+                    if (player.state) {
+                        line.push(player.state.name);
+                    } else {
+                        line.push('');
+                    }
+                    if (player.clubName) {
+                        line.push(player.clubName);
+                    } else {
+                        line.push('');
+                    }
+
                     line.push(player.contactNumber);
 
                     str += line.join(',') + '\r\n';
@@ -414,6 +423,7 @@ module.exports = {
                     deferred.reject(err);
                 }
                 if (event) {
+
                     getParticipantForEvent(event)
                         .then(function(participants) {
                             var sortedParticipants = participants.sort(function(participant1, participant2) {
@@ -423,6 +433,8 @@ module.exports = {
                         }, function(err) {
                             deferred.reject(err);
                         });
+                } else {
+                    deferred.reject('No such Event');
                 }
             });
         return deferred.promise;
