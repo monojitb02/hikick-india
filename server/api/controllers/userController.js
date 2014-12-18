@@ -55,7 +55,7 @@ module.exports = {
     },
     logout: function(req, res) {
         var workflow = lib.workflow(req, res),
-            clientip = req.connection.remoteAddress;
+            clientip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         console.log('logout attempt from :' + clientip + ' on ' + new Date());
         req.session.destroy(function() {
             workflow.outcome.errfor.message = lib.message.LOGOUT_FAILED;
